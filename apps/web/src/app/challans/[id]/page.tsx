@@ -46,6 +46,7 @@ import {
   generateCode128SvgBars 
 } from '@/lib/barcode';
 import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText } from '@/lib/challan-units.mjs';
+import { distinct, lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 import { 
   downloadChallanHtml, 
   printChallan 
@@ -68,7 +69,8 @@ export default function ChallanDetailPage() {
   const [notice, setNotice] = useState<string | null>(null);
   // Finished garments (Finishing onward) are shown by name and image only, without colour or quantity.
   const finishedGoods = isFinishedGoodsChallan(challan);
-  const { images: garmentImages } = useGarmentImages(finishedGoods ? [challan?.programId] : []);
+  // Garment images of every sheet on the challan.
+  const { images: garmentImages } = useGarmentImages(finishedGoods ? distinct([challan?.programId, ...(challan?.items || []).map((i: any) => lineSheetId(i, challan))]) : []);
 
   useEffect(() => {
     setUser(getCurrentUser());
@@ -404,26 +406,40 @@ export default function ChallanDetailPage() {
                 <table className="w-full text-left text-sm min-w-[560px]">
                   <thead className="bg-neutral-50 text-xs font-medium text-neutral-500">
                     <tr>
-                      <th className="py-2.5 pl-4 pr-3 font-medium">Fabric</th>
+                      <th className="py-2.5 pl-4 pr-3 font-medium">Production Sheet</th>
+                      <th className="py-2.5 px-3 font-medium">Fabric</th>
                       <th className="py-2.5 px-3 font-medium">{hasDyeColour ? 'Base Colour' : 'Colour'}</th>
                       {hasDyeColour && <th className="py-2.5 px-3 font-medium">Dye Colour</th>}
                       <th className="py-2.5 px-3 font-medium text-right">Size</th>
                       {toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
                       <th className="py-2.5 px-3 font-medium">Unit</th>
                       {!toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
+                      <th className="py-2.5 px-3 font-medium">Source Challan</th>
                       <th className="py-2.5 pl-3 pr-4 font-medium">Remarks</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100 text-neutral-900">
                     {items.map((item: any, idx: number) => (
                       <tr key={item.id || idx}>
-                        <td className="py-3 pl-4 pr-3 font-medium">{item.fabricCode || item.itemDescription || '—'}</td>
+                        <td className="py-3 pl-4 pr-3 font-mono text-xs font-semibold whitespace-nowrap">
+                          {sheetLabel(item.program || (lineSheetId(item, challan) === challan.programId ? challan.program : null))}
+                        </td>
+                        <td className="py-3 px-3 font-medium">{item.fabricCode || item.itemDescription || '—'}</td>
                         <td className="py-3 px-3">{item.colour || '—'}</td>
                         {hasDyeColour && <td className="py-3 px-3 font-semibold text-brand-800">{item.requiredColour || '—'}</td>}
                         <td className="py-3 px-3 text-right tabular-nums font-semibold whitespace-nowrap">{item.quantity}{toRecuttingLayout && item.uom ? ` ${item.uom}` : ''}</td>
                         {toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(item)}</td>}
                         <td className="py-3 px-3 whitespace-nowrap">{toRecuttingLayout ? unitQuantityText(item) : item.uom || '—'}</td>
                         {!toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(item)}</td>}
+                        <td className="py-3 px-3 font-mono text-xs whitespace-nowrap">
+                          {item.sourceChallanItem?.challan ? (
+                            <Link href={`/challans/${item.sourceChallanItem.challan.id}`} className="text-brand-700 hover:underline">
+                              {item.sourceChallanItem.challan.challanNumber}
+                            </Link>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
                         <td className="py-3 pl-3 pr-4 text-neutral-600">
                           {[item.rollNumber ? `Roll ${item.rollNumber}` : null, userChallanRemarks(item.remarks)].filter(Boolean).join(' · ') || '—'}
                         </td>
@@ -431,15 +447,25 @@ export default function ChallanDetailPage() {
                     ))}
                     {items.length === 0 && (
                       <tr>
-                        <td colSpan={hasDyeColour ? 7 : 6} className="py-6 text-center text-neutral-500">No items on this challan.</td>
+                        <td colSpan={hasDyeColour ? 9 : 8} className="py-6 text-center text-neutral-500">No items on this challan.</td>
                       </tr>
                     )}
+                    {/* A challan carrying several Production Sheets: each sheet's total */}
+                    {sheetBreakdown(challan).multiSheet &&
+                      sheetBreakdown(challan).sheets.map((s: any) => (
+                        <tr key={s.programId || 'none'} className="bg-neutral-50/70">
+                          <td colSpan={3} className="py-2 pl-4 pr-3 text-xs font-semibold text-neutral-600">
+                            Sheet {sheetLabel(s.program)} ({s.lines.length} line{s.lines.length === 1 ? '' : 's'})
+                          </td>
+                          <td colSpan={hasDyeColour ? 6 : 5} className="py-2 px-3 text-xs font-semibold tabular-nums">{formatTotals(s.totals)}</td>
+                        </tr>
+                      ))}
                   </tbody>
                   {items.length > 0 && (
                     <tfoot className="bg-neutral-50 border-t border-neutral-200 text-neutral-900">
                       <tr>
-                        <td colSpan={2} className="py-3 pl-4 pr-3 text-sm font-semibold">Total</td>
-                        <td colSpan={hasDyeColour ? 5 : 4} className="py-3 px-3 text-sm font-bold tabular-nums">
+                        <td colSpan={3} className="py-3 pl-4 pr-3 text-sm font-semibold">Total</td>
+                        <td colSpan={hasDyeColour ? 6 : 5} className="py-3 px-3 text-sm font-bold tabular-nums">
                           {formatTotals(unitTotals)}
                         </td>
                       </tr>

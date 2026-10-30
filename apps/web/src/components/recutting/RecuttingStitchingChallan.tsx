@@ -24,6 +24,20 @@ import {
 import { CategoryBadge } from '@/components/recutting/RecuttingUi';
 import { AverageField, QuantityUnitField, averageError, quantityPairError, type QtyUnit } from '@/components/challan/AverageField';
 import { CATEGORY_LABEL, GARMENT_CATEGORIES, categoryName, readyForStitching } from '@/lib/recutting.mjs';
+import { distinct, incomingChallanOptions } from '@/lib/challan-sheets.mjs';
+import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
+
+/** An allocation as a line of its incoming challan (for the incoming challan picker). */
+const asLine = (a: any) => ({
+  ...a,
+  inboundChallanId: a.workItem?.inboundChallanId,
+  inboundChallan: a.workItem?.inboundChallan,
+  programId: a.workItem?.programId,
+  program: a.workItem?.program,
+  fabricName: a.workItem?.fabricName,
+  colour: a.workItem?.colour,
+  uom: a.cutUom,
+});
 
 interface Row {
   key: string;
@@ -46,7 +60,9 @@ function StitchingChallanContent() {
   const params = useSearchParams();
   const [allocations, setAllocations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [programId, setProgramId] = useState(params.get('programId') || '');
+  // A link may open this page for one incoming challan (?challanId=) or one sheet (?programId=, a filter).
+  const sheetFilter = params.get('programId') || '';
+  const [sourceIds, setSourceIds] = useState<string[]>(() => (params.get('challanId') ? [params.get('challanId') as string] : []));
   const [category, setCategory] = useState((params.get('category') || '').toUpperCase());
   const [challanNumber, setChallanNumber] = useState('');
   const [numberError, setNumberError] = useState<string | null>(null);
@@ -81,18 +97,28 @@ function StitchingChallanContent() {
     load();
   }, []);
 
-  const sheets = useMemo(() => {
-    const map = new Map<string, any>();
-    for (const a of allocations) if (a.workItem?.program) map.set(a.workItem.program.id, a.workItem.program);
-    return Array.from(map.values());
-  }, [allocations]);
-  const program = sheets.find((p) => p.id === programId) || null;
-  const choices = allocations.filter((a) => a.workItem?.programId === programId && (!category || a.category === category));
-  const byId = (id: string) => allocations.find((a) => a.id === id);
-
+  // Step 1: incoming challans whose lines have cut quantity not yet issued. Nothing is selected for the user.
+  const lines = useMemo(
+    () => allocations.map(asLine).filter((a) => readyForStitching(a) > 0 && (!sheetFilter || a.programId === sheetFilter)),
+    [allocations, sheetFilter],
+  );
+  const options = useMemo(() => incomingChallanOptions(lines, readyForStitching), [lines]);
   useEffect(() => {
-    if (!programId && sheets.length === 1) setProgramId(sheets[0].id);
-  }, [sheets, programId]);
+    if (loading) return;
+    setSourceIds((ids) => {
+      const next = ids.filter((id) => options.some((o) => o.id === id));
+      return next.length === ids.length ? ids : next;
+    });
+  }, [options, loading]);
+  const selectedOptions = options.filter((o) => sourceIds.includes(o.id));
+  const hasSource = sourceIds.length > 0;
+  // Step 2: only allocations of the selected incoming challans' lines (of any Production Sheet on them).
+  const choices = lines.filter((a) => sourceIds.includes(a.inboundChallanId) && (!category || a.category === category));
+  const byId = (id: string) => lines.find((a) => a.id === id);
+  const chooseSources = (ids: string[]) => {
+    setSourceIds(ids);
+    setRows([newRow()]);
+  };
 
   const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const choose = (key: string, allocationId: string) => {
@@ -107,14 +133,26 @@ function StitchingChallanContent() {
     if (a && unit) acc[unit] = (acc[unit] || 0) + (Number(r.quantity) || 0);
     return acc;
   }, {});
-  const incomingRefs = Array.from(new Set(filled.map((r) => byId(r.allocationId)?.workItem?.inboundChallan?.challanNumber).filter(Boolean)));
   const allocationRefs = filled.map((r) => byId(r.allocationId)?.allocationNumber).filter(Boolean);
+  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetRef(s))));
+  const breakdownRows = filled
+    .map((r) => ({ r, a: byId(r.allocationId) }))
+    .filter((x) => x.a)
+    .map(({ r, a }) => ({
+      key: r.key,
+      program: a.program,
+      fabric: `${a.fabricName} (${categoryName(a)}${a.styleRef ? ` ${a.styleRef}` : ''})`,
+      colour: a.colour,
+      quantity: Number(r.quantity) || 0,
+      uom: a.cutUom,
+      source: a.inboundChallan?.challanNumber || null,
+    }));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setNumberError(null);
-    if (!program) return setError('Choose a Production Sheet.');
+    if (!hasSource) return setError('Select the incoming challan this challan is issued from.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError('Add at least one item.');
     const entryError = (r: Row) => averageError(r.average, r.averageUnit) || quantityPairError(r.unitQuantity, r.unitQuantityUom, 'Unit quantity', true);
@@ -130,6 +168,7 @@ function StitchingChallanContent() {
           challanNumber: challanNumber.trim(),
           issuedDate: challanDate,
           remarks,
+          sourceChallanIds: sourceIds,
           lines: filled.map((r) => ({
             allocationId: r.allocationId,
             quantity: r.quantity,
@@ -183,33 +222,17 @@ function StitchingChallanContent() {
           </Notice>
         )}
 
+        <IncomingChallanPicker options={options} selected={sourceIds} onChange={chooseSources} loading={loading} availableLabel="Cut, not issued" />
+
         <form onSubmit={submit} className="space-y-6">
-          <Panel title="Challan">
+          <Panel title="2. Challan">
             <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <ChallanNumberField value={challanNumber} onChange={setChallanNumber} error={numberError} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Challan date</span>
                 <input type="date" value={challanDate} onChange={(e) => setChallanDate(e.target.value)} required className={`${FIELD} mt-1`} />
               </label>
-              <label className="block">
-                <span className="text-xs font-semibold text-neutral-600">Production Sheet</span>
-                <select
-                  value={programId}
-                  onChange={(e) => {
-                    setProgramId(e.target.value);
-                    setRows([newRow()]);
-                  }}
-                  className={`${FIELD} mt-1`}
-                  required
-                >
-                  <option value="">{sheets.length ? 'Choose a sheet' : 'Nothing ready'}</option>
-                  {sheets.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {sheetRef(p)}{p.designNumber ? ` · ${p.designNumber}` : ''}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <ReadOnly label="Incoming challans" value={selectedOptions.map((o) => o.challan?.challanNumber).filter(Boolean).join(', ') || '—'} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Garment category</span>
                 <select value={category} onChange={(e) => setCategory(e.target.value)} className={`${FIELD} mt-1`}>
@@ -219,9 +242,7 @@ function StitchingChallanContent() {
               </label>
               <ReadOnly label="Source" value="Recutting" />
               <ReadOnly label="Destination" value="Stitching" />
-              <ReadOnly label="Design / Serial" value={program ? `${program.designNumber || program.wilcomDesignNumber || '—'} · ${program.programSerialNo || '—'}` : '—'} />
-              <ReadOnly label="Delivery date" value={program ? fmtDate(program.deliveryDate) : '—'} />
-              <ReadOnly label="Incoming challan" value={incomingRefs.join(', ') || '—'} />
+              <ReadOnly label="Production Sheets" value={chosenSheets.join(', ') || '—'} />
               <ReadOnly label="Allocation refs" value={allocationRefs.join(', ') || '—'} />
               <ReadOnly label="Issued by" value={incharge || '—'} />
               <label className="block">
@@ -232,10 +253,10 @@ function StitchingChallanContent() {
           </Panel>
 
           <Panel
-            title="Category / Style / Color / Fabric / Measurement"
+            title="3. Category / Style / Color / Fabric / Measurement"
             count={filled.length}
             actions={
-              <button type="button" onClick={() => setRows((rs) => [...rs, newRow()])} disabled={!program || rows.length >= choices.length} className={BTN_SECONDARY}>
+              <button type="button" onClick={() => setRows((rs) => [...rs, newRow()])} disabled={!hasSource || rows.length >= choices.length} className={BTN_SECONDARY}>
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add item</span>
               </button>
@@ -246,6 +267,7 @@ function StitchingChallanContent() {
                 <thead className={THEAD}>
                   <tr>
                     <th className="py-3 px-4 min-w-[240px]">Allocation</th>
+                    <th className="py-3 px-3">Production Sheet</th>
                     <th className="py-3 px-3">Category</th>
                     <th className="py-3 px-3">Style</th>
                     <th className="py-3 px-3">Colour</th>
@@ -260,8 +282,8 @@ function StitchingChallanContent() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {!program && <EmptyRow colSpan={12} text="Choose a Production Sheet to add items" />}
-                  {program &&
+                  {!hasSource && <EmptyRow colSpan={14} text="Select an incoming challan above to add its cut allocations" />}
+                  {hasSource &&
                     rows.map((r) => {
                       const a = byId(r.allocationId);
                       const taken = new Set(rows.filter((x) => x.key !== r.key).map((x) => x.allocationId));
@@ -274,11 +296,12 @@ function StitchingChallanContent() {
                               <option value="">Choose a cut allocation</option>
                               {choices.filter((x) => !taken.has(x.id)).map((x) => (
                                 <option key={x.id} value={x.id}>
-                                  {x.allocationNumber} · {categoryName(x)}{x.styleRef ? ` · ${x.styleRef}` : ''} · {x.workItem?.colour || '—'} · {fmtQty(readyForStitching(x), x.cutUom)}
+                                  {sheetRef(x.program)} · {x.allocationNumber} · {categoryName(x)}{x.styleRef ? ` · ${x.styleRef}` : ''} · {x.workItem?.colour || '—'} · {fmtQty(readyForStitching(x), x.cutUom)}
                                 </option>
                               ))}
                             </select>
                           </td>
+                          <td className="py-2.5 px-3 font-mono text-xs">{a ? sheetRef(a.program) : '—'}</td>
                           <td className="py-2.5 px-3">{a ? <CategoryBadge category={a.category} otherName={a.otherName} /> : '—'}</td>
                           <td className="py-2.5 px-3 text-neutral-800">{a?.styleRef || '—'}</td>
                           <td className="py-2.5 px-3 text-neutral-700">{a?.workItem?.colour || '—'}</td>
@@ -346,12 +369,14 @@ function StitchingChallanContent() {
                 Total to stitch:{' '}
                 <span className="font-semibold text-neutral-900 tabular-nums">{Object.entries(totals).map(([u, q]) => fmtQty(q, u)).join(' · ') || '—'}</span>
               </span>
-              <button type="submit" disabled={submitting || !program} className={BTN_PRIMARY}>
+              <button type="submit" disabled={submitting || !hasSource} className={BTN_PRIMARY}>
                 <Send className="w-3.5 h-3.5" />
                 <span>{submitting ? 'Issuing…' : 'Issue Challan'}</span>
               </button>
             </div>
           </Panel>
+
+          <SheetBreakdown title="4. Review: Production Sheet breakdown" rows={breakdownRows} />
         </form>
       </main>
     </div>

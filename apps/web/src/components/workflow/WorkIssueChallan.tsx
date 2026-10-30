@@ -27,8 +27,10 @@ import { TRANSFERABLE_STATUSES, availableFor } from '@/lib/work-items.mjs';
 import { destinationName, workPath, type TransferKind, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
 import { GarmentImageUpload, GarmentThumb, useGarmentImages } from '@/components/workflow/FinishedGarments';
-import { groupGarments, imageFor } from '@/lib/finished-garments.mjs';
+import { garmentName, groupGarments, imageFor } from '@/lib/finished-garments.mjs';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
+import { challanSheetRefs, distinct, incomingChallanOptions, lineSheetId } from '@/lib/challan-sheets.mjs';
+import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 
 const AVAILABLE_LABEL: Record<TransferKind, string> = { PASS: 'Available', REJECT: 'Rejected', REWORK: 'For Rework' };
 
@@ -66,7 +68,9 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
   const [items, setItems] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [programId, setProgramId] = useState(params.get('programId') || '');
+  // A link may open this page for one incoming challan (?challanId=) or one sheet (?programId=, a filter).
+  const sheetFilter = params.get('programId') || '';
+  const [sourceIds, setSourceIds] = useState<string[]>(() => (params.get('challanId') ? [params.get('challanId') as string] : []));
   const [challanNumber, setChallanNumber] = useState('');
   const [numberError, setNumberError] = useState<string | null>(null);
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -108,9 +112,9 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
 
   // Lines that may move now: completed or ready (QC: with this outcome), with quantity not yet sent.
   const ready = useMemo(
-    () => items.filter((i) => (flow.qc || TRANSFERABLE_STATUSES.includes(i.status)) && available(i) > 0),
+    () => items.filter((i) => (flow.qc || TRANSFERABLE_STATUSES.includes(i.status)) && available(i) > 0 && (!sheetFilter || i.programId === sheetFilter)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items],
+    [items, sheetFilter],
   );
   // The next department may accept one unit only (Final QC -> Inventory: pieces); other lines wait.
   const unitBlocked = useMemo(
@@ -124,14 +128,29 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [items],
   );
-  const sheets = useMemo(() => {
-    const map = new Map<string, any>();
-    for (const i of eligible) if (i.program) map.set(i.program.id, i.program);
-    return Array.from(map.values());
-  }, [eligible]);
-  const program = sheets.find((p) => p.id === programId) || null;
-  const sheetItems = eligible.filter((i) => i.programId === programId);
+  // Step 1: incoming challans with lines still to send. Nothing is selected for the user.
+  const options = useMemo(
+    () => incomingChallanOptions(eligible, available),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [eligible],
+  );
+  // A selected challan that has nothing left any more is dropped from the selection.
+  useEffect(() => {
+    if (loading) return;
+    setSourceIds((ids) => {
+      const next = ids.filter((id) => options.some((o) => o.id === id));
+      return next.length === ids.length ? ids : next;
+    });
+  }, [options, loading]);
+  const selectedOptions = options.filter((o) => sourceIds.includes(o.id));
+  const hasSource = sourceIds.length > 0;
+  // Step 2: only lines of the selected incoming challans can be chosen (of any Production Sheet on them).
+  const sheetItems = eligible.filter((i) => sourceIds.includes(i.inboundChallanId));
   const itemById = (id: string) => sheetItems.find((i) => i.id === id);
+  const chooseSources = (ids: string[]) => {
+    setSourceIds(ids);
+    setRows([newRow()]);
+  };
 
   // Finished garments (Finishing onward): rows choose a garment (all its lines and pieces), not a line.
   const finished = Boolean(flow.finishedGoods);
@@ -139,11 +158,9 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
   const showAverage = !finished && ENTRY_AVERAGE_FLOWS.has(flow.code);
   const garments = useMemo(() => (finished ? groupGarments(sheetItems) : []), [finished, sheetItems]);
   const garmentByKey = (key: string) => garments.find((g) => g.key === key);
-  const { images, reload: reloadImages } = useGarmentImages(finished ? [programId, ...recent.map((c) => c.programId)] : []);
-
-  useEffect(() => {
-    if (!programId && sheets.length === 1) setProgramId(sheets[0].id);
-  }, [sheets, programId]);
+  const { images, reload: reloadImages } = useGarmentImages(
+    finished ? distinct([...sheetItems.map((i) => i.programId), ...recent.flatMap((c) => (c.items || []).map((i: any) => lineSheetId(i, c)))]) : [],
+  );
 
   const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const chooseItem = (key: string, itemId: string) => {
@@ -162,7 +179,16 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
     acc[l.item.uom] = (acc[l.item.uom] || 0) + l.quantity;
     return acc;
   }, {});
-  const incomingRefs = Array.from(new Set(chosenLines.map((l) => l.item.inboundChallan?.challanNumber).filter(Boolean)));
+  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetRef(s))));
+  const breakdownRows = chosenLines.map((l, index) => ({
+    key: `${l.item.id}-${index}`,
+    program: l.item.program,
+    fabric: finished ? garmentName(l.item) : `${l.item.fabricName}${l.item.garmentCategory ? ` (${l.item.garmentCategory}${l.item.styleRef ? ` ${l.item.styleRef}` : ''})` : ''}`,
+    colour: l.item.colour,
+    quantity: l.quantity,
+    uom: l.item.uom,
+    source: l.item.inboundChallan?.challanNumber || null,
+  }));
   const withoutImage = canAddImages ? filled.map((r) => garmentByKey(r.itemId)).filter((g) => g && !imageFor(images, g.items[0])) : [];
 
   const resetForm = () => {
@@ -177,9 +203,14 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
     e.preventDefault();
     setError(null);
     setNumberError(null);
-    if (!program) return setError('Choose a Production Sheet.');
+    if (!hasSource) return setError('Select the incoming challan this challan is issued from.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError(finished ? 'Add at least one finished garment.' : 'Add at least one item.');
+    // A line may be on several rows; together they may not exceed what it has available.
+    const usedByItem = new Map<string, number>();
+    for (const l of chosenLines) usedByItem.set(l.item.id, (usedByItem.get(l.item.id) || 0) + l.quantity);
+    const over = chosenLines.find((l) => (usedByItem.get(l.item.id) || 0) > available(l.item) + 0.0005);
+    if (over) return setError(`Requested quantity exceeds the available balance of ${over.item.fabricName}${over.item.colour ? ` (${over.item.colour})` : ''}.`);
     if (showAverage) {
       const entryError = (r: Row) => averageError(r.average, r.averageUnit) || quantityPairError(r.unitQuantity, r.unitQuantityUom, 'Unit quantity', true);
       const bad = filled.findIndex((r) => entryError(r));
@@ -198,6 +229,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
           challanNumber: challanNumber.trim(),
           issuedDate: challanDate,
           remarks,
+          sourceChallanIds: sourceIds,
           // Finished garments send no quantity: the server sends every available piece of each line.
           lines: finished
             ? filled.flatMap((r) => (garmentByKey(r.itemId)?.items || []).map((i: any) => ({ workItemId: i.id, remarks: r.remarks })))
@@ -253,37 +285,20 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
           </Notice>
         )}
 
+        <IncomingChallanPicker options={options} selected={sourceIds} onChange={chooseSources} loading={loading} availableLabel={AVAILABLE_LABEL[kind]} />
+
         <form onSubmit={submit} className="space-y-6">
-          <Panel title="Challan">
+          <Panel title="2. Challan">
             <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <ChallanNumberField value={challanNumber} onChange={setChallanNumber} error={numberError} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Challan date</span>
                 <input type="date" value={challanDate} onChange={(e) => setChallanDate(e.target.value)} required className={`${FIELD} mt-1`} />
               </label>
-              <label className="block">
-                <span className="text-xs font-semibold text-neutral-600">Production Sheet</span>
-                <select
-                  value={programId}
-                  onChange={(e) => {
-                    setProgramId(e.target.value);
-                    setRows([newRow()]);
-                  }}
-                  className={`${FIELD} mt-1`}
-                  required
-                >
-                  <option value="">{sheets.length ? 'Choose a sheet' : kind === 'PASS' ? 'Nothing ready' : 'Nothing pending'}</option>
-                  {sheets.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {sheetRef(p)}{p.designNumber ? ` · ${p.designNumber}` : ''}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <ReadOnly label="Design / Serial" value={program ? `${program.designNumber || program.wilcomDesignNumber || '—'} · ${program.programSerialNo || '—'}` : '—'} />
+              <ReadOnly label="Incoming challans" value={selectedOptions.map((o) => o.challan?.challanNumber).filter(Boolean).join(', ') || '—'} />
+              <ReadOnly label="Production Sheets" value={chosenSheets.join(', ') || '—'} />
               <ReadOnly label="Source" value={flow.label} />
               <ReadOnly label="Destination" value={dest} />
-              <ReadOnly label="Incoming challan" value={incomingRefs.join(', ') || '—'} />
               <ReadOnly label="Department incharge (issued by)" value={incharge || '—'} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Priority</span>
@@ -295,8 +310,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                   <option value="URGENT">Urgent</option>
                 </select>
               </label>
-              <ReadOnly label="Delivery date" value={program ? fmtDate(program.deliveryDate) : '—'} />
-              <label className="block sm:col-span-2 lg:col-span-3">
+              <label className="block sm:col-span-2 lg:col-span-4">
                 <span className="text-xs font-semibold text-neutral-600">Remarks</span>
                 <input value={remarks} onChange={(e) => setRemarks(e.target.value)} maxLength={500} className={`${FIELD} mt-1`} />
               </label>
@@ -304,13 +318,13 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
           </Panel>
 
           <Panel
-            title={finished ? 'Finished Garments' : 'Color / Fabric / Measurement'}
+            title={finished ? '3. Finished Garments' : '3. Color / Fabric / Measurement'}
             count={filled.length}
             actions={
               <button
                 type="button"
                 onClick={() => setRows((rs) => [...rs, newRow()])}
-                disabled={!program || rows.length >= (finished ? garments.length : sheetItems.length)}
+                disabled={!hasSource || rows.length >= (finished ? garments.length : sheetItems.length)}
                 className={BTN_SECONDARY}
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -332,8 +346,8 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100">
-                    {!program && <EmptyRow colSpan={kind === 'PASS' ? 5 : 6} text="Choose a Production Sheet to add finished garments" />}
-                    {program &&
+                    {!hasSource && <EmptyRow colSpan={kind === 'PASS' ? 5 : 6} text="Select an incoming challan above to add its finished garments" />}
+                    {hasSource &&
                       rows.map((r) => {
                         const g = garmentByKey(r.itemId);
                         const image = g ? imageFor(images, g.items[0]) : null;
@@ -347,12 +361,12 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                               <select value={r.itemId} onChange={(e) => updateRow(r.key, { itemId: e.target.value })} className={FIELD} aria-label="Finished garment">
                                 <option value="">Choose a finished garment</option>
                                 {garments.filter((x) => !taken.has(x.key)).map((x) => (
-                                  <option key={x.key} value={x.key}>{x.name}</option>
+                                  <option key={x.key} value={x.key}>{sheetRef(x.items[0]?.program)} · {x.name}</option>
                                 ))}
                               </select>
                               {g && canAddImages && (
                                 <div className="mt-1.5">
-                                  <GarmentImageUpload programId={programId} garmentCategory={g.garmentCategory} styleRef={g.styleRef} hasImage={Boolean(image)} onUploaded={reloadImages} />
+                                  <GarmentImageUpload programId={g.programId || ''} garmentCategory={g.garmentCategory} styleRef={g.styleRef} hasImage={Boolean(image)} onUploaded={reloadImages} />
                                 </div>
                               )}
                             </td>
@@ -390,6 +404,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                 <thead className={THEAD}>
                   <tr>
                     <th className="py-3 px-4 min-w-[220px]">{flow.label} Line</th>
+                    <th className="py-3 px-3">Production Sheet</th>
                     <th className="py-3 px-3">Colour</th>
                     <th className="py-3 px-3">Fabric</th>
                     <th className="py-3 px-3">Dyed / Undyed</th>
@@ -404,8 +419,8 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {!program && <EmptyRow colSpan={(kind === 'PASS' ? 10 : 11) + (showAverage ? 1 : 0)} text="Choose a Production Sheet to add items" />}
-                  {program &&
+                  {!hasSource && <EmptyRow colSpan={(kind === 'PASS' ? 11 : 12) + (showAverage ? 1 : 0)} text="Select an incoming challan above to add its lines" />}
+                  {hasSource &&
                     rows.map((r) => {
                       const i = itemById(r.itemId);
                       const taken = new Set(rows.filter((x) => x.key !== r.key).map((x) => x.itemId));
@@ -417,11 +432,12 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                               <option value="">Choose a ready line</option>
                               {sheetItems.filter((x) => !taken.has(x.id)).map((x) => (
                                 <option key={x.id} value={x.id}>
-                                  {challanRef(x) ? `${challanRef(x)} · ` : ''}{x.garmentCategory ? `${x.garmentCategory}${x.styleRef ? ` ${x.styleRef}` : ''} · ` : ''}{x.fabricName} · {x.colour || '—'} · {x.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed'}
+                                  {sheetRef(x.program)} · {challanRef(x) ? `${challanRef(x)} · ` : ''}{x.garmentCategory ? `${x.garmentCategory}${x.styleRef ? ` ${x.styleRef}` : ''} · ` : ''}{x.fabricName} · {x.colour || '—'} · {x.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed'}
                                 </option>
                               ))}
                             </select>
                           </td>
+                          <td className="py-2.5 px-3 font-mono text-xs">{i ? sheetRef(i.program) : '—'}</td>
                           <td className="py-2.5 px-3 text-neutral-700">{i?.colour || '—'}</td>
                           <td className="py-2.5 px-3 font-semibold text-neutral-900">{i?.fabricName || '—'}<GarmentTag item={i} /></td>
                           <td className="py-2.5 px-3">{i ? <FabricStatusBadge status={i.fabricProcessingStatus} /> : '—'}</td>
@@ -513,12 +529,14 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                 </span>
               </span>
               )}
-              <button type="submit" disabled={submitting || !program} className={BTN_PRIMARY}>
+              <button type="submit" disabled={submitting || !hasSource} className={BTN_PRIMARY}>
                 <Send className="w-3.5 h-3.5" />
                 <span>{submitting ? 'Issuing…' : 'Issue Challan'}</span>
               </button>
             </div>
           </Panel>
+
+          <SheetBreakdown title="4. Review: Production Sheet breakdown" rows={breakdownRows} />
         </form>
 
         <Panel title={`Recent Challans to ${dest}`} count={recent.length}>
@@ -528,7 +546,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                 <tr>
                   <th className="py-3 px-4">Challan</th>
                   <th className="py-3 px-3">Date</th>
-                  <th className="py-3 px-3">Production Sheet</th>
+                  <th className="py-3 px-3">Production Sheets</th>
                   <th className="py-3 px-3">Incoming Challan</th>
                   <th className="py-3 px-3">{finished ? 'Finished garments' : 'Items'}</th>
                   {!finished && <th className="py-3 px-3 text-right">Quantity</th>}
@@ -544,7 +562,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                       <Link href={`/challans/${c.id}`} className="hover:underline">{c.challanNumber}</Link>
                     </td>
                     <td className="py-3 px-3 text-xs text-neutral-600">{fmtDate(c.issuedDate || c.createdAt)}</td>
-                    <td className="py-3 px-3 font-mono text-xs">{sheetRef(c.program)}</td>
+                    <td className="py-3 px-3 font-mono text-xs">{challanSheetRefs(c)}</td>
                     <td className="py-3 px-3 font-mono text-xs text-neutral-600">
                       {Array.from(new Set((c.workTransfers || []).map((t: any) => t.workItem?.inboundChallan?.challanNumber).filter(Boolean))).join(', ') ||
                         c.parentChallan?.challanNumber ||
@@ -552,7 +570,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                     </td>
                     {finished ? (
                       <td className="py-3 px-3 text-xs text-neutral-700">
-                        {groupGarments((c.items || []).map((i: any) => ({ ...i, programId: c.programId }))).map((g) => (
+                        {groupGarments((c.items || []).map((i: any) => ({ ...i, programId: lineSheetId(i, c) }))).map((g) => (
                           <span key={g.key} className="flex items-center gap-2 whitespace-nowrap py-0.5">
                             <GarmentThumb image={imageFor(images, g.items[0])} name={g.name} size="sm" />
                             <span className="font-semibold text-neutral-900">{g.name}</span>
@@ -591,7 +609,7 @@ function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <span className="text-xs font-semibold text-neutral-600">{label}</span>
-      <div className="mt-1 h-9 px-3 flex items-center bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 truncate">{value}</div>
+      <div className="mt-1 h-9 px-3 flex items-center bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 truncate" title={value}>{value}</div>
     </div>
   );
 }

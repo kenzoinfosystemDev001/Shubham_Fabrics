@@ -6,7 +6,9 @@ import {
   challanNumberErrorResponse,
   requireChallanNumberSet,
 } from '@/lib/challan-number-server';
-import { MIXED_UNIT, formatTotals, headerUnitOf, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
+import { MIXED_UNIT, formatTotals, headerUnitOf, totalsByUnit } from '@/lib/challan-units.mjs';
+import { lineSheetId } from '@/lib/challan-sheets.mjs';
+import { lineLabel, qc1LineQuantities, qc1UnitTotals } from '@/lib/qc1-inspection.mjs';
 import { canWriteColumns } from '@/lib/challan-item-average';
 import { SHRINKAGE_NOT_SET_UP, ShrinkageError, saveShrinkageForLine, shrinkageTableExists } from '@/lib/shrinkage-server';
 
@@ -79,72 +81,33 @@ export async function POST(
       );
     }
 
-    // 2. Strict Backend Validations on Quantities, per unit. Every challan line keeps its unit (MTR or
-    // PCS); each unit is inspected in that unit and nothing is ever added across units. A single-unit
-    // challan may still send the plain quantityInspected / quantityPassed / ... fields.
+    // 2. Strict Backend Validations on Quantities, per challan line. Each line keeps its own fabric,
+    // colour, unit (MTR or PCS) and Production Sheet; its outcome (pass, shrinkage, rework, hold) is
+    // recorded against that line and nothing is ever added across units or split across lines
+    // (lib/qc1-inspection). Shrinkage is fabric lost in dyeing, recorded as the line's shrinkage.
     const receivedByUnit = totalsByUnit(challan.items, challan.fabricUnit);
     const challanUnits = Object.keys(receivedByUnit);
     if (challanUnits.length === 0) {
       return NextResponse.json({ error: 'This challan has no quantity to inspect.' }, { status: 400 });
     }
-    const rawByUnit: Record<string, any> | null =
-      body.byUnit && typeof body.byUnit === 'object'
-        ? body.byUnit
-        : challanUnits.length === 1
-          ? { [challanUnits[0]]: { quantityInspected, quantityPassed, quantityShrinkage, quantityRework, quantityHold } }
-          : null;
-    if (!rawByUnit) {
-      return NextResponse.json(
-        { error: 'This challan has lines in MTR and PCS. Enter the inspection quantities for each unit.' },
-        { status: 400 }
-      );
+    const lineCheck = qc1LineQuantities(challan.items, { ...body, quantityInspected, quantityPassed, quantityShrinkage, quantityRework, quantityHold });
+    if (!lineCheck.ok) {
+      return NextResponse.json({ error: lineCheck.error }, { status: 400 });
     }
-    const num = (v: unknown) => (v === undefined || v === null || v === '' ? 0 : Number(v));
-    // Shrinkage: fabric lost in dyeing. It is recorded as the line's shrinkage (Shrinkage screen), not sent anywhere.
-    const byUnit: Array<{ unit: string; inspected: number; passed: number; shrinkage: number; rework: number; hold: number }> = [];
-    for (const [rawUnit, q] of Object.entries(rawByUnit)) {
-      const unit = unitOf(rawUnit);
-      if (!unit || !(unit in receivedByUnit)) {
-        return NextResponse.json({ error: `Challan ${challan.challanNumber} has no ${rawUnit} line to inspect.` }, { status: 400 });
-      }
-      const row = {
-        unit,
-        inspected: num(q?.quantityInspected),
-        passed: num(q?.quantityPassed),
-        shrinkage: num(q?.quantityShrinkage),
-        rework: num(q?.quantityRework),
-        hold: num(q?.quantityHold),
-      };
-      for (const [label, v] of [['Quantity Inspected', row.inspected], ['Quantity Passed', row.passed], ['Shrinkage', row.shrinkage], ['Quantity Rework', row.rework], ['Quantity Hold', row.hold]] as const) {
-        if (!Number.isFinite(v) || v < 0) {
-          return NextResponse.json({ error: `${label} (${unit}) cannot be negative.` }, { status: 400 });
-        }
-      }
-      const sumCategories = row.passed + row.shrinkage + row.rework + row.hold;
-      if (row.inspected <= 0 && sumCategories <= 0) continue; // this unit is not part of this inspection
-      if (row.inspected <= 0) {
-        return NextResponse.json({ error: `Quantity Inspected (${unit}) must be a positive number greater than 0.` }, { status: 400 });
-      }
-      if (row.inspected > receivedByUnit[unit] + 0.001) {
-        return NextResponse.json(
-          { error: `Quantity Inspected (${row.inspected} ${unit}) cannot exceed Quantity Received from Dyeing (${receivedByUnit[unit]} ${unit}).` },
-          { status: 400 }
-        );
-      }
-      // Allow slight float precision variance (0.001)
-      if (sumCategories > row.inspected + 0.001) {
-        return NextResponse.json(
-          {
-            error: `The sum of Passed (${row.passed}) + Shrinkage (${row.shrinkage}) + Rework (${row.rework}) + Hold (${row.hold}) = ${sumCategories} ${unit}, which exceeds Quantity Inspected (${row.inspected} ${unit}).`,
-          },
-          { status: 400 }
-        );
-      }
-      byUnit.push(row);
-    }
-    if (byUnit.length === 0) {
-      return NextResponse.json({ error: 'Quantity Inspected must be a positive number greater than 0.' }, { status: 400 });
-    }
+    const inspectedLines = lineCheck.lines;
+    // Per-unit sums of the inspected lines, for header quantities, records and messages.
+    const byUnit = qc1UnitTotals(inspectedLines);
+    const lineSummary = inspectedLines.map((r) => ({
+      challanItemId: r.item.id,
+      line: lineLabel(r.item),
+      programId: lineSheetId(r.item, challan),
+      unit: r.unit,
+      inspected: r.inspected,
+      passed: r.passed,
+      shrinkage: r.shrinkage,
+      rework: r.rework,
+      hold: r.hold,
+    }));
     // "Any quantity" flags only; quantities of different units are never added together.
     const qPassed = byUnit.some((r) => r.passed > 0) ? 1 : 0;
     const qShrinkage = byUnit.some((r) => r.shrinkage > 0) ? 1 : 0;
@@ -214,13 +177,19 @@ export async function POST(
     const primaryItem = challan.items[0];
     const uom = singleUnit?.unit || headerUnitOf(byUnit.map((r) => r.unit)) || 'MTR';
     const effectiveColor = observedColor || primaryItem?.colour || challan.program?.fabricColor || 'Standard';
-    // The challan line a unit's outgoing quantity is described from (fabric, colour).
-    const itemFor = (unit: string) => challan.items.find((it) => unitOf(it.uom) === unit) || primaryItem;
-    // Lines of an outgoing challan: one per unit with quantity; header totals only for one unit.
+    // Observed colour of an outgoing line: its own, or (a one-line challan) the colour observed for the challan.
+    const singleLine = challan.items.length === 1;
+    const colourOf = (r: (typeof inspectedLines)[number]) =>
+      r.observedColor || (singleLine ? observedColor : null) || r.item.colour || effectiveColor;
+    // Each outgoing line comes from one inspected line and keeps its fabric, colour and Production Sheet.
+    const lineSource = (r: (typeof inspectedLines)[number]) => ({ programId: lineSheetId(r.item, challan), sourceChallanItemId: r.item.id });
+    // Lines of an outgoing challan: one per inspected line with quantity; header totals only for one unit.
     const outgoing = (key: 'passed' | 'rework') => {
-      const rows = byUnit.filter((r) => r[key] > 0);
-      const one = rows.length === 1 ? rows[0] : null;
-      return { rows, unit: one ? one.unit : MIXED_UNIT, quantity: one ? one[key] : null };
+      const rows = inspectedLines.filter((r) => r[key] > 0);
+      const totals = totalsByUnit(rows.map((r) => ({ quantity: r[key], uom: r.unit })));
+      const units = Object.keys(totals);
+      const one = units.length === 1 ? units[0] : null;
+      return { rows, unit: one || MIXED_UNIT, quantity: one ? totals[one] : null };
     };
     const recordedAt = new Date();
     // The Dyeing QC incharge name typed on the form goes on every challan this inspection creates: in its
@@ -274,6 +243,16 @@ export async function POST(
               measuredValue: `Pass: ${r.passed}, Shrinkage: ${r.shrinkage}, Rework: ${r.rework}`,
               status: normalizedResult === 'PASS' ? 'PASS' : 'FAIL',
               comments: `Inspected: ${r.inspected} ${r.unit}`,
+              uom: r.unit,
+            })),
+            // One outcome per challan line (fabric, colour and Production Sheet stay with their line).
+            ...inspectedLines.map((r) => ({
+              inspectionId: inspection.id,
+              parameterName: 'LINE_BREAKDOWN',
+              expectedValue: `${r.item.quantity} ${r.unit}`,
+              measuredValue: `Pass: ${r.passed}, Shrinkage: ${r.shrinkage}, Rework: ${r.rework}, Hold: ${r.hold}`,
+              status: r.rework > 0 ? 'FAIL' : 'PASS',
+              comments: `${lineLabel(r.item)} · Inspected: ${r.inspected} ${r.unit} · Line ${r.item.id}`,
               uom: r.unit,
             })),
           ],
@@ -363,43 +342,33 @@ export async function POST(
           });
 
           for (const r of rework.rows) {
-            const src = itemFor(r.unit);
+            const src = r.item;
             await tx.challanItem.create({
               data: {
                 challanId: reworkReturnChallan.id,
                 itemDescription: `${src?.itemDescription || 'Dyed Fabric'} - Dyeing QC Rework Return`,
                 fabricCode: src?.fabricCode || 'KNIT',
-                colour: observedColor || src?.colour || effectiveColor,
+                colour: colourOf(r),
                 unitType: r.unit === 'PCS' ? 'PCS' : 'ROLL',
                 quantity: r.rework,
                 uom: r.unit,
+                ...lineSource(r),
                 remarks: `Returned for rework/alteration. Must go through Dyeing QC again: ${reworkReason || effectiveRemark}`,
               },
             });
           }
         }
 
-        // E.2 Shrinkage: recorded per challan line (one record per line, updated if it already exists).
-        // A unit with several lines shares its shrinkage across them by line quantity; each line can be
-        // corrected on the Shrinkage screen. Fabric Store stock is not changed.
-        for (const r of byUnit.filter((x) => x.shrinkage > 0)) {
-          const lines = challan.items.filter((it) => unitOf(it.uom) === r.unit);
-          const lineTotal = lines.reduce((sum, it) => sum + (it.quantity || 0), 0);
-          let left = r.shrinkage;
-          for (const [index, line] of lines.entries()) {
-            const share =
-              index === lines.length - 1
-                ? left
-                : Math.round(((r.shrinkage * (line.quantity || 0)) / (lineTotal || 1)) * 1000) / 1000;
-            left = Math.round((left - share) * 1000) / 1000;
-            await saveShrinkageForLine(tx, {
-              challanItemId: line.id,
-              shrinkageQty: share,
-              shrinkageUnit: r.unit,
-              userId: actorId,
-              source: 'INSPECTION',
-            });
-          }
+        // E.2 Shrinkage: recorded on the line it was measured on (one record per line, updated if it
+        // already exists); never spread across lines. Fabric Store stock is not changed.
+        for (const r of inspectedLines.filter((x) => x.shrinkage > 0)) {
+          await saveShrinkageForLine(tx, {
+            challanItemId: r.item.id,
+            shrinkageQty: r.shrinkage,
+            shrinkageUnit: r.unit,
+            userId: actorId,
+            source: 'INSPECTION',
+          });
         }
 
         // E.3 Forward Passed yardage to Embroidery Department if result is PASS (Rule 7)
@@ -433,16 +402,17 @@ export async function POST(
           });
 
           for (const r of pass.rows) {
-            const src = itemFor(r.unit);
+            const src = r.item;
             await tx.challanItem.create({
               data: {
                 challanId: passForwardChallan.id,
                 itemDescription: `${src?.itemDescription || 'Dyeing QC Approved Fabric'} — Embroidery Lot`,
                 fabricCode: src?.fabricCode || 'FABRIC',
-                colour: observedColor || src?.colour || effectiveColor,
+                colour: colourOf(r),
                 unitType: r.unit === 'PCS' ? 'PCS' : 'ROLL',
                 quantity: r.passed,
                 uom: r.unit,
+                ...lineSource(r),
                 // Passed QC after dyeing: this line is dyed fabric.
                 fabricProcessingStatus: 'DYED',
                 remarks: `Inspected & Passed by Dyeing QC Gate. Approved for Embroidery: ${effectiveRemark}`,
@@ -497,6 +467,7 @@ export async function POST(
             metadata: JSON.stringify({
               result: normalizedResult,
               byUnit,
+              byLine: lineSummary,
               reworkReturnChallanNumber: reworkReturnChallan?.challanNumber || null,
               passForwardChallanNumber: passForwardChallan?.challanNumber || null,
             }),
@@ -514,6 +485,7 @@ export async function POST(
               challanNumber: challan.challanNumber,
               result: normalizedResult,
               byUnit,
+              byLine: lineSummary,
               qcRemark: effectiveRemark,
               reworkReturnChallan: reworkReturnChallan?.challanNumber || null,
               passForwardChallan: passForwardChallan?.challanNumber || null,
@@ -527,6 +499,7 @@ export async function POST(
           productionTransaction: prodTx,
           productionTransactions,
           byUnit,
+          byLine: lineSummary,
           passForwardChallan,
           reworkReturnChallan,
           challan: updatedChallan,

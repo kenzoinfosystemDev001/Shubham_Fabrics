@@ -24,6 +24,10 @@ import {
 import { availableForQc, needsColorReview } from '@/lib/dyeing-workflow.mjs';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 import { StockItemsSection, newStockFabric, stockLinesOf, type StockFabric, type StockSource } from '@/components/challan/StockItemsSection';
+import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
+import { NO_INCOMING_CHALLAN, challanSheetRefs, distinct, incomingChallanOptions } from '@/lib/challan-sheets.mjs';
+
+const sourceOf = (o: any) => o.inboundChallanId || NO_INCOMING_CHALLAN;
 
 const READY = ['DYED', 'READY_FOR_QC1', 'PARTIALLY_SENT_TO_QC1'];
 
@@ -32,7 +36,9 @@ function IssueChallanContent() {
   const [orders, setOrders] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [programId, setProgramId] = useState(params.get('programId') || '');
+  // A link may open this page for one incoming challan (?challanId=) or one sheet (?programId=, a filter).
+  const sheetFilter = params.get('programId') || '';
+  const [sourceIds, setSourceIds] = useState<string[]>(() => (params.get('challanId') ? [params.get('challanId') as string] : []));
   const [challanNumber, setChallanNumber] = useState('');
   const [numberError, setNumberError] = useState<string | null>(null);
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -62,16 +68,27 @@ function IssueChallanContent() {
   }, []);
 
   // Lines that may go to QC now: completed or ready, something left to send, colour reviewed if needed.
-  const eligible = useMemo(() => orders.filter((o) => READY.includes(o.status) && availableForQc(o) > 0 && !needsColorReview(o)), [orders]);
+  const eligible = useMemo(
+    () => orders.filter((o) => READY.includes(o.status) && availableForQc(o) > 0 && !needsColorReview(o) && (!sheetFilter || o.programId === sheetFilter)),
+    [orders, sheetFilter],
+  );
   const waitingReview = useMemo(() => orders.filter((o) => READY.includes(o.status) && needsColorReview(o)), [orders]);
-  const sheets = useMemo(() => {
-    const map = new Map<string, any>();
-    for (const o of eligible) if (o.program) map.set(o.program.id, o.program);
-    return Array.from(map.values());
-  }, [eligible]);
-  const program = sheets.find((p) => p.id === programId) || null;
-  const sheetOrders = eligible.filter((o) => o.programId === programId);
+  // Step 1: incoming challans with dyed lines still to send. Nothing is selected for the user.
+  const options = useMemo(() => incomingChallanOptions(eligible, availableForQc), [eligible]);
+  // A selected challan that has nothing left any more is dropped from the selection.
+  useEffect(() => {
+    if (loading) return;
+    setSourceIds((ids) => {
+      const next = ids.filter((id) => options.some((o) => o.id === id));
+      return next.length === ids.length ? ids : next;
+    });
+  }, [options, loading]);
+  const selectedOptions = options.filter((o) => sourceIds.includes(o.id));
+  const hasSource = sourceIds.length > 0;
+  // Step 2: only dyed lines of the selected incoming challans (of any Production Sheet on them).
+  const sheetOrders = eligible.filter((o) => sourceIds.includes(sourceOf(o)));
   const orderById = (id: string) => sheetOrders.find((o) => o.id === id);
+  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetRef(s))));
   // Items section: each colour is a dyed line (colour as recorded in Dyeing Process).
   const [fabrics, setFabrics] = useState<StockFabric[]>([newStockFabric()]);
   const colourOf = (o: any) => o.dyedColor || o.targetColor || '';
@@ -81,14 +98,32 @@ function IssueChallanContent() {
     colour: colourOf(o),
     uom: o.uom,
     available: availableForQc(o),
-    detail: [baseColour(o) ? `Base ${baseColour(o)}` : '', o.targetColor && o.targetColor !== colourOf(o) ? `Required ${o.targetColor}` : ''].filter(Boolean).join(' · '),
+    // Each dyed line names its Production Sheet and incoming challan.
+    detail: [
+      `Sheet ${sheetRef(o.program)}`,
+      o.inboundChallan?.challanNumber ? `Challan ${o.inboundChallan.challanNumber}` : '',
+      baseColour(o) ? `Base ${baseColour(o)}` : '',
+      o.targetColor && o.targetColor !== colourOf(o) ? `Required ${o.targetColor}` : '',
+    ].filter(Boolean).join(' · '),
   }));
   const itemsCheck = stockLinesOf(fabrics, sources);
   const itemLines = 'lines' in itemsCheck ? itemsCheck.lines : [];
-
-  useEffect(() => {
-    if (!programId && sheets.length === 1) setProgramId(sheets[0].id);
-  }, [sheets, programId]);
+  const breakdownRows = itemLines
+    .map((l, index) => ({ l, index, o: orderById(l.sourceId) }))
+    .filter((x) => x.o)
+    .map(({ l, index, o }) => ({
+      key: `${l.sourceId}-${index}`,
+      program: o.program,
+      fabric: o.fabricName,
+      colour: colourOf(o),
+      quantity: l.quantity,
+      uom: o.uom,
+      source: o.inboundChallan?.challanNumber || null,
+    }));
+  const chooseSources = (ids: string[]) => {
+    setSourceIds(ids);
+    setFabrics([newStockFabric()]);
+  };
 
   const totals = itemLines.reduce<Record<string, number>>((acc, l) => {
     const o = orderById(l.sourceId);
@@ -107,7 +142,7 @@ function IssueChallanContent() {
     e.preventDefault();
     setError(null);
     setNumberError(null);
-    if (!program) return setError('Choose a Production Sheet.');
+    if (!hasSource) return setError('Select the incoming challan this challan is issued from.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if ('error' in itemsCheck) return setError(itemsCheck.error);
     setSubmitting(true);
@@ -122,6 +157,7 @@ function IssueChallanContent() {
           priority: priority || undefined,
           remarks,
           inchargeName: incharge.trim(),
+          sourceChallanIds: sourceIds,
           lines: itemLines.map((l) => ({
             orderId: l.sourceId,
             quantity: l.quantity,
@@ -169,33 +205,17 @@ function IssueChallanContent() {
           </Notice>
         )}
 
+        <IncomingChallanPicker options={options} selected={sourceIds} onChange={chooseSources} loading={loading} availableLabel="Dyed, not sent" />
+
         <form onSubmit={submit} className="space-y-6">
-          <Panel title="Challan">
+          <Panel title="2. Challan">
             <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <ChallanNumberField value={challanNumber} onChange={setChallanNumber} error={numberError} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Challan date</span>
                 <input type="date" value={challanDate} onChange={(e) => setChallanDate(e.target.value)} required className={`${FIELD} mt-1`} />
               </label>
-              <label className="block">
-                <span className="text-xs font-semibold text-neutral-600">Production Sheet</span>
-                <select
-                  value={programId}
-                  onChange={(e) => {
-                    setProgramId(e.target.value);
-                    setFabrics([newStockFabric()]);
-                  }}
-                  className={`${FIELD} mt-1`}
-                  required
-                >
-                  <option value="">{sheets.length ? 'Choose a sheet' : 'No dyed fabric ready'}</option>
-                  {sheets.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {sheetRef(p)}{p.designNumber ? ` · ${p.designNumber}` : ''}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <ReadOnly label="Incoming challans" value={selectedOptions.map((o) => o.challan?.challanNumber || 'Not recorded').join(', ') || '—'} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Priority</span>
                 <select value={priority} onChange={(e) => setPriority(e.target.value)} className={`${FIELD} mt-1`}>
@@ -208,22 +228,25 @@ function IssueChallanContent() {
               </label>
               <ReadOnly label="Source" value="Dyeing" />
               <ReadOnly label="Destination" value="Dyeing QC" />
-              <ReadOnly label="Design / Serial" value={program ? `${program.designNumber || program.wilcomDesignNumber || '—'} · ${program.programSerialNo || '—'}` : '—'} />
-              <ReadOnly label="Delivery date" value={program ? fmtDate(program.deliveryDate) : '—'} />
+              <ReadOnly label="Production Sheets" value={chosenSheets.join(', ') || '—'} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Department incharge</span>
                 <input value={incharge} onChange={(e) => setIncharge(e.target.value)} maxLength={100} placeholder="Incharge name" className={`${FIELD} mt-1`} />
               </label>
-              <label className="block sm:col-span-2 lg:col-span-3">
+              <label className="block sm:col-span-2 lg:col-span-4">
                 <span className="text-xs font-semibold text-neutral-600">Remarks</span>
                 <input value={remarks} onChange={(e) => setRemarks(e.target.value)} maxLength={500} className={`${FIELD} mt-1`} />
               </label>
             </div>
           </Panel>
 
-          <Panel title="Color / Fabric / Measurement" count={itemLines.length}>
+          <Panel title="3. Color / Fabric / Measurement" count={itemLines.length}>
             <div className="p-5">
-              <StockItemsSection sources={sources} value={fabrics} onChange={setFabrics} disabled={!program} />
+              {hasSource ? (
+                <StockItemsSection sources={sources} value={fabrics} onChange={setFabrics} />
+              ) : (
+                <p className="text-sm text-neutral-500">Select an incoming challan above to add its dyed lines.</p>
+              )}
             </div>
             <div className="px-5 py-4 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <span className="text-sm text-neutral-600">
@@ -232,12 +255,14 @@ function IssueChallanContent() {
                   {Object.entries(totals).map(([u, q]) => fmtQty(q, u)).join(' · ') || '—'}
                 </span>
               </span>
-              <button type="submit" disabled={submitting || !program} className={BTN_PRIMARY}>
+              <button type="submit" disabled={submitting || !hasSource} className={BTN_PRIMARY}>
                 <Send className="w-3.5 h-3.5" />
                 <span>{submitting ? 'Issuing…' : 'Issue Challan'}</span>
               </button>
             </div>
           </Panel>
+
+          <SheetBreakdown title="4. Review: Production Sheet breakdown" rows={breakdownRows} />
         </form>
 
         <Panel title="Recent Challans to Dyeing QC" count={recent.length}>
@@ -247,7 +272,7 @@ function IssueChallanContent() {
                 <tr>
                   <th className="py-3 px-4">Challan</th>
                   <th className="py-3 px-3">Date</th>
-                  <th className="py-3 px-3">Production Sheet</th>
+                  <th className="py-3 px-3">Production Sheets</th>
                   <th className="py-3 px-3">Incoming Challan</th>
                   <th className="py-3 px-3">Items</th>
                   <th className="py-3 px-3 text-right">Quantity</th>
@@ -263,7 +288,7 @@ function IssueChallanContent() {
                       <Link href={`/challans/${c.id}`} className="hover:underline">{c.challanNumber}</Link>
                     </td>
                     <td className="py-3 px-3 text-xs text-neutral-600">{fmtDate(c.issuedDate || c.createdAt)}</td>
-                    <td className="py-3 px-3 font-mono text-xs">{sheetRef(c.program)}</td>
+                    <td className="py-3 px-3 font-mono text-xs">{challanSheetRefs(c)}</td>
                     <td className="py-3 px-3 font-mono text-xs text-neutral-600">{c.parentChallan?.challanNumber || '—'}</td>
                     <td className="py-3 px-3 text-xs text-neutral-700">
                       {(c.items || []).map((i: any) => i.colour || i.itemDescription).join(', ') || '—'}

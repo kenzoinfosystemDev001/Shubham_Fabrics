@@ -3,6 +3,7 @@
 // imports. Quantity flow: expected -> received -> processed -> transferred.
 
 import { headerUnitOf } from './challan-units.mjs';
+import { checkSourceSelection, distinct } from './challan-sheets.mjs';
 
 export const WORK_STATUS = /** @type {const} */ ({
   AWAITING_RECEIPT: 'AWAITING_RECEIPT',
@@ -343,23 +344,19 @@ export function validateProductionUpdate(item, input) {
  * @param {Map<string, any>} itemsById
  * @param {string} departmentCode
  * @param {string} [kind] PASS (default) | REJECT | REWORK: which QC outcome the challan carries
- * @returns {{ ok: true, unit: string, programId: string } | { ok: false, error: string }}
+ * @param {unknown} [sourceChallanIds] the incoming challans selected; when given, every line must come from one of them
+ * @returns {{ ok: true, unit: string, programId: string, programIds: string[], sourceChallanIds: string[] } | { ok: false, error: string }}
  */
-export function validateTransferLines(lines, itemsById, departmentCode, kind = 'PASS') {
+export function validateTransferLines(lines, itemsById, departmentCode, kind = 'PASS', sourceChallanIds = undefined) {
   if (!Array.isArray(lines) || lines.length === 0) return { ok: false, error: 'Add at least one item to transfer.' };
   // A work line may appear on several challan lines (entries of one fabric colour); together they may not
   // exceed what it has available.
   const sent = new Map();
   const units = [];
-  let programId = null;
   for (const [index, line] of lines.entries()) {
     const n = index + 1;
     const item = itemsById.get(line.workItemId);
     if (!item || item.departmentCode !== departmentCode) return { ok: false, error: `Line ${n}: work item not found.` };
-    if (programId && item.programId !== programId) {
-      return { ok: false, error: 'All items on one challan must belong to the same Production Sheet.' };
-    }
-    programId = item.programId;
     // Each line keeps its own unit; meters and pieces are never added together.
     units.push(item.uom);
     const qc = isQcItem(item);
@@ -375,5 +372,15 @@ export function validateTransferLines(lines, itemsById, departmentCode, kind = '
       return { ok: false, error: `Line ${n}: only ${available} ${item.uom} of ${item.fabricName} is ${what}.` };
     }
   }
-  return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: /** @type {string} */ (programId) };
+  const items = lines.map((l) => itemsById.get(l.workItemId));
+  /** @type {string[]} */
+  let sources = [];
+  if (sourceChallanIds !== undefined) {
+    const source = checkSourceSelection(sourceChallanIds, items.map((i) => ({ label: i.fabricName || i.itemNumber, inboundChallanId: i.inboundChallanId })));
+    if (!source.ok) return source;
+    sources = source.ids;
+  }
+  // Lines of several Production Sheets may travel together; each keeps its own sheet.
+  const programIds = distinct(items.map((i) => i.programId));
+  return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: programIds[0], programIds, sourceChallanIds: sources };
 }

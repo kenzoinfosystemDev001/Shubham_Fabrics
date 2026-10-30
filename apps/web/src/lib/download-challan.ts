@@ -18,6 +18,7 @@ import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilc
 import { generateProductionSheetHtml } from '@/lib/download-production-sheet';
 import { garmentImageUrl, groupGarments, imageFor, isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
 import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText } from '@/lib/challan-units.mjs';
+import { lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 
 /** A finished garment as printed on the challan: its name and image (a data URL, so the file works offline). */
 export interface PrintedGarment {
@@ -115,6 +116,13 @@ export function generateChallanHtml(challan: any): string {
 
   // Items
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
+  // A challan carrying several Production Sheets names each line's sheet and totals each sheet.
+  const sheets = sheetBreakdown(challan);
+  const sheetPrefix = (it: any) => {
+    if (!sheets.multiSheet) return '';
+    const id = lineSheetId(it, challan);
+    return `[${sheetLabel(sheets.sheets.find((s: any) => s.programId === id)?.program)}] `;
+  };
   // Store → Dyeing lines carry the colour Dyeing must achieve next to the current (base) colour.
   const hasDyeColour = items.some((i: any) => String(i.requiredColour || '').trim());
   // Programming to Recutting: Size | Average | Unit | Remarks, each of the first three a quantity with its own unit;
@@ -271,7 +279,7 @@ export function generateChallanHtml(challan: any): string {
         <tbody>
           ${items.map((it: any) => `
           <tr>
-            <td style="font-weight: 700;">${esc(it.fabricCode || it.itemDescription || '—')}</td>
+            <td style="font-weight: 700;">${esc(sheetPrefix(it) + (it.fabricCode || it.itemDescription || '—'))}</td>
             <td>${esc(it.colour || '—')}</td>
             ${hasDyeColour ? `<td style="font-weight: 700;">${esc(it.requiredColour || '—')}</td>` : ''}
             <td class="num" style="font-weight: 700;">${esc(`${it.quantity ?? ''}${toRecuttingLayout && it.uom ? ` ${it.uom}` : ''}`)}</td>
@@ -281,6 +289,11 @@ export function generateChallanHtml(challan: any): string {
             <td class="muted">${esc([it.rollNumber ? `Roll ${it.rollNumber}` : '', userChallanRemarks(it.remarks)].filter(Boolean).join(' · ') || '—')}</td>
           </tr>`).join('')}
           ${items.length === 0 ? `<tr><td colspan="${hasDyeColour ? 7 : 6}" class="muted" style="text-align: center;">No items on this challan.</td></tr>` : ''}
+          ${sheets.multiSheet ? sheets.sheets.map((s: any) => `
+          <tr>
+            <td colspan="2">Sheet ${esc(sheetLabel(s.program))} (${s.lines.length} line${s.lines.length === 1 ? '' : 's'})</td>
+            <td colspan="${hasDyeColour ? 5 : 4}">${esc(formatTotals(s.totals))}</td>
+          </tr>`).join('') : ''}
           <tr class="total">
             <td colspan="2">Total</td>
             <td colspan="${hasDyeColour ? 5 : 4}">${esc(totalsText)}</td>

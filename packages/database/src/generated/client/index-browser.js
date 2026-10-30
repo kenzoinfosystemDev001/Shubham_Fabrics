@@ -637,6 +637,8 @@ exports.Prisma.ChallanItemScalarFieldEnum = {
   sourceLotId: 'sourceLotId',
   sourceRollId: 'sourceRollId',
   sourceBundleId: 'sourceBundleId',
+  programId: 'programId',
+  sourceChallanItemId: 'sourceChallanItemId',
   createdAt: 'createdAt'
 };
 

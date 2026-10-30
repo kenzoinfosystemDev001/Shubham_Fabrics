@@ -5,6 +5,7 @@ import { assertChallanNumbersAvailable, challanNumberErrorResponse, requireChall
 import { DyeingRequestError, TX_OPTIONS, dyeingErrorResponse } from '@/lib/dyeing-server';
 import { isColorMismatch, statusAfterTransfer, validateQcTransferLines } from '@/lib/dyeing-workflow.mjs';
 import { MIXED_UNIT } from '@/lib/challan-units.mjs';
+import { ITEMS_WITH_SHEET, NO_INCOMING_CHALLAN } from '@/lib/challan-sheets.mjs';
 import { canWriteColumns, lineExtrasOf, lineExtrasWriter } from '@/lib/challan-item-average';
 
 const ENDPOINT = 'DYEING_QC_CHALLAN';
@@ -28,6 +29,8 @@ export interface IssueQcChallanInput {
   issuedDate?: unknown;
   priority?: unknown;
   remarks?: unknown;
+  /** The incoming (Store -> Dyeing or rework) challans the user selected; every line must come from one. */
+  sourceChallanIds?: unknown;
   inchargeName?: unknown; // the Dyeing incharge name typed on the form
   lines: QcTransferLineInput[];
 }
@@ -36,7 +39,7 @@ async function loadChallan(id: string) {
   return prisma.challan.findUnique({
     where: { id },
     include: {
-      items: { orderBy: { createdAt: 'asc' } },
+      items: ITEMS_WITH_SHEET,
       program: { select: { id: true, programNumber: true, programSerialNo: true, designNumber: true, deliveryDate: true } },
       parentChallan: { select: { id: true, challanNumber: true } },
       issuedBy: { select: { id: true, fullName: true, username: true } },
@@ -46,9 +49,10 @@ async function loadChallan(id: string) {
 }
 
 /**
- * Issues one Dyeing -> Dyeing QC (QC1) challan for several dyed lines of the same Production
- * Sheet. Each line moves only the quantity actually transferred, never more than is dyed and not
- * yet sent. Stock-like counters, the challan, its items and the transfer records are written in one
+ * Issues one Dyeing -> Dyeing QC (QC1) challan for dyed lines of the incoming challans the user
+ * selected. Lines may belong to several Production Sheets; each challan line records its own sheet
+ * and the incoming line it came from. Each line moves only the quantity actually transferred, never
+ * more than is dyed and not yet sent. Stock-like counters, the challan, its items and the transfer records are written in one
  * transaction; the same submission (idempotency key) is never applied twice.
  */
 export async function issueDyeingQcChallan(user: AuthenticatedUser, input: IssueQcChallanInput) {
@@ -78,8 +82,12 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
       include: { program: { select: { id: true, programNumber: true, programSerialNo: true } } },
     });
     const byId = new Map(orders.map((o) => [o.id, o]));
-    const check = validateQcTransferLines(lines, byId);
+    // The selected incoming challans are required: a line of any other challan is refused.
+    const check = validateQcTransferLines(lines, byId, Array.isArray(input.sourceChallanIds) ? input.sourceChallanIds : []);
     if (!check.ok) throw new DyeingRequestError(check.error);
+    // Header parent: the first selected incoming challan; every line also records its own source line.
+    const usedSources = new Set(orders.map((o) => o.inboundChallanId || NO_INCOMING_CHALLAN));
+    const parentChallanId = check.sourceChallanIds.find((id) => id !== NO_INCOMING_CHALLAN && usedSources.has(id)) || null;
 
     // Base (original) colour of each line, from its Store -> Dyeing challan line.
     const inboundItemIds = orders.map((o) => o.inboundChallanItemId).filter((v): v is string => Boolean(v));
@@ -131,7 +139,7 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
           challanNumber,
           challanType: 'DYEING_TO_QC1',
           programId: check.programId,
-          parentChallanId: prepared[0].order.inboundChallanId,
+          parentChallanId,
           fromDepartment: 'DYEING',
           toDepartment: 'QC1',
           status: 'ISSUED',
@@ -176,6 +184,8 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
             fabricCode: p.order.fabricName,
             colour: p.actual,
             requiredColour: p.order.targetColor || null,
+            programId: p.order.programId,
+            sourceChallanItemId: p.order.inboundChallanItemId,
             unitType: 'ROLL',
             quantity: p.quantity,
             uom: p.order.uom,
@@ -229,7 +239,7 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
           action: 'DYEING_ISSUE_QC1',
           entity: 'Challan',
           entityId: challan.id,
-          afterState: JSON.stringify({ challanNumber, total, unit: check.unit, lines: prepared.length }),
+          afterState: JSON.stringify({ challanNumber, total, unit: check.unit, lines: prepared.length, sheets: check.programIds, sourceChallanIds: input.sourceChallanIds }),
         },
       });
       if (key) {
