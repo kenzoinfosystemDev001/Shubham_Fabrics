@@ -52,7 +52,7 @@ const EMPTY_QC1_CHALLAN_NUMBERS: Record<Qc1ChallanNumberField, string> = {
   rejectChallanNumber: '',
 };
 
-/** One unit's inspection quantities (a challan with MTR and PCS lines is inspected per unit). */
+/** One challan line's inspection quantities (each line is inspected in its own unit). */
 type UnitQty = { quantityInspected: string; quantityPassed: string; quantityFailed: string; quantityRework: string; quantityHold: string };
 const pickUnitQty = (f: UnitQty): UnitQty => ({
   quantityInspected: f.quantityInspected,
@@ -62,7 +62,22 @@ const pickUnitQty = (f: UnitQty): UnitQty => ({
   quantityHold: f.quantityHold,
 });
 
-/** An inspection outcome per unit, e.g. "120 MTR · 10 PCS". */
+/**
+ * The lines of a Dyeing -> QC1 challan as inspected: each keeps its fabric, colour, unit and Production
+ * Sheet, so its outcome stays with it on the challans QC1 issues.
+ */
+function inspectLinesOf(challan: any): Array<{ key: string; unit: string; sent: number; label: string }> {
+  const items: any[] = Array.isArray(challan?.items) ? challan.items : [];
+  if (items.length === 0) return [{ key: 'challan', unit: challan?.uom || 'MTR', sent: Number(challan?.totalSentQuantity) || 0, label: challan?.uom || 'MTR' }];
+  return items.map((item, index) => {
+    const unit = String(item.uom || 'MTR').toUpperCase();
+    const sheet = item.program?.programSerialNo || item.program?.programNumber || challan?.productionSheetNumber || '';
+    const what = [item.fabricCode || item.itemDescription, item.colour].filter(Boolean).join(' — ');
+    const qty = Number(item.quantity) || 0;
+    return { key: item.id, unit, sent: qty, label: String(index + 1) + '. ' + (sheet ? sheet + ' · ' : '') + (what || 'Line') + ' (' + qty + ' ' + unit + ')' };
+  });
+}
+
 /** Unit of a challan's defective quantity (its own unit; older challans used the header unit). */
 const defectUnitOf = (c: any): string =>
   [c?.defectiveUnit, c?.fabricUnit, c?.items?.[0]?.uom].map((u) => String(u || '').toUpperCase()).find((u) => u === 'MTR' || u === 'PCS') || 'MTR';
@@ -161,26 +176,24 @@ export default function QC1MyWorkPage() {
     holdReason: '',
     remarks: '',
   });
-  // A challan may carry MTR and PCS lines: each unit is inspected in its own unit. The breakdown
-  // inputs edit `inspectUnit`; the other units' entries are kept in unitQuantities.
-  const [inspectUnit, setInspectUnit] = useState('');
-  const [unitQuantities, setUnitQuantities] = useState<Record<string, UnitQty>>({});
-  const inspectUnits = selectedChallanForInspect
-    ? selectedChallanForInspect.units?.length
-      ? selectedChallanForInspect.units
-      : [{ unit: selectedChallanForInspect.uom, sent: selectedChallanForInspect.totalSentQuantity }]
-    : [];
-  const activeUnitSent = inspectUnits.find((u) => u.unit === inspectUnit)?.sent ?? selectedChallanForInspect?.totalSentQuantity ?? 0;
-  const allUnitQuantities = (): Record<string, UnitQty> => ({ ...unitQuantities, [inspectUnit]: pickUnitQty(inspectionForm) });
-  const switchInspectUnit = (unit: string) => {
-    const all = allUnitQuantities();
-    setUnitQuantities(all);
-    setInspectUnit(unit);
-    setInspectionForm({ ...inspectionForm, ...all[unit] });
+  // Each challan line (fabric, colour, Production Sheet) is inspected on its own, in its own unit. The
+  // breakdown inputs edit `inspectLine`; the other lines' entries are kept in lineQuantities.
+  const [inspectLine, setInspectLine] = useState('');
+  const [lineQuantities, setLineQuantities] = useState<Record<string, UnitQty>>({});
+  const inspectLines = selectedChallanForInspect ? inspectLinesOf(selectedChallanForInspect) : [];
+  const activeLine = inspectLines.find((l) => l.key === inspectLine);
+  const activeLineSent = activeLine?.sent ?? 0;
+  const activeLineUnit = activeLine?.unit || selectedChallanForInspect?.uom || '';
+  const allLineQuantities = (): Record<string, UnitQty> => ({ ...lineQuantities, [inspectLine]: pickUnitQty(inspectionForm) });
+  const switchInspectLine = (key: string) => {
+    const all = allLineQuantities();
+    setLineQuantities(all);
+    setInspectLine(key);
+    setInspectionForm({ ...inspectionForm, ...all[key] });
   };
-  // A decision applies to every unit: all of each unit's inspected quantity takes that outcome.
-  const applyDecisionToOtherUnits = (result: 'PASS' | 'REWORK' | 'REJECT') =>
-    setUnitQuantities((prev) =>
+  // A decision applies to every line: all of each line's inspected quantity takes that outcome.
+  const applyDecisionToOtherLines = (result: 'PASS' | 'REWORK' | 'REJECT') =>
+    setLineQuantities((prev) =>
       Object.fromEntries(
         Object.entries(prev).map(([unit, q]) => {
           const total = q.quantityInspected || '0';
@@ -188,8 +201,8 @@ export default function QC1MyWorkPage() {
         })
       )
     );
-  // Which outgoing challans are needed: any unit with that outcome.
-  const anyUnitHas = (key: keyof UnitQty) => (Object.values(allUnitQuantities()).some((q) => Number(q[key] || 0) > 0) ? '1' : '0');
+  // Which outgoing challans are needed: any line with that outcome.
+  const anyUnitHas = (key: keyof UnitQty) => (Object.values(allLineQuantities()).some((q) => Number(q[key] || 0) > 0) ? '1' : '0');
   const numbersForm = {
     result: inspectionForm.result,
     quantityPassed: anyUnitHas('quantityPassed'),
@@ -306,8 +319,8 @@ export default function QC1MyWorkPage() {
     setInspectionSuccess(null);
     setChallanNumbers(EMPTY_QC1_CHALLAN_NUMBERS);
     setChallanNumberErrors({});
-    // Every unit starts fully inspected and passed, in its own unit.
-    const units = challan.units?.length ? challan.units : [{ unit: challan.uom, sent: challan.totalSentQuantity || 0 }];
+    // Every line starts fully inspected and passed, in its own unit.
+    const units = inspectLinesOf(challan);
     const startQty = (sent: number): UnitQty => ({
       quantityInspected: String(sent),
       quantityPassed: String(sent),
@@ -315,8 +328,8 @@ export default function QC1MyWorkPage() {
       quantityRework: '0',
       quantityHold: '0',
     });
-    setUnitQuantities(Object.fromEntries(units.map((u) => [u.unit, startQty(u.sent || 0)])));
-    setInspectUnit(units[0].unit);
+    setLineQuantities(Object.fromEntries(units.map((u) => [u.key, startQty(u.sent || 0)])));
+    setInspectLine(units[0].key);
     setInspectionForm({
       ...startQty(units[0].sent || 0),
       result: 'PASS',
@@ -337,11 +350,11 @@ export default function QC1MyWorkPage() {
     setSubmittingInspection(true);
     setInspectionError(null);
 
-    // Frontend validation guard, per unit (meters and pieces are never added together)
-    const quantities = allUnitQuantities();
-    const byUnit: Record<string, { quantityInspected: number; quantityPassed: number; quantityFailed: number; quantityRework: number; quantityHold: number }> = {};
-    for (const { unit, sent } of inspectUnits) {
-      const q = quantities[unit];
+    // Frontend validation guard, per line (meters and pieces are never added together)
+    const quantities = allLineQuantities();
+    const byLine: Record<string, { quantityInspected: number; quantityPassed: number; quantityFailed: number; quantityRework: number; quantityHold: number }> = {};
+    for (const { key, unit, sent, label } of inspectLines) {
+      const q = quantities[key];
       if (!q) continue;
       const row = {
         quantityInspected: Number(q.quantityInspected || 0),
@@ -351,32 +364,32 @@ export default function QC1MyWorkPage() {
         quantityHold: Number(q.quantityHold || 0),
       };
       if (Object.values(row).some((v) => isNaN(v) || v < 0)) {
-        setInspectionError(`Quantities (${unit}) cannot be negative.`);
+        setInspectionError(`${label}: quantities cannot be negative.`);
         setSubmittingInspection(false);
         return;
       }
       if (row.quantityInspected <= 0) continue;
       if (row.quantityInspected > sent) {
-        setInspectionError(`Quantity Inspected (${row.quantityInspected} ${unit}) cannot exceed Quantity Received from Dyeing (${sent} ${unit}).`);
+        setInspectionError(`${label}: Quantity Inspected (${row.quantityInspected} ${unit}) cannot exceed Quantity Received from Dyeing (${sent} ${unit}).`);
         setSubmittingInspection(false);
         return;
       }
       const sumCategories = row.quantityPassed + row.quantityFailed + row.quantityRework;
       if (sumCategories > row.quantityInspected + 0.001) {
         setInspectionError(
-          `Sum of Passed (${row.quantityPassed}) + Failed (${row.quantityFailed}) + Rework (${row.quantityRework}) = ${sumCategories} ${unit}, which exceeds Quantity Inspected (${row.quantityInspected} ${unit}).`
+          `${label}: Passed (${row.quantityPassed}) + Failed (${row.quantityFailed}) + Rework (${row.quantityRework}) = ${sumCategories} ${unit}, which exceeds Quantity Inspected (${row.quantityInspected} ${unit}).`
         );
         setSubmittingInspection(false);
         return;
       }
-      byUnit[unit] = row;
+      byLine[key] = row;
     }
-    if (Object.keys(byUnit).length === 0) {
+    if (Object.keys(byLine).length === 0) {
       setInspectionError('Quantity Inspected must be greater than 0.');
       setSubmittingInspection(false);
       return;
     }
-    const units = Object.values(byUnit);
+    const units = Object.values(byLine);
     const qPassed = units.some((r) => r.quantityPassed > 0) ? 1 : 0;
     const qFailed = units.some((r) => r.quantityFailed > 0) ? 1 : 0;
     const qRework = units.some((r) => r.quantityRework > 0) ? 1 : 0;
@@ -425,7 +438,8 @@ export default function QC1MyWorkPage() {
 
     try {
       const payload = {
-        byUnit,
+        // Outcomes per challan line; the server issues one outgoing line per inspected line.
+        byLine,
         result: inspectionForm.result,
         observedColor: inspectionForm.observedColor,
         defectRemarks: inspectionForm.defectRemarks,
@@ -434,7 +448,7 @@ export default function QC1MyWorkPage() {
         remarks: inspectionForm.remarks,
         inspectorId: currentUser?.id,
         ...typedNumbers,
-        // One defect count per unit that has failed or rework quantity.
+        // One defect count per line that has failed or rework quantity.
         defects: units
           .filter((r) => r.quantityFailed + r.quantityRework > 0)
           .map((r) => ({
@@ -1726,22 +1740,23 @@ export default function QC1MyWorkPage() {
                         <div className="flex items-center justify-between">
                           <h4 className="text-[11px] font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-2">
                             <span>Inspection Yardage Breakdown</span>
-                            {inspectUnits.length > 1 ? (
+                            {inspectLines.length > 1 ? (
                               <select
-                                value={inspectUnit}
-                                onChange={(e) => switchInspectUnit(e.target.value)}
-                                className="px-2 py-1 bg-white border border-neutral-300 rounded text-[11px] font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 cursor-pointer normal-case"
+                                value={inspectLine}
+                                onChange={(e) => switchInspectLine(e.target.value)}
+                                aria-label="Challan line being inspected"
+                                className="max-w-[18rem] px-2 py-1 bg-white border border-neutral-300 rounded text-[11px] font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 cursor-pointer normal-case"
                               >
-                                {inspectUnits.map((u) => (
-                                  <option key={u.unit} value={u.unit}>{u.unit === 'PCS' ? 'PCS (Pieces)' : 'MTR (Meters)'}</option>
+                                {inspectLines.map((l) => (
+                                  <option key={l.key} value={l.key}>{l.label}</option>
                                 ))}
                               </select>
                             ) : (
-                              <span>({inspectUnit || selectedChallanForInspect.uom})</span>
+                              <span>({activeLineUnit})</span>
                             )}
                           </h4>
                           <span className="text-[10px] text-neutral-500 font-mono">
-                            Available: {activeUnitSent} {inspectUnit}
+                            Available: {activeLineSent} {activeLineUnit}
                           </span>
                         </div>
 
@@ -1755,7 +1770,7 @@ export default function QC1MyWorkPage() {
                               type="number"
                               step="any"
                               min="0"
-                              max={activeUnitSent}
+                              max={activeLineSent}
                               value={inspectionForm.quantityInspected}
                               onChange={(e) => {
                                 const val = e.target.value;
@@ -1858,7 +1873,7 @@ export default function QC1MyWorkPage() {
                             type="button"
                             onClick={() => {
                               const total = inspectionForm.quantityInspected || '0';
-                              applyDecisionToOtherUnits('PASS');
+                              applyDecisionToOtherLines('PASS');
                               setInspectionForm({
                                 ...inspectionForm,
                                 result: 'PASS',
@@ -1895,7 +1910,7 @@ export default function QC1MyWorkPage() {
                             type="button"
                             onClick={() => {
                               const total = inspectionForm.quantityInspected || '0';
-                              applyDecisionToOtherUnits('REWORK');
+                              applyDecisionToOtherLines('REWORK');
                               setInspectionForm({
                                 ...inspectionForm,
                                 result: 'REWORK',
@@ -1932,7 +1947,7 @@ export default function QC1MyWorkPage() {
                             type="button"
                             onClick={() => {
                               const total = inspectionForm.quantityInspected || '0';
-                              applyDecisionToOtherUnits('REJECT');
+                              applyDecisionToOtherLines('REJECT');
                               setInspectionForm({
                                 ...inspectionForm,
                                 result: 'REJECT',

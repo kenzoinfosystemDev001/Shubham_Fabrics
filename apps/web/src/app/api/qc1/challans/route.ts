@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
+import { ITEMS_WITH_SHEET } from '@/lib/challan-sheets.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,7 +71,7 @@ export async function GET(request: Request) {
             createdBy: { select: { fullName: true, username: true } },
           },
         },
-        items: true,
+        items: ITEMS_WITH_SHEET,
         parentChallan: {
           select: {
             id: true,

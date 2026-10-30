@@ -3,6 +3,7 @@ import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { dyeingErrorResponse, USER_NAME_SELECT } from '@/lib/dyeing-server';
 import { issueDyeingQcChallan } from '@/lib/dyeing-qc-issue';
+import { ITEMS_WITH_SHEET } from '@/lib/challan-sheets.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,12 +24,14 @@ export async function GET(request: Request) {
                 { program: { programNumber: { contains: search, mode: 'insensitive' } } },
                 { program: { programSerialNo: { contains: search, mode: 'insensitive' } } },
                 { program: { designNumber: { contains: search, mode: 'insensitive' } } },
+                // Any sheet carried by a line, not only the challan's own.
+                { items: { some: { program: { programSerialNo: { contains: search, mode: 'insensitive' } } } } },
               ],
             }
           : {}),
       },
       include: {
-        items: { orderBy: { createdAt: 'asc' } },
+        items: ITEMS_WITH_SHEET,
         program: { select: { id: true, programNumber: true, programSerialNo: true, designNumber: true, deliveryDate: true } },
         parentChallan: { select: { id: true, challanNumber: true } },
         issuedBy: { select: USER_NAME_SELECT },
@@ -45,7 +48,7 @@ export async function GET(request: Request) {
 
 /**
  * POST /api/dyeing/qc-challans
- * Body: { idempotencyKey, challanNumber, issuedDate?, priority?, remarks?,
+ * Body: { idempotencyKey, challanNumber, issuedDate?, priority?, remarks?, sourceChallanIds: [incoming challan ids],
  *         lines: [{ orderId, quantity, actualDyedColor?, remarks? }] }
  */
 export async function POST(request: Request) {

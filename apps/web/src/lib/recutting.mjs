@@ -5,6 +5,7 @@
 
 import { receivedBasis } from './work-items.mjs';
 import { headerUnitOf } from './challan-units.mjs';
+import { checkSourceSelection, distinct } from './challan-sheets.mjs';
 
 export const GARMENT_CATEGORIES = /** @type {const} */ (['TOP', 'BOTTOM', 'DUPATTA', 'OTHERS']);
 export const CATEGORY_LABEL = { TOP: 'Top', BOTTOM: 'Bottom', DUPATTA: 'Dupatta', OTHERS: 'Others' };
@@ -132,17 +133,17 @@ export function validateCancel(allocation, reason) {
 }
 
 /**
- * Validates Stitching challan lines against their allocations: one Production Sheet, each line in its
- * own unit, only cut quantity not yet sent.
+ * Validates Stitching challan lines against their allocations: each line in its own unit and its own
+ * Production Sheet, only cut quantity not yet sent.
  * @param {Array<{ allocationId: string, quantity: unknown }>} lines
- * @param {Map<string, any>} allocationsById allocation with workItem { programId, departmentCode }
- * @returns {{ ok: true, unit: string, programId: string } | { ok: false, error: string }}
+ * @param {Map<string, any>} allocationsById allocation with workItem { programId, inboundChallanId, departmentCode }
+ * @param {unknown} [sourceChallanIds] the incoming challans selected; when given, every line must come from one of them
+ * @returns {{ ok: true, unit: string, programId: string, programIds: string[], sourceChallanIds: string[] } | { ok: false, error: string }}
  */
-export function validateStitchingLines(lines, allocationsById) {
+export function validateStitchingLines(lines, allocationsById, sourceChallanIds = undefined) {
   if (!Array.isArray(lines) || lines.length === 0) return { ok: false, error: 'Add at least one item.' };
   const seen = new Set();
   const units = [];
-  let programId = null;
   for (const [index, line] of lines.entries()) {
     const n = index + 1;
     const a = allocationsById.get(line.allocationId);
@@ -150,8 +151,6 @@ export function validateStitchingLines(lines, allocationsById) {
     if (seen.has(line.allocationId)) return { ok: false, error: `Line ${n}: the same allocation is listed twice.` };
     seen.add(line.allocationId);
     if (a.status === 'CANCELLED') return { ok: false, error: `Line ${n}: ${a.allocationNumber} was cancelled.` };
-    if (programId && a.workItem.programId !== programId) return { ok: false, error: 'All items on one challan must belong to the same Production Sheet.' };
-    programId = a.workItem.programId;
     // Each line keeps its own unit; meters and pieces are never added together.
     units.push(a.cutUom);
     const quantity = Number(line.quantity);
@@ -159,5 +158,15 @@ export function validateStitchingLines(lines, allocationsById) {
     const ready = readyForStitching(a);
     if (round(quantity) > ready) return { ok: false, error: `Line ${n}: only ${ready} ${a.cutUom} of ${a.allocationNumber} is cut and not yet issued.` };
   }
-  return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: /** @type {string} */ (programId) };
+  const allocations = lines.map((l) => allocationsById.get(l.allocationId));
+  /** @type {string[]} */
+  let sources = [];
+  if (sourceChallanIds !== undefined) {
+    const source = checkSourceSelection(sourceChallanIds, allocations.map((a) => ({ label: a.allocationNumber, inboundChallanId: a.workItem.inboundChallanId })));
+    if (!source.ok) return source;
+    sources = source.ids;
+  }
+  // Lines of several Production Sheets may travel together; each keeps its own sheet.
+  const programIds = distinct(allocations.map((a) => a.workItem.programId));
+  return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: programIds[0], programIds, sourceChallanIds: sources };
 }

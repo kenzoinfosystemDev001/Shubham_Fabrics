@@ -15,6 +15,7 @@ import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilc
 import { generateProductionSheetHtml } from '@/lib/download-production-sheet';
 import { garmentImageUrl, groupGarments, imageFor, isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
 import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
+import { lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 
 /** A finished garment as printed on the challan: its name and image (a data URL, so the file works offline). */
 export interface PrintedGarment {
@@ -112,6 +113,13 @@ export function generateChallanHtml(challan: any): string {
 
   // Items
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
+  // A challan carrying several Production Sheets names each line's sheet and totals each sheet.
+  const sheets = sheetBreakdown(challan);
+  const sheetPrefix = (it: any) => {
+    if (!sheets.multiSheet) return '';
+    const id = lineSheetId(it, challan);
+    return `[${escapeHtml(sheetLabel(sheets.sheets.find((s: any) => s.programId === id)?.program))}] `;
+  };
   // Each line keeps its unit: totals are per unit, never MTR + PCS.
   const unitTotals = challanTotalsByUnit(challan);
   const totalUnits = Object.keys(unitTotals);
@@ -693,7 +701,7 @@ export function generateChallanHtml(challan: any): string {
           ${items.length > 0 ? items.map((it, idx) => `
             <tr>
               <td style="text-align: center; font-family: monospace;">${idx + 1}</td>
-              <td style="font-weight: 700;">${it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
+              <td style="font-weight: 700;">${sheetPrefix(it)}${it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
               <td>${it.colour || prog.fabricColor || 'Standard'}</td>
               <td style="font-family: monospace;">${it.rollNumber || it.lotNumber || '—'}</td>
               <td class="num">${it.quantity || 0}</td>
@@ -709,6 +717,11 @@ export function generateChallanHtml(challan: any): string {
               <td style="text-align: center;">${totalUnitLabel}</td>
             </tr>
           `}
+          ${sheets.multiSheet ? sheets.sheets.map((s: any) => `
+          <tr>
+            <td colspan="4" style="text-align: right; font-size: 10px; font-weight: 700;">SHEET ${escapeHtml(sheetLabel(s.program))} (${s.lines.length} LINE${s.lines.length === 1 ? '' : 'S'}):</td>
+            <td colspan="2" class="num" style="font-weight: 700;">${formatTotals(s.totals)}</td>
+          </tr>`).join('') : ''}
           <tr class="totals-row">
             <td colspan="4" style="text-align: right; text-transform: uppercase; font-size: 10px; font-weight: 900;">
               TOTAL QUANTITY:

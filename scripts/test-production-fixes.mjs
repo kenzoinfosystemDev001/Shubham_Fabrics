@@ -2,7 +2,8 @@
 // (pure rules plus the real ledger service against an in-memory Prisma stand-in), and the
 // Fabric Store -> Dyeing instruction lines, and the Upload Stock Sheet rules (file types, Excel
 // columns, quantities, dates, review warnings, confirm validation), and finished-garment challans
-// (Finishing onward: garment name and image only). Touches no database.
+// (Finishing onward: garment name and image only), and sheet-wise challans (several Production Sheets per
+// challan, incoming challan selection, per-line Dyeing QC outcomes). Touches no database.
 // Run: node --test scripts/test-production-fixes.mjs
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -15,6 +16,10 @@ import * as stock from '../apps/web/src/lib/fabric-stock-rules.mjs';
 import * as dyeing from '../apps/web/src/lib/dyeing-instructions.mjs';
 import * as stockImport from '../apps/web/src/lib/stock-import-rules.mjs';
 import * as finished from '../apps/web/src/lib/finished-garments.mjs';
+import * as challanSheets from '../apps/web/src/lib/challan-sheets.mjs';
+import * as qc1 from '../apps/web/src/lib/qc1-inspection.mjs';
+import * as workRules from '../apps/web/src/lib/work-items.mjs';
+import * as dyeingRules from '../apps/web/src/lib/dyeing-workflow.mjs';
 
 // ---------------------------------------------------------------------------
 // Manual challan numbers
@@ -771,4 +776,140 @@ test('finished garments: the style image, else the category image, never another
   assert.equal(finished.imageFor(images, { programId: 'p3', garmentCategory: 'TOP', styleRef: 'Kurta' }), null);
   assert.equal(finished.garmentImageUrl(images[0]), '/api/garment-images/i1?v=2');
   assert.equal(finished.garmentImageUrl(null), null);
+});
+
+// ---------------------------------------------------------------------------
+// Sheet-wise challans (lib/challan-challanSheets.mjs, lib/qc1-inspection.mjs and the issue validators).
+// Illustrative values only (three sheets on one challan); nothing touches the database.
+// ---------------------------------------------------------------------------
+
+const PS1 = { id: 'p1', programSerialNo: 'PS-001' };
+const PS2 = { id: 'p2', programSerialNo: 'PS-002' };
+const PS3 = { id: 'p3', programSerialNo: 'PS-003' };
+const threeSheetChallan = () => ({
+  id: 'c1',
+  programId: 'p1',
+  program: PS1,
+  fabricUnit: 'MTR',
+  items: [
+    { id: 'i1', programId: 'p1', program: PS1, fabricCode: 'Fabric A', colour: 'Red', quantity: 100, uom: 'MTR' },
+    { id: 'i2', programId: 'p2', program: PS2, fabricCode: 'Fabric A', colour: 'Blue', quantity: 150, uom: 'MTR' },
+    { id: 'i3', programId: 'p3', program: PS3, fabricCode: 'Fabric B', colour: 'Red', quantity: 200, uom: 'MTR' },
+  ],
+});
+
+test('sheets: one challan carries three sheets; each keeps its fabric, colour and quantity, and they reconcile with the total', () => {
+  const b = challanSheets.sheetBreakdown(threeSheetChallan());
+  assert.equal(b.multiSheet, true);
+  assert.deepEqual(b.sheets.map((s) => [challanSheets.sheetLabel(s.program), s.lines.map((l) => `${l.fabricCode} ${l.colour}`), s.totals]), [
+    ['PS-001', ['Fabric A Red'], { MTR: 100 }],
+    ['PS-002', ['Fabric A Blue'], { MTR: 150 }],
+    ['PS-003', ['Fabric B Red'], { MTR: 200 }],
+  ]);
+  assert.deepEqual(b.totals, { MTR: 450 });
+  assert.equal(challanSheets.challanSheetRefs(threeSheetChallan()), 'PS-001, PS-002, PS-003');
+});
+
+test('sheets: two sheets with the same fabric and colour stay apart by sheet', () => {
+  const c = threeSheetChallan();
+  c.items[1] = { ...c.items[1], colour: 'Red' };
+  assert.deepEqual(challanSheets.sheetBreakdown(c).sheets.map((s) => s.totals), [{ MTR: 100 }, { MTR: 150 }, { MTR: 200 }]);
+});
+
+test('sheets: meters and pieces are totalled separately, per sheet and per challan', () => {
+  const c = threeSheetChallan();
+  c.items.push({ id: 'i4', programId: 'p1', program: PS1, fabricCode: 'Kurta', quantity: 320, uom: 'PCS' });
+  const b = challanSheets.sheetBreakdown(c);
+  assert.deepEqual(b.sheets[0].totals, { MTR: 100, PCS: 320 });
+  assert.deepEqual(b.totals, { MTR: 450, PCS: 320 }, 'never 770');
+});
+
+test('sheets: a line recorded before per-line sheets belongs to its challan sheet; nothing is invented', () => {
+  const legacy = { programId: 'p9', program: { id: 'p9', programNumber: 'PRG-9' }, items: [{ id: 'x', quantity: 450, uom: 'MTR' }] };
+  const b = challanSheets.sheetBreakdown(legacy);
+  assert.equal(b.multiSheet, false);
+  assert.equal(challanSheets.sheetLabel(b.sheets[0].program), 'PRG-9');
+  assert.deepEqual(b.sheets[0].totals, { MTR: 450 });
+  assert.equal(challanSheets.lineSheetId({ programId: null }, legacy), 'p9');
+});
+
+test('incoming challans: options group eligible lines by incoming challan with their sheets and available quantity', () => {
+  const records = [
+    { id: 'w1', inboundChallanId: 'A', inboundChallan: { challanNumber: 'CH-A', issuedDate: '2026-10-01' }, programId: 'p1', program: PS1, uom: 'MTR', left: 100 },
+    { id: 'w2', inboundChallanId: 'B', inboundChallan: { challanNumber: 'CH-B', issuedDate: '2026-10-03' }, programId: 'p2', program: PS2, uom: 'MTR', left: 150 },
+    { id: 'w3', inboundChallanId: 'B', inboundChallan: { challanNumber: 'CH-B', issuedDate: '2026-10-03' }, programId: 'p3', program: PS3, uom: 'PCS', left: 20 },
+    { id: 'w4', inboundChallanId: 'C', inboundChallan: { challanNumber: 'CH-C', issuedDate: '2026-10-02' }, programId: 'p1', program: PS1, uom: 'MTR', left: 5 },
+  ];
+  const options = challanSheets.incomingChallanOptions(records, (r) => r.left);
+  assert.deepEqual(options.map((o) => o.challan.challanNumber), ['CH-B', 'CH-C', 'CH-A'], 'newest first');
+  const b = options[0];
+  assert.deepEqual(b.sheets.map((s) => s.programSerialNo), ['PS-002', 'PS-003']);
+  assert.deepEqual(b.available, { MTR: 150, PCS: 20 });
+  // Choosing the second challan offers only its own lines; no other challan is selected for the user.
+  const picked = records.filter((r) => [options[1].id].includes(r.inboundChallanId));
+  assert.deepEqual(picked.map((r) => r.id), ['w4']);
+});
+
+test('incoming challans: a line from an unselected challan is refused, and a selection is required', () => {
+  const lines = [{ label: 'EMB-1', inboundChallanId: 'A' }, { label: 'EMB-2', inboundChallanId: 'B' }];
+  assert.deepEqual(challanSheets.checkSourceSelection(['A', 'B'], lines), { ok: true, ids: ['A', 'B'] });
+  assert.match(challanSheets.checkSourceSelection(['A'], lines).error, /Line 2: EMB-2 does not belong to the selected incoming challan/);
+  assert.match(challanSheets.checkSourceSelection([], lines).error, /Select the incoming challan/);
+  assert.match(challanSheets.checkSourceSelection(undefined, lines).error, /Select the incoming challan/);
+  // Older Dyeing lines without an incoming challan are selected under their own key.
+  assert.equal(challanSheets.checkSourceSelection([challanSheets.NO_INCOMING_CHALLAN], [{ label: 'DYE-1', inboundChallanId: null }]).ok, true);
+});
+
+const embLine = (over) => ({
+  id: 'w1', itemNumber: 'EMB-1', departmentCode: 'EMBROIDERY', programId: 'p1', inboundChallanId: 'A', status: 'COMPLETED', uom: 'MTR',
+  expectedQuantity: 100, receivedQuantity: 100, processedQuantity: 100, transferredQuantity: 0, ...over,
+});
+
+test('issue: partial transfer of one sheet leaves the rest available; over-issuing is refused', () => {
+  const items = [embLine(), embLine({ id: 'w2', itemNumber: 'EMB-2', programId: 'p2', processedQuantity: 150, receivedQuantity: 150 })];
+  const byId = new Map(items.map((i) => [i.id, i]));
+  const ok = workRules.validateTransferLines([{ workItemId: 'w1', quantity: 40 }, { workItemId: 'w2', quantity: 150 }], byId, 'EMBROIDERY', 'PASS', ['A']);
+  assert.equal(ok.ok, true);
+  assert.deepEqual(ok.programIds, ['p1', 'p2'], 'both sheets travel on one challan');
+  // After 40 of 100 left, only 60 remains for a later challan.
+  const after = embLine({ transferredQuantity: 40 });
+  assert.equal(workRules.availableFor(after, 'PASS'), 60);
+  const over = workRules.validateTransferLines([{ workItemId: 'w1', quantity: 61 }], new Map([['w1', after]]), 'EMBROIDERY', 'PASS', ['A']);
+  assert.match(over.error, /only 60 MTR of EMB-1/);
+});
+
+test('issue: Dyeing lines of several sheets go to Dyeing QC together, only from the selected incoming challans', () => {
+  const order = (id, programId, inboundChallanId, dyed) => ({ id, orderNumber: id, programId, inboundChallanId, status: 'DYED', uom: 'MTR', dyedQuantity: dyed, sentToQc1Quantity: 0, colorMismatch: false });
+  const byId = new Map([order('D1', 'p1', 'S1', 100), order('D2', 'p2', 'S1', 150), order('D3', 'p3', 'S2', 200)].map((o) => [o.id, o]));
+  const ok = dyeingRules.validateQcTransferLines([{ orderId: 'D1', quantity: 100 }, { orderId: 'D2', quantity: 150 }], byId, ['S1']);
+  assert.deepEqual([ok.ok, ok.programIds], [true, ['p1', 'p2']]);
+  assert.match(dyeingRules.validateQcTransferLines([{ orderId: 'D3', quantity: 10 }], byId, ['S1']).error, /D3 does not belong to the selected incoming challan/);
+  assert.match(dyeingRules.validateQcTransferLines([{ orderId: 'D1', quantity: 101 }], byId, ['S1']).error, /only 100 MTR of D1/);
+});
+
+test('QC1: each dyed line is inspected on its own; outcomes stay with their sheet and are never split from a total', () => {
+  const c = threeSheetChallan();
+  const byLine = {
+    i1: { quantityInspected: 100, quantityPassed: 95, quantityFailed: 5 },
+    i2: { quantityInspected: 150, quantityPassed: 150 },
+    i3: { quantityInspected: 120, quantityPassed: 100, quantityRework: 20 }, // part of the line inspected
+  };
+  const r = qc1.qc1LineQuantities(c.items, { byLine });
+  assert.equal(r.ok, true);
+  assert.deepEqual(r.lines.map((l) => [l.item.programId, l.passed, l.failed, l.rework]), [['p1', 95, 5, 0], ['p2', 150, 0, 0], ['p3', 100, 0, 20]]);
+  assert.deepEqual(qc1.qc1UnitTotals(r.lines), [{ unit: 'MTR', inspected: 370, passed: 345, failed: 5, rework: 20, hold: 0 }]);
+  // A unit total cannot be spread across the three lines.
+  assert.match(qc1.qc1LineQuantities(c.items, { byUnit: { MTR: { quantityInspected: 450, quantityPassed: 450 } } }).error, /3 MTR lines .* never split/);
+  // A line cannot be inspected beyond what it carried, and outcomes cannot exceed what was inspected.
+  assert.match(qc1.qc1LineQuantities(c.items, { byLine: { i1: { quantityInspected: 101 } } }).error, /Fabric A — Red: .* cannot exceed .* \(100 MTR\)/);
+  assert.match(qc1.qc1LineQuantities(c.items, { byLine: { i1: { quantityInspected: 10, quantityPassed: 11 } } }).error, /exceeds Quantity Inspected/);
+  assert.match(qc1.qc1LineQuantities(c.items, { byLine: { other: { quantityInspected: 1 } } }).error, /not on this challan/);
+});
+
+test('QC1: a one-line-per-unit challan may still send per-unit quantities (they map to exactly one line)', () => {
+  const items = [{ id: 'm', quantity: 80, uom: 'MTR' }, { id: 'p', quantity: 30, uom: 'PCS' }];
+  const r = qc1.qc1LineQuantities(items, { byUnit: { MTR: { quantityInspected: 80, quantityPassed: 80 }, PCS: { quantityInspected: 30, quantityPassed: 28, quantityFailed: 2 } } });
+  assert.deepEqual(r.lines.map((l) => [l.item.id, l.unit, l.passed, l.failed]), [['m', 'MTR', 80, 0], ['p', 'PCS', 28, 2]]);
+  const plain = qc1.qc1LineQuantities([{ id: 'only', quantity: 50, uom: 'MTR' }], { quantityInspected: 50, quantityPassed: 50 });
+  assert.equal(plain.lines[0].item.id, 'only');
 });

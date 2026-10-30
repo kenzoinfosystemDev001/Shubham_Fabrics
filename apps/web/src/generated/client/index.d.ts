@@ -8672,6 +8672,7 @@ export namespace Prisma {
     bomItems: number
     routes: number
     challans: number
+    challanItems: number
     productionLogs: number
     rolls: number
     bundles: number
@@ -8696,6 +8697,7 @@ export namespace Prisma {
     bomItems?: boolean | ProgramCountOutputTypeCountBomItemsArgs
     routes?: boolean | ProgramCountOutputTypeCountRoutesArgs
     challans?: boolean | ProgramCountOutputTypeCountChallansArgs
+    challanItems?: boolean | ProgramCountOutputTypeCountChallanItemsArgs
     productionLogs?: boolean | ProgramCountOutputTypeCountProductionLogsArgs
     rolls?: boolean | ProgramCountOutputTypeCountRollsArgs
     bundles?: boolean | ProgramCountOutputTypeCountBundlesArgs
@@ -8770,6 +8772,13 @@ export namespace Prisma {
    */
   export type ProgramCountOutputTypeCountChallansArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ChallanWhereInput
+  }
+
+  /**
+   * ProgramCountOutputType without action
+   */
+  export type ProgramCountOutputTypeCountChallanItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChallanItemWhereInput
   }
 
   /**
@@ -9038,6 +9047,37 @@ export namespace Prisma {
    */
   export type ChallanCountOutputTypeCountDeadlineAlertsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DeadlineAlertWhereInput
+  }
+
+
+  /**
+   * Count Type ChallanItemCountOutputType
+   */
+
+  export type ChallanItemCountOutputType = {
+    derivedItems: number
+  }
+
+  export type ChallanItemCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    derivedItems?: boolean | ChallanItemCountOutputTypeCountDerivedItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ChallanItemCountOutputType without action
+   */
+  export type ChallanItemCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChallanItemCountOutputType
+     */
+    select?: ChallanItemCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ChallanItemCountOutputType without action
+   */
+  export type ChallanItemCountOutputTypeCountDerivedItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChallanItemWhereInput
   }
 
 
@@ -33354,6 +33394,7 @@ export namespace Prisma {
     bomItems?: boolean | Program$bomItemsArgs<ExtArgs>
     routes?: boolean | Program$routesArgs<ExtArgs>
     challans?: boolean | Program$challansArgs<ExtArgs>
+    challanItems?: boolean | Program$challanItemsArgs<ExtArgs>
     productionLogs?: boolean | Program$productionLogsArgs<ExtArgs>
     rolls?: boolean | Program$rollsArgs<ExtArgs>
     bundles?: boolean | Program$bundlesArgs<ExtArgs>
@@ -33569,6 +33610,7 @@ export namespace Prisma {
     bomItems?: boolean | Program$bomItemsArgs<ExtArgs>
     routes?: boolean | Program$routesArgs<ExtArgs>
     challans?: boolean | Program$challansArgs<ExtArgs>
+    challanItems?: boolean | Program$challanItemsArgs<ExtArgs>
     productionLogs?: boolean | Program$productionLogsArgs<ExtArgs>
     rolls?: boolean | Program$rollsArgs<ExtArgs>
     bundles?: boolean | Program$bundlesArgs<ExtArgs>
@@ -33612,6 +33654,7 @@ export namespace Prisma {
       bomItems: Prisma.$ProgramBOMPayload<ExtArgs>[]
       routes: Prisma.$ProgramRoutePayload<ExtArgs>[]
       challans: Prisma.$ChallanPayload<ExtArgs>[]
+      challanItems: Prisma.$ChallanItemPayload<ExtArgs>[]
       productionLogs: Prisma.$ProductionTransactionPayload<ExtArgs>[]
       rolls: Prisma.$FabricRollPayload<ExtArgs>[]
       bundles: Prisma.$BundlePayload<ExtArgs>[]
@@ -34089,6 +34132,7 @@ export namespace Prisma {
     bomItems<T extends Program$bomItemsArgs<ExtArgs> = {}>(args?: Subset<T, Program$bomItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProgramBOMPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     routes<T extends Program$routesArgs<ExtArgs> = {}>(args?: Subset<T, Program$routesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProgramRoutePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     challans<T extends Program$challansArgs<ExtArgs> = {}>(args?: Subset<T, Program$challansArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChallanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    challanItems<T extends Program$challanItemsArgs<ExtArgs> = {}>(args?: Subset<T, Program$challanItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChallanItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     productionLogs<T extends Program$productionLogsArgs<ExtArgs> = {}>(args?: Subset<T, Program$productionLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductionTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     rolls<T extends Program$rollsArgs<ExtArgs> = {}>(args?: Subset<T, Program$rollsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricRollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     bundles<T extends Program$bundlesArgs<ExtArgs> = {}>(args?: Subset<T, Program$bundlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BundlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -34806,6 +34850,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ChallanScalarFieldEnum | ChallanScalarFieldEnum[]
+  }
+
+  /**
+   * Program.challanItems
+   */
+  export type Program$challanItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChallanItem
+     */
+    select?: ChallanItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChallanItem
+     */
+    omit?: ChallanItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChallanItemInclude<ExtArgs> | null
+    where?: ChallanItemWhereInput
+    orderBy?: ChallanItemOrderByWithRelationInput | ChallanItemOrderByWithRelationInput[]
+    cursor?: ChallanItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ChallanItemScalarFieldEnum | ChallanItemScalarFieldEnum[]
   }
 
   /**
@@ -51343,6 +51411,8 @@ export namespace Prisma {
     sourceLotId: string | null
     sourceRollId: string | null
     sourceBundleId: string | null
+    programId: string | null
+    sourceChallanItemId: string | null
     createdAt: Date | null
   }
 
@@ -51372,6 +51442,8 @@ export namespace Prisma {
     sourceLotId: string | null
     sourceRollId: string | null
     sourceBundleId: string | null
+    programId: string | null
+    sourceChallanItemId: string | null
     createdAt: Date | null
   }
 
@@ -51401,6 +51473,8 @@ export namespace Prisma {
     sourceLotId: number
     sourceRollId: number
     sourceBundleId: number
+    programId: number
+    sourceChallanItemId: number
     createdAt: number
     _all: number
   }
@@ -51446,6 +51520,8 @@ export namespace Prisma {
     sourceLotId?: true
     sourceRollId?: true
     sourceBundleId?: true
+    programId?: true
+    sourceChallanItemId?: true
     createdAt?: true
   }
 
@@ -51475,6 +51551,8 @@ export namespace Prisma {
     sourceLotId?: true
     sourceRollId?: true
     sourceBundleId?: true
+    programId?: true
+    sourceChallanItemId?: true
     createdAt?: true
   }
 
@@ -51504,6 +51582,8 @@ export namespace Prisma {
     sourceLotId?: true
     sourceRollId?: true
     sourceBundleId?: true
+    programId?: true
+    sourceChallanItemId?: true
     createdAt?: true
     _all?: true
   }
@@ -51620,6 +51700,8 @@ export namespace Prisma {
     sourceLotId: string | null
     sourceRollId: string | null
     sourceBundleId: string | null
+    programId: string | null
+    sourceChallanItemId: string | null
     createdAt: Date
     _count: ChallanItemCountAggregateOutputType | null
     _avg: ChallanItemAvgAggregateOutputType | null
@@ -51668,8 +51750,14 @@ export namespace Prisma {
     sourceLotId?: boolean
     sourceRollId?: boolean
     sourceBundleId?: boolean
+    programId?: boolean
+    sourceChallanItemId?: boolean
     createdAt?: boolean
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
+    program?: boolean | ChallanItem$programArgs<ExtArgs>
+    sourceChallanItem?: boolean | ChallanItem$sourceChallanItemArgs<ExtArgs>
+    derivedItems?: boolean | ChallanItem$derivedItemsArgs<ExtArgs>
+    _count?: boolean | ChallanItemCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["challanItem"]>
 
   export type ChallanItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -51698,8 +51786,12 @@ export namespace Prisma {
     sourceLotId?: boolean
     sourceRollId?: boolean
     sourceBundleId?: boolean
+    programId?: boolean
+    sourceChallanItemId?: boolean
     createdAt?: boolean
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
+    program?: boolean | ChallanItem$programArgs<ExtArgs>
+    sourceChallanItem?: boolean | ChallanItem$sourceChallanItemArgs<ExtArgs>
   }, ExtArgs["result"]["challanItem"]>
 
   export type ChallanItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -51728,8 +51820,12 @@ export namespace Prisma {
     sourceLotId?: boolean
     sourceRollId?: boolean
     sourceBundleId?: boolean
+    programId?: boolean
+    sourceChallanItemId?: boolean
     createdAt?: boolean
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
+    program?: boolean | ChallanItem$programArgs<ExtArgs>
+    sourceChallanItem?: boolean | ChallanItem$sourceChallanItemArgs<ExtArgs>
   }, ExtArgs["result"]["challanItem"]>
 
   export type ChallanItemSelectScalar = {
@@ -51758,24 +51854,37 @@ export namespace Prisma {
     sourceLotId?: boolean
     sourceRollId?: boolean
     sourceBundleId?: boolean
+    programId?: boolean
+    sourceChallanItemId?: boolean
     createdAt?: boolean
   }
 
-  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "requiredColour" | "requiredQuantity" | "fabricProcessingStatus" | "garmentCategory" | "styleRef" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "createdAt", ExtArgs["result"]["challanItem"]>
+  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "requiredColour" | "requiredQuantity" | "fabricProcessingStatus" | "garmentCategory" | "styleRef" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "programId" | "sourceChallanItemId" | "createdAt", ExtArgs["result"]["challanItem"]>
   export type ChallanItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
+    program?: boolean | ChallanItem$programArgs<ExtArgs>
+    sourceChallanItem?: boolean | ChallanItem$sourceChallanItemArgs<ExtArgs>
+    derivedItems?: boolean | ChallanItem$derivedItemsArgs<ExtArgs>
+    _count?: boolean | ChallanItemCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ChallanItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
+    program?: boolean | ChallanItem$programArgs<ExtArgs>
+    sourceChallanItem?: boolean | ChallanItem$sourceChallanItemArgs<ExtArgs>
   }
   export type ChallanItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
+    program?: boolean | ChallanItem$programArgs<ExtArgs>
+    sourceChallanItem?: boolean | ChallanItem$sourceChallanItemArgs<ExtArgs>
   }
 
   export type $ChallanItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ChallanItem"
     objects: {
       challan: Prisma.$ChallanPayload<ExtArgs>
+      program: Prisma.$ProgramPayload<ExtArgs> | null
+      sourceChallanItem: Prisma.$ChallanItemPayload<ExtArgs> | null
+      derivedItems: Prisma.$ChallanItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -51803,6 +51912,8 @@ export namespace Prisma {
       sourceLotId: string | null
       sourceRollId: string | null
       sourceBundleId: string | null
+      programId: string | null
+      sourceChallanItemId: string | null
       createdAt: Date
     }, ExtArgs["result"]["challanItem"]>
     composites: {}
@@ -52199,6 +52310,9 @@ export namespace Prisma {
   export interface Prisma__ChallanItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     challan<T extends ChallanDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ChallanDefaultArgs<ExtArgs>>): Prisma__ChallanClient<$Result.GetResult<Prisma.$ChallanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    program<T extends ChallanItem$programArgs<ExtArgs> = {}>(args?: Subset<T, ChallanItem$programArgs<ExtArgs>>): Prisma__ProgramClient<$Result.GetResult<Prisma.$ProgramPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    sourceChallanItem<T extends ChallanItem$sourceChallanItemArgs<ExtArgs> = {}>(args?: Subset<T, ChallanItem$sourceChallanItemArgs<ExtArgs>>): Prisma__ChallanItemClient<$Result.GetResult<Prisma.$ChallanItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    derivedItems<T extends ChallanItem$derivedItemsArgs<ExtArgs> = {}>(args?: Subset<T, ChallanItem$derivedItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChallanItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -52253,6 +52367,8 @@ export namespace Prisma {
     readonly sourceLotId: FieldRef<"ChallanItem", 'String'>
     readonly sourceRollId: FieldRef<"ChallanItem", 'String'>
     readonly sourceBundleId: FieldRef<"ChallanItem", 'String'>
+    readonly programId: FieldRef<"ChallanItem", 'String'>
+    readonly sourceChallanItemId: FieldRef<"ChallanItem", 'String'>
     readonly createdAt: FieldRef<"ChallanItem", 'DateTime'>
   }
     
@@ -52647,6 +52763,68 @@ export namespace Prisma {
      * Limit how many ChallanItems to delete.
      */
     limit?: number
+  }
+
+  /**
+   * ChallanItem.program
+   */
+  export type ChallanItem$programArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Program
+     */
+    select?: ProgramSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Program
+     */
+    omit?: ProgramOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramInclude<ExtArgs> | null
+    where?: ProgramWhereInput
+  }
+
+  /**
+   * ChallanItem.sourceChallanItem
+   */
+  export type ChallanItem$sourceChallanItemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChallanItem
+     */
+    select?: ChallanItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChallanItem
+     */
+    omit?: ChallanItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChallanItemInclude<ExtArgs> | null
+    where?: ChallanItemWhereInput
+  }
+
+  /**
+   * ChallanItem.derivedItems
+   */
+  export type ChallanItem$derivedItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChallanItem
+     */
+    select?: ChallanItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChallanItem
+     */
+    omit?: ChallanItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChallanItemInclude<ExtArgs> | null
+    where?: ChallanItemWhereInput
+    orderBy?: ChallanItemOrderByWithRelationInput | ChallanItemOrderByWithRelationInput[]
+    cursor?: ChallanItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ChallanItemScalarFieldEnum | ChallanItemScalarFieldEnum[]
   }
 
   /**
@@ -105825,6 +106003,8 @@ export namespace Prisma {
     sourceLotId: 'sourceLotId',
     sourceRollId: 'sourceRollId',
     sourceBundleId: 'sourceBundleId',
+    programId: 'programId',
+    sourceChallanItemId: 'sourceChallanItemId',
     createdAt: 'createdAt'
   };
 
@@ -108643,6 +108823,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMListRelationFilter
     routes?: ProgramRouteListRelationFilter
     challans?: ChallanListRelationFilter
+    challanItems?: ChallanItemListRelationFilter
     productionLogs?: ProductionTransactionListRelationFilter
     rolls?: FabricRollListRelationFilter
     bundles?: BundleListRelationFilter
@@ -108727,6 +108908,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMOrderByRelationAggregateInput
     routes?: ProgramRouteOrderByRelationAggregateInput
     challans?: ChallanOrderByRelationAggregateInput
+    challanItems?: ChallanItemOrderByRelationAggregateInput
     productionLogs?: ProductionTransactionOrderByRelationAggregateInput
     rolls?: FabricRollOrderByRelationAggregateInput
     bundles?: BundleOrderByRelationAggregateInput
@@ -108814,6 +108996,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMListRelationFilter
     routes?: ProgramRouteListRelationFilter
     challans?: ChallanListRelationFilter
+    challanItems?: ChallanItemListRelationFilter
     productionLogs?: ProductionTransactionListRelationFilter
     rolls?: FabricRollListRelationFilter
     bundles?: BundleListRelationFilter
@@ -110283,8 +110466,13 @@ export namespace Prisma {
     sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
     sourceRollId?: StringNullableFilter<"ChallanItem"> | string | null
     sourceBundleId?: StringNullableFilter<"ChallanItem"> | string | null
+    programId?: StringNullableFilter<"ChallanItem"> | string | null
+    sourceChallanItemId?: StringNullableFilter<"ChallanItem"> | string | null
     createdAt?: DateTimeFilter<"ChallanItem"> | Date | string
     challan?: XOR<ChallanScalarRelationFilter, ChallanWhereInput>
+    program?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
+    sourceChallanItem?: XOR<ChallanItemNullableScalarRelationFilter, ChallanItemWhereInput> | null
+    derivedItems?: ChallanItemListRelationFilter
   }
 
   export type ChallanItemOrderByWithRelationInput = {
@@ -110313,8 +110501,13 @@ export namespace Prisma {
     sourceLotId?: SortOrderInput | SortOrder
     sourceRollId?: SortOrderInput | SortOrder
     sourceBundleId?: SortOrderInput | SortOrder
+    programId?: SortOrderInput | SortOrder
+    sourceChallanItemId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     challan?: ChallanOrderByWithRelationInput
+    program?: ProgramOrderByWithRelationInput
+    sourceChallanItem?: ChallanItemOrderByWithRelationInput
+    derivedItems?: ChallanItemOrderByRelationAggregateInput
   }
 
   export type ChallanItemWhereUniqueInput = Prisma.AtLeast<{
@@ -110346,8 +110539,13 @@ export namespace Prisma {
     sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
     sourceRollId?: StringNullableFilter<"ChallanItem"> | string | null
     sourceBundleId?: StringNullableFilter<"ChallanItem"> | string | null
+    programId?: StringNullableFilter<"ChallanItem"> | string | null
+    sourceChallanItemId?: StringNullableFilter<"ChallanItem"> | string | null
     createdAt?: DateTimeFilter<"ChallanItem"> | Date | string
     challan?: XOR<ChallanScalarRelationFilter, ChallanWhereInput>
+    program?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
+    sourceChallanItem?: XOR<ChallanItemNullableScalarRelationFilter, ChallanItemWhereInput> | null
+    derivedItems?: ChallanItemListRelationFilter
   }, "id">
 
   export type ChallanItemOrderByWithAggregationInput = {
@@ -110376,6 +110574,8 @@ export namespace Prisma {
     sourceLotId?: SortOrderInput | SortOrder
     sourceRollId?: SortOrderInput | SortOrder
     sourceBundleId?: SortOrderInput | SortOrder
+    programId?: SortOrderInput | SortOrder
+    sourceChallanItemId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: ChallanItemCountOrderByAggregateInput
     _avg?: ChallanItemAvgOrderByAggregateInput
@@ -110413,6 +110613,8 @@ export namespace Prisma {
     sourceLotId?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     sourceRollId?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     sourceBundleId?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
+    programId?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
+    sourceChallanItemId?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ChallanItem"> | Date | string
   }
 
@@ -116929,6 +117131,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -117009,6 +117212,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -117089,6 +117293,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -117169,6 +117374,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -118806,6 +119012,9 @@ export namespace Prisma {
     sourceBundleId?: string | null
     createdAt?: Date | string
     challan: ChallanCreateNestedOneWithoutItemsInput
+    program?: ProgramCreateNestedOneWithoutChallanItemsInput
+    sourceChallanItem?: ChallanItemCreateNestedOneWithoutDerivedItemsInput
+    derivedItems?: ChallanItemCreateNestedManyWithoutSourceChallanItemInput
   }
 
   export type ChallanItemUncheckedCreateInput = {
@@ -118834,7 +119043,10 @@ export namespace Prisma {
     sourceLotId?: string | null
     sourceRollId?: string | null
     sourceBundleId?: string | null
+    programId?: string | null
+    sourceChallanItemId?: string | null
     createdAt?: Date | string
+    derivedItems?: ChallanItemUncheckedCreateNestedManyWithoutSourceChallanItemInput
   }
 
   export type ChallanItemUpdateInput = {
@@ -118864,6 +119076,9 @@ export namespace Prisma {
     sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     challan?: ChallanUpdateOneRequiredWithoutItemsNestedInput
+    program?: ProgramUpdateOneWithoutChallanItemsNestedInput
+    sourceChallanItem?: ChallanItemUpdateOneWithoutDerivedItemsNestedInput
+    derivedItems?: ChallanItemUpdateManyWithoutSourceChallanItemNestedInput
   }
 
   export type ChallanItemUncheckedUpdateInput = {
@@ -118892,7 +119107,10 @@ export namespace Prisma {
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    derivedItems?: ChallanItemUncheckedUpdateManyWithoutSourceChallanItemNestedInput
   }
 
   export type ChallanItemCreateManyInput = {
@@ -118921,6 +119139,8 @@ export namespace Prisma {
     sourceLotId?: string | null
     sourceRollId?: string | null
     sourceBundleId?: string | null
+    programId?: string | null
+    sourceChallanItemId?: string | null
     createdAt?: Date | string
   }
 
@@ -118978,6 +119198,8 @@ export namespace Prisma {
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -125660,6 +125882,12 @@ export namespace Prisma {
     none?: ProgramRouteWhereInput
   }
 
+  export type ChallanItemListRelationFilter = {
+    every?: ChallanItemWhereInput
+    some?: ChallanItemWhereInput
+    none?: ChallanItemWhereInput
+  }
+
   export type BundleListRelationFilter = {
     every?: BundleWhereInput
     some?: BundleWhereInput
@@ -125679,6 +125907,10 @@ export namespace Prisma {
   }
 
   export type ProgramRouteOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ChallanItemOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -126640,16 +126872,6 @@ export namespace Prisma {
     isNot?: ChallanWhereInput | null
   }
 
-  export type ChallanItemListRelationFilter = {
-    every?: ChallanItemWhereInput
-    some?: ChallanItemWhereInput
-    none?: ChallanItemWhereInput
-  }
-
-  export type ChallanItemOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type ChallanCountOrderByAggregateInput = {
     id?: SortOrder
     challanNumber?: SortOrder
@@ -126760,6 +126982,16 @@ export namespace Prisma {
     isNot?: ChallanWhereInput
   }
 
+  export type ProgramNullableScalarRelationFilter = {
+    is?: ProgramWhereInput | null
+    isNot?: ProgramWhereInput | null
+  }
+
+  export type ChallanItemNullableScalarRelationFilter = {
+    is?: ChallanItemWhereInput | null
+    isNot?: ChallanItemWhereInput | null
+  }
+
   export type ChallanItemCountOrderByAggregateInput = {
     id?: SortOrder
     challanId?: SortOrder
@@ -126786,6 +127018,8 @@ export namespace Prisma {
     sourceLotId?: SortOrder
     sourceRollId?: SortOrder
     sourceBundleId?: SortOrder
+    programId?: SortOrder
+    sourceChallanItemId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -126822,6 +127056,8 @@ export namespace Prisma {
     sourceLotId?: SortOrder
     sourceRollId?: SortOrder
     sourceBundleId?: SortOrder
+    programId?: SortOrder
+    sourceChallanItemId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -126851,6 +127087,8 @@ export namespace Prisma {
     sourceLotId?: SortOrder
     sourceRollId?: SortOrder
     sourceBundleId?: SortOrder
+    programId?: SortOrder
+    sourceChallanItemId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -127144,11 +127382,6 @@ export namespace Prisma {
     notes?: SortOrder
     metadata?: SortOrder
     createdAt?: SortOrder
-  }
-
-  export type ProgramNullableScalarRelationFilter = {
-    is?: ProgramWhereInput | null
-    isNot?: ProgramWhereInput | null
   }
 
   export type StockLedgerEntryCountOrderByAggregateInput = {
@@ -132846,6 +133079,13 @@ export namespace Prisma {
     connect?: ChallanWhereUniqueInput | ChallanWhereUniqueInput[]
   }
 
+  export type ChallanItemCreateNestedManyWithoutProgramInput = {
+    create?: XOR<ChallanItemCreateWithoutProgramInput, ChallanItemUncheckedCreateWithoutProgramInput> | ChallanItemCreateWithoutProgramInput[] | ChallanItemUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutProgramInput | ChallanItemCreateOrConnectWithoutProgramInput[]
+    createMany?: ChallanItemCreateManyProgramInputEnvelope
+    connect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+  }
+
   export type ProductionTransactionCreateNestedManyWithoutProgramInput = {
     create?: XOR<ProductionTransactionCreateWithoutProgramInput, ProductionTransactionUncheckedCreateWithoutProgramInput> | ProductionTransactionCreateWithoutProgramInput[] | ProductionTransactionUncheckedCreateWithoutProgramInput[]
     connectOrCreate?: ProductionTransactionCreateOrConnectWithoutProgramInput | ProductionTransactionCreateOrConnectWithoutProgramInput[]
@@ -132991,6 +133231,13 @@ export namespace Prisma {
     connectOrCreate?: ChallanCreateOrConnectWithoutProgramInput | ChallanCreateOrConnectWithoutProgramInput[]
     createMany?: ChallanCreateManyProgramInputEnvelope
     connect?: ChallanWhereUniqueInput | ChallanWhereUniqueInput[]
+  }
+
+  export type ChallanItemUncheckedCreateNestedManyWithoutProgramInput = {
+    create?: XOR<ChallanItemCreateWithoutProgramInput, ChallanItemUncheckedCreateWithoutProgramInput> | ChallanItemCreateWithoutProgramInput[] | ChallanItemUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutProgramInput | ChallanItemCreateOrConnectWithoutProgramInput[]
+    createMany?: ChallanItemCreateManyProgramInputEnvelope
+    connect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
   }
 
   export type ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput = {
@@ -133237,6 +133484,20 @@ export namespace Prisma {
     update?: ChallanUpdateWithWhereUniqueWithoutProgramInput | ChallanUpdateWithWhereUniqueWithoutProgramInput[]
     updateMany?: ChallanUpdateManyWithWhereWithoutProgramInput | ChallanUpdateManyWithWhereWithoutProgramInput[]
     deleteMany?: ChallanScalarWhereInput | ChallanScalarWhereInput[]
+  }
+
+  export type ChallanItemUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<ChallanItemCreateWithoutProgramInput, ChallanItemUncheckedCreateWithoutProgramInput> | ChallanItemCreateWithoutProgramInput[] | ChallanItemUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutProgramInput | ChallanItemCreateOrConnectWithoutProgramInput[]
+    upsert?: ChallanItemUpsertWithWhereUniqueWithoutProgramInput | ChallanItemUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: ChallanItemCreateManyProgramInputEnvelope
+    set?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    disconnect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    delete?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    connect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    update?: ChallanItemUpdateWithWhereUniqueWithoutProgramInput | ChallanItemUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: ChallanItemUpdateManyWithWhereWithoutProgramInput | ChallanItemUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: ChallanItemScalarWhereInput | ChallanItemScalarWhereInput[]
   }
 
   export type ProductionTransactionUpdateManyWithoutProgramNestedInput = {
@@ -133531,6 +133792,20 @@ export namespace Prisma {
     update?: ChallanUpdateWithWhereUniqueWithoutProgramInput | ChallanUpdateWithWhereUniqueWithoutProgramInput[]
     updateMany?: ChallanUpdateManyWithWhereWithoutProgramInput | ChallanUpdateManyWithWhereWithoutProgramInput[]
     deleteMany?: ChallanScalarWhereInput | ChallanScalarWhereInput[]
+  }
+
+  export type ChallanItemUncheckedUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<ChallanItemCreateWithoutProgramInput, ChallanItemUncheckedCreateWithoutProgramInput> | ChallanItemCreateWithoutProgramInput[] | ChallanItemUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutProgramInput | ChallanItemCreateOrConnectWithoutProgramInput[]
+    upsert?: ChallanItemUpsertWithWhereUniqueWithoutProgramInput | ChallanItemUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: ChallanItemCreateManyProgramInputEnvelope
+    set?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    disconnect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    delete?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    connect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    update?: ChallanItemUpdateWithWhereUniqueWithoutProgramInput | ChallanItemUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: ChallanItemUpdateManyWithWhereWithoutProgramInput | ChallanItemUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: ChallanItemScalarWhereInput | ChallanItemScalarWhereInput[]
   }
 
   export type ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput = {
@@ -134747,12 +135022,86 @@ export namespace Prisma {
     connect?: ChallanWhereUniqueInput
   }
 
+  export type ProgramCreateNestedOneWithoutChallanItemsInput = {
+    create?: XOR<ProgramCreateWithoutChallanItemsInput, ProgramUncheckedCreateWithoutChallanItemsInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutChallanItemsInput
+    connect?: ProgramWhereUniqueInput
+  }
+
+  export type ChallanItemCreateNestedOneWithoutDerivedItemsInput = {
+    create?: XOR<ChallanItemCreateWithoutDerivedItemsInput, ChallanItemUncheckedCreateWithoutDerivedItemsInput>
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutDerivedItemsInput
+    connect?: ChallanItemWhereUniqueInput
+  }
+
+  export type ChallanItemCreateNestedManyWithoutSourceChallanItemInput = {
+    create?: XOR<ChallanItemCreateWithoutSourceChallanItemInput, ChallanItemUncheckedCreateWithoutSourceChallanItemInput> | ChallanItemCreateWithoutSourceChallanItemInput[] | ChallanItemUncheckedCreateWithoutSourceChallanItemInput[]
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutSourceChallanItemInput | ChallanItemCreateOrConnectWithoutSourceChallanItemInput[]
+    createMany?: ChallanItemCreateManySourceChallanItemInputEnvelope
+    connect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+  }
+
+  export type ChallanItemUncheckedCreateNestedManyWithoutSourceChallanItemInput = {
+    create?: XOR<ChallanItemCreateWithoutSourceChallanItemInput, ChallanItemUncheckedCreateWithoutSourceChallanItemInput> | ChallanItemCreateWithoutSourceChallanItemInput[] | ChallanItemUncheckedCreateWithoutSourceChallanItemInput[]
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutSourceChallanItemInput | ChallanItemCreateOrConnectWithoutSourceChallanItemInput[]
+    createMany?: ChallanItemCreateManySourceChallanItemInputEnvelope
+    connect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+  }
+
   export type ChallanUpdateOneRequiredWithoutItemsNestedInput = {
     create?: XOR<ChallanCreateWithoutItemsInput, ChallanUncheckedCreateWithoutItemsInput>
     connectOrCreate?: ChallanCreateOrConnectWithoutItemsInput
     upsert?: ChallanUpsertWithoutItemsInput
     connect?: ChallanWhereUniqueInput
     update?: XOR<XOR<ChallanUpdateToOneWithWhereWithoutItemsInput, ChallanUpdateWithoutItemsInput>, ChallanUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type ProgramUpdateOneWithoutChallanItemsNestedInput = {
+    create?: XOR<ProgramCreateWithoutChallanItemsInput, ProgramUncheckedCreateWithoutChallanItemsInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutChallanItemsInput
+    upsert?: ProgramUpsertWithoutChallanItemsInput
+    disconnect?: ProgramWhereInput | boolean
+    delete?: ProgramWhereInput | boolean
+    connect?: ProgramWhereUniqueInput
+    update?: XOR<XOR<ProgramUpdateToOneWithWhereWithoutChallanItemsInput, ProgramUpdateWithoutChallanItemsInput>, ProgramUncheckedUpdateWithoutChallanItemsInput>
+  }
+
+  export type ChallanItemUpdateOneWithoutDerivedItemsNestedInput = {
+    create?: XOR<ChallanItemCreateWithoutDerivedItemsInput, ChallanItemUncheckedCreateWithoutDerivedItemsInput>
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutDerivedItemsInput
+    upsert?: ChallanItemUpsertWithoutDerivedItemsInput
+    disconnect?: ChallanItemWhereInput | boolean
+    delete?: ChallanItemWhereInput | boolean
+    connect?: ChallanItemWhereUniqueInput
+    update?: XOR<XOR<ChallanItemUpdateToOneWithWhereWithoutDerivedItemsInput, ChallanItemUpdateWithoutDerivedItemsInput>, ChallanItemUncheckedUpdateWithoutDerivedItemsInput>
+  }
+
+  export type ChallanItemUpdateManyWithoutSourceChallanItemNestedInput = {
+    create?: XOR<ChallanItemCreateWithoutSourceChallanItemInput, ChallanItemUncheckedCreateWithoutSourceChallanItemInput> | ChallanItemCreateWithoutSourceChallanItemInput[] | ChallanItemUncheckedCreateWithoutSourceChallanItemInput[]
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutSourceChallanItemInput | ChallanItemCreateOrConnectWithoutSourceChallanItemInput[]
+    upsert?: ChallanItemUpsertWithWhereUniqueWithoutSourceChallanItemInput | ChallanItemUpsertWithWhereUniqueWithoutSourceChallanItemInput[]
+    createMany?: ChallanItemCreateManySourceChallanItemInputEnvelope
+    set?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    disconnect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    delete?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    connect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    update?: ChallanItemUpdateWithWhereUniqueWithoutSourceChallanItemInput | ChallanItemUpdateWithWhereUniqueWithoutSourceChallanItemInput[]
+    updateMany?: ChallanItemUpdateManyWithWhereWithoutSourceChallanItemInput | ChallanItemUpdateManyWithWhereWithoutSourceChallanItemInput[]
+    deleteMany?: ChallanItemScalarWhereInput | ChallanItemScalarWhereInput[]
+  }
+
+  export type ChallanItemUncheckedUpdateManyWithoutSourceChallanItemNestedInput = {
+    create?: XOR<ChallanItemCreateWithoutSourceChallanItemInput, ChallanItemUncheckedCreateWithoutSourceChallanItemInput> | ChallanItemCreateWithoutSourceChallanItemInput[] | ChallanItemUncheckedCreateWithoutSourceChallanItemInput[]
+    connectOrCreate?: ChallanItemCreateOrConnectWithoutSourceChallanItemInput | ChallanItemCreateOrConnectWithoutSourceChallanItemInput[]
+    upsert?: ChallanItemUpsertWithWhereUniqueWithoutSourceChallanItemInput | ChallanItemUpsertWithWhereUniqueWithoutSourceChallanItemInput[]
+    createMany?: ChallanItemCreateManySourceChallanItemInputEnvelope
+    set?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    disconnect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    delete?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    connect?: ChallanItemWhereUniqueInput | ChallanItemWhereUniqueInput[]
+    update?: ChallanItemUpdateWithWhereUniqueWithoutSourceChallanItemInput | ChallanItemUpdateWithWhereUniqueWithoutSourceChallanItemInput[]
+    updateMany?: ChallanItemUpdateManyWithWhereWithoutSourceChallanItemInput | ChallanItemUpdateManyWithWhereWithoutSourceChallanItemInput[]
+    deleteMany?: ChallanItemScalarWhereInput | ChallanItemScalarWhereInput[]
   }
 
   export type ProgramCreateNestedOneWithoutProductionLogsInput = {
@@ -138088,6 +138437,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -138167,6 +138517,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -138256,6 +138607,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -138335,6 +138687,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -143320,6 +143673,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -143399,6 +143753,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -143971,6 +144326,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -144050,6 +144406,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -145227,6 +145584,78 @@ export namespace Prisma {
 
   export type ChallanCreateManyProgramInputEnvelope = {
     data: ChallanCreateManyProgramInput | ChallanCreateManyProgramInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ChallanItemCreateWithoutProgramInput = {
+    id?: string
+    itemDescription: string
+    fabricCode?: string | null
+    colour?: string | null
+    shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
+    fabricProcessingStatus?: string | null
+    garmentCategory?: string | null
+    styleRef?: string | null
+    size?: string | null
+    unitType: string
+    rollNumber?: string | null
+    lotNumber?: string | null
+    bundleNumber?: string | null
+    barcode?: string | null
+    quantity: number
+    grossWeightKg?: number | null
+    netWeightKg?: number | null
+    uom: string
+    remarks?: string | null
+    sourceLotId?: string | null
+    sourceRollId?: string | null
+    sourceBundleId?: string | null
+    createdAt?: Date | string
+    challan: ChallanCreateNestedOneWithoutItemsInput
+    sourceChallanItem?: ChallanItemCreateNestedOneWithoutDerivedItemsInput
+    derivedItems?: ChallanItemCreateNestedManyWithoutSourceChallanItemInput
+  }
+
+  export type ChallanItemUncheckedCreateWithoutProgramInput = {
+    id?: string
+    challanId: string
+    itemDescription: string
+    fabricCode?: string | null
+    colour?: string | null
+    shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
+    fabricProcessingStatus?: string | null
+    garmentCategory?: string | null
+    styleRef?: string | null
+    size?: string | null
+    unitType: string
+    rollNumber?: string | null
+    lotNumber?: string | null
+    bundleNumber?: string | null
+    barcode?: string | null
+    quantity: number
+    grossWeightKg?: number | null
+    netWeightKg?: number | null
+    uom: string
+    remarks?: string | null
+    sourceLotId?: string | null
+    sourceRollId?: string | null
+    sourceBundleId?: string | null
+    sourceChallanItemId?: string | null
+    createdAt?: Date | string
+    derivedItems?: ChallanItemUncheckedCreateNestedManyWithoutSourceChallanItemInput
+  }
+
+  export type ChallanItemCreateOrConnectWithoutProgramInput = {
+    where: ChallanItemWhereUniqueInput
+    create: XOR<ChallanItemCreateWithoutProgramInput, ChallanItemUncheckedCreateWithoutProgramInput>
+  }
+
+  export type ChallanItemCreateManyProgramInputEnvelope = {
+    data: ChallanItemCreateManyProgramInput | ChallanItemCreateManyProgramInput[]
     skipDuplicates?: boolean
   }
 
@@ -146485,6 +146914,56 @@ export namespace Prisma {
     data: XOR<ChallanUpdateManyMutationInput, ChallanUncheckedUpdateManyWithoutProgramInput>
   }
 
+  export type ChallanItemUpsertWithWhereUniqueWithoutProgramInput = {
+    where: ChallanItemWhereUniqueInput
+    update: XOR<ChallanItemUpdateWithoutProgramInput, ChallanItemUncheckedUpdateWithoutProgramInput>
+    create: XOR<ChallanItemCreateWithoutProgramInput, ChallanItemUncheckedCreateWithoutProgramInput>
+  }
+
+  export type ChallanItemUpdateWithWhereUniqueWithoutProgramInput = {
+    where: ChallanItemWhereUniqueInput
+    data: XOR<ChallanItemUpdateWithoutProgramInput, ChallanItemUncheckedUpdateWithoutProgramInput>
+  }
+
+  export type ChallanItemUpdateManyWithWhereWithoutProgramInput = {
+    where: ChallanItemScalarWhereInput
+    data: XOR<ChallanItemUpdateManyMutationInput, ChallanItemUncheckedUpdateManyWithoutProgramInput>
+  }
+
+  export type ChallanItemScalarWhereInput = {
+    AND?: ChallanItemScalarWhereInput | ChallanItemScalarWhereInput[]
+    OR?: ChallanItemScalarWhereInput[]
+    NOT?: ChallanItemScalarWhereInput | ChallanItemScalarWhereInput[]
+    id?: StringFilter<"ChallanItem"> | string
+    challanId?: StringFilter<"ChallanItem"> | string
+    itemDescription?: StringFilter<"ChallanItem"> | string
+    fabricCode?: StringNullableFilter<"ChallanItem"> | string | null
+    colour?: StringNullableFilter<"ChallanItem"> | string | null
+    shade?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredColour?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
+    fabricProcessingStatus?: StringNullableFilter<"ChallanItem"> | string | null
+    garmentCategory?: StringNullableFilter<"ChallanItem"> | string | null
+    styleRef?: StringNullableFilter<"ChallanItem"> | string | null
+    size?: StringNullableFilter<"ChallanItem"> | string | null
+    unitType?: StringFilter<"ChallanItem"> | string
+    rollNumber?: StringNullableFilter<"ChallanItem"> | string | null
+    lotNumber?: StringNullableFilter<"ChallanItem"> | string | null
+    bundleNumber?: StringNullableFilter<"ChallanItem"> | string | null
+    barcode?: StringNullableFilter<"ChallanItem"> | string | null
+    quantity?: FloatFilter<"ChallanItem"> | number
+    grossWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
+    netWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
+    uom?: StringFilter<"ChallanItem"> | string
+    remarks?: StringNullableFilter<"ChallanItem"> | string | null
+    sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
+    sourceRollId?: StringNullableFilter<"ChallanItem"> | string | null
+    sourceBundleId?: StringNullableFilter<"ChallanItem"> | string | null
+    programId?: StringNullableFilter<"ChallanItem"> | string | null
+    sourceChallanItemId?: StringNullableFilter<"ChallanItem"> | string | null
+    createdAt?: DateTimeFilter<"ChallanItem"> | Date | string
+  }
+
   export type ProductionTransactionUpsertWithWhereUniqueWithoutProgramInput = {
     where: ProductionTransactionWhereUniqueInput
     update: XOR<ProductionTransactionUpdateWithoutProgramInput, ProductionTransactionUncheckedUpdateWithoutProgramInput>
@@ -146850,6 +147329,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -146929,6 +147409,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -147088,6 +147569,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -147167,6 +147649,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -147322,6 +147805,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -147401,6 +147885,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -147525,6 +148010,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -147604,6 +148090,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -147718,6 +148205,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -147797,6 +148285,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -147921,6 +148410,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -148000,6 +148490,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -148114,6 +148605,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -148193,6 +148685,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -148317,6 +148810,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -148396,6 +148890,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -148510,6 +149005,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -148589,6 +149085,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -148758,6 +149255,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -148837,6 +149335,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -149002,6 +149501,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationCreateNestedManyWithoutProgramInput
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -149081,6 +149581,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationUncheckedCreateNestedManyWithoutProgramInput
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -149218,6 +149719,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationUpdateManyWithoutProgramNestedInput
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -149297,6 +149799,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationUncheckedUpdateManyWithoutProgramNestedInput
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -150460,6 +150963,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationCreateNestedManyWithoutProgramInput
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -150539,6 +151043,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationUncheckedCreateNestedManyWithoutProgramInput
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -151267,6 +151772,9 @@ export namespace Prisma {
     sourceRollId?: string | null
     sourceBundleId?: string | null
     createdAt?: Date | string
+    program?: ProgramCreateNestedOneWithoutChallanItemsInput
+    sourceChallanItem?: ChallanItemCreateNestedOneWithoutDerivedItemsInput
+    derivedItems?: ChallanItemCreateNestedManyWithoutSourceChallanItemInput
   }
 
   export type ChallanItemUncheckedCreateWithoutChallanInput = {
@@ -151294,7 +151802,10 @@ export namespace Prisma {
     sourceLotId?: string | null
     sourceRollId?: string | null
     sourceBundleId?: string | null
+    programId?: string | null
+    sourceChallanItemId?: string | null
     createdAt?: Date | string
+    derivedItems?: ChallanItemUncheckedCreateNestedManyWithoutSourceChallanItemInput
   }
 
   export type ChallanItemCreateOrConnectWithoutChallanInput = {
@@ -152039,6 +152550,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationUpdateManyWithoutProgramNestedInput
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -152118,6 +152630,7 @@ export namespace Prisma {
     specifications?: ProgramSpecificationUncheckedUpdateManyWithoutProgramNestedInput
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -152793,38 +153306,6 @@ export namespace Prisma {
     data: XOR<ChallanItemUpdateManyMutationInput, ChallanItemUncheckedUpdateManyWithoutChallanInput>
   }
 
-  export type ChallanItemScalarWhereInput = {
-    AND?: ChallanItemScalarWhereInput | ChallanItemScalarWhereInput[]
-    OR?: ChallanItemScalarWhereInput[]
-    NOT?: ChallanItemScalarWhereInput | ChallanItemScalarWhereInput[]
-    id?: StringFilter<"ChallanItem"> | string
-    challanId?: StringFilter<"ChallanItem"> | string
-    itemDescription?: StringFilter<"ChallanItem"> | string
-    fabricCode?: StringNullableFilter<"ChallanItem"> | string | null
-    colour?: StringNullableFilter<"ChallanItem"> | string | null
-    shade?: StringNullableFilter<"ChallanItem"> | string | null
-    requiredColour?: StringNullableFilter<"ChallanItem"> | string | null
-    requiredQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
-    fabricProcessingStatus?: StringNullableFilter<"ChallanItem"> | string | null
-    garmentCategory?: StringNullableFilter<"ChallanItem"> | string | null
-    styleRef?: StringNullableFilter<"ChallanItem"> | string | null
-    size?: StringNullableFilter<"ChallanItem"> | string | null
-    unitType?: StringFilter<"ChallanItem"> | string
-    rollNumber?: StringNullableFilter<"ChallanItem"> | string | null
-    lotNumber?: StringNullableFilter<"ChallanItem"> | string | null
-    bundleNumber?: StringNullableFilter<"ChallanItem"> | string | null
-    barcode?: StringNullableFilter<"ChallanItem"> | string | null
-    quantity?: FloatFilter<"ChallanItem"> | number
-    grossWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
-    netWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
-    uom?: StringFilter<"ChallanItem"> | string
-    remarks?: StringNullableFilter<"ChallanItem"> | string | null
-    sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
-    sourceRollId?: StringNullableFilter<"ChallanItem"> | string | null
-    sourceBundleId?: StringNullableFilter<"ChallanItem"> | string | null
-    createdAt?: DateTimeFilter<"ChallanItem"> | Date | string
-  }
-
   export type ProductionTransactionUpsertWithWhereUniqueWithoutChallanInput = {
     where: ProductionTransactionWhereUniqueInput
     update: XOR<ProductionTransactionUpdateWithoutChallanInput, ProductionTransactionUncheckedUpdateWithoutChallanInput>
@@ -153092,6 +153573,310 @@ export namespace Prisma {
     create: XOR<ChallanCreateWithoutItemsInput, ChallanUncheckedCreateWithoutItemsInput>
   }
 
+  export type ProgramCreateWithoutChallanItemsInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    buyerName: string
+    orderNumber: string
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    customer?: CustomerCreateNestedOneWithoutProgramsInput
+    design?: DesignCreateNestedOneWithoutProgramsInput
+    createdBy: UserCreateNestedOneWithoutCreatedProgramsInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedProgramsInput
+    fabrics?: ProgramFabricCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteCreateNestedManyWithoutProgramInput
+    challans?: ChallanCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollCreateNestedManyWithoutProgramInput
+    bundles?: BundleCreateNestedManyWithoutProgramInput
+    cartons?: CartonCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
+    departmentWorkItems?: DepartmentWorkItemCreateNestedManyWithoutProgramInput
+    garmentImages?: GarmentImageCreateNestedManyWithoutProgramInput
+  }
+
+  export type ProgramUncheckedCreateWithoutChallanItemsInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    customerId?: string | null
+    buyerName: string
+    orderNumber: string
+    designId?: string | null
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    createdById: string
+    approvedById?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fabrics?: ProgramFabricUncheckedCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourUncheckedCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeUncheckedCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationUncheckedCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
+    challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
+    bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
+    cartons?: CartonUncheckedCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordUncheckedCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
+    departmentWorkItems?: DepartmentWorkItemUncheckedCreateNestedManyWithoutProgramInput
+    garmentImages?: GarmentImageUncheckedCreateNestedManyWithoutProgramInput
+  }
+
+  export type ProgramCreateOrConnectWithoutChallanItemsInput = {
+    where: ProgramWhereUniqueInput
+    create: XOR<ProgramCreateWithoutChallanItemsInput, ProgramUncheckedCreateWithoutChallanItemsInput>
+  }
+
+  export type ChallanItemCreateWithoutDerivedItemsInput = {
+    id?: string
+    itemDescription: string
+    fabricCode?: string | null
+    colour?: string | null
+    shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
+    fabricProcessingStatus?: string | null
+    garmentCategory?: string | null
+    styleRef?: string | null
+    size?: string | null
+    unitType: string
+    rollNumber?: string | null
+    lotNumber?: string | null
+    bundleNumber?: string | null
+    barcode?: string | null
+    quantity: number
+    grossWeightKg?: number | null
+    netWeightKg?: number | null
+    uom: string
+    remarks?: string | null
+    sourceLotId?: string | null
+    sourceRollId?: string | null
+    sourceBundleId?: string | null
+    createdAt?: Date | string
+    challan: ChallanCreateNestedOneWithoutItemsInput
+    program?: ProgramCreateNestedOneWithoutChallanItemsInput
+    sourceChallanItem?: ChallanItemCreateNestedOneWithoutDerivedItemsInput
+  }
+
+  export type ChallanItemUncheckedCreateWithoutDerivedItemsInput = {
+    id?: string
+    challanId: string
+    itemDescription: string
+    fabricCode?: string | null
+    colour?: string | null
+    shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
+    fabricProcessingStatus?: string | null
+    garmentCategory?: string | null
+    styleRef?: string | null
+    size?: string | null
+    unitType: string
+    rollNumber?: string | null
+    lotNumber?: string | null
+    bundleNumber?: string | null
+    barcode?: string | null
+    quantity: number
+    grossWeightKg?: number | null
+    netWeightKg?: number | null
+    uom: string
+    remarks?: string | null
+    sourceLotId?: string | null
+    sourceRollId?: string | null
+    sourceBundleId?: string | null
+    programId?: string | null
+    sourceChallanItemId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ChallanItemCreateOrConnectWithoutDerivedItemsInput = {
+    where: ChallanItemWhereUniqueInput
+    create: XOR<ChallanItemCreateWithoutDerivedItemsInput, ChallanItemUncheckedCreateWithoutDerivedItemsInput>
+  }
+
+  export type ChallanItemCreateWithoutSourceChallanItemInput = {
+    id?: string
+    itemDescription: string
+    fabricCode?: string | null
+    colour?: string | null
+    shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
+    fabricProcessingStatus?: string | null
+    garmentCategory?: string | null
+    styleRef?: string | null
+    size?: string | null
+    unitType: string
+    rollNumber?: string | null
+    lotNumber?: string | null
+    bundleNumber?: string | null
+    barcode?: string | null
+    quantity: number
+    grossWeightKg?: number | null
+    netWeightKg?: number | null
+    uom: string
+    remarks?: string | null
+    sourceLotId?: string | null
+    sourceRollId?: string | null
+    sourceBundleId?: string | null
+    createdAt?: Date | string
+    challan: ChallanCreateNestedOneWithoutItemsInput
+    program?: ProgramCreateNestedOneWithoutChallanItemsInput
+    derivedItems?: ChallanItemCreateNestedManyWithoutSourceChallanItemInput
+  }
+
+  export type ChallanItemUncheckedCreateWithoutSourceChallanItemInput = {
+    id?: string
+    challanId: string
+    itemDescription: string
+    fabricCode?: string | null
+    colour?: string | null
+    shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
+    fabricProcessingStatus?: string | null
+    garmentCategory?: string | null
+    styleRef?: string | null
+    size?: string | null
+    unitType: string
+    rollNumber?: string | null
+    lotNumber?: string | null
+    bundleNumber?: string | null
+    barcode?: string | null
+    quantity: number
+    grossWeightKg?: number | null
+    netWeightKg?: number | null
+    uom: string
+    remarks?: string | null
+    sourceLotId?: string | null
+    sourceRollId?: string | null
+    sourceBundleId?: string | null
+    programId?: string | null
+    createdAt?: Date | string
+    derivedItems?: ChallanItemUncheckedCreateNestedManyWithoutSourceChallanItemInput
+  }
+
+  export type ChallanItemCreateOrConnectWithoutSourceChallanItemInput = {
+    where: ChallanItemWhereUniqueInput
+    create: XOR<ChallanItemCreateWithoutSourceChallanItemInput, ChallanItemUncheckedCreateWithoutSourceChallanItemInput>
+  }
+
+  export type ChallanItemCreateManySourceChallanItemInputEnvelope = {
+    data: ChallanItemCreateManySourceChallanItemInput | ChallanItemCreateManySourceChallanItemInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ChallanUpsertWithoutItemsInput = {
     update: XOR<ChallanUpdateWithoutItemsInput, ChallanUncheckedUpdateWithoutItemsInput>
     create: XOR<ChallanCreateWithoutItemsInput, ChallanUncheckedCreateWithoutItemsInput>
@@ -153189,6 +153974,266 @@ export namespace Prisma {
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
+  export type ProgramUpsertWithoutChallanItemsInput = {
+    update: XOR<ProgramUpdateWithoutChallanItemsInput, ProgramUncheckedUpdateWithoutChallanItemsInput>
+    create: XOR<ProgramCreateWithoutChallanItemsInput, ProgramUncheckedCreateWithoutChallanItemsInput>
+    where?: ProgramWhereInput
+  }
+
+  export type ProgramUpdateToOneWithWhereWithoutChallanItemsInput = {
+    where?: ProgramWhereInput
+    data: XOR<ProgramUpdateWithoutChallanItemsInput, ProgramUncheckedUpdateWithoutChallanItemsInput>
+  }
+
+  export type ProgramUpdateWithoutChallanItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    customer?: CustomerUpdateOneWithoutProgramsNestedInput
+    design?: DesignUpdateOneWithoutProgramsNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedProgramsNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedProgramsNestedInput
+    fabrics?: ProgramFabricUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
+    departmentWorkItems?: DepartmentWorkItemUpdateManyWithoutProgramNestedInput
+    garmentImages?: GarmentImageUpdateManyWithoutProgramNestedInput
+  }
+
+  export type ProgramUncheckedUpdateWithoutChallanItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    customerId?: NullableStringFieldUpdateOperationsInput | string | null
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designId?: NullableStringFieldUpdateOperationsInput | string | null
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabrics?: ProgramFabricUncheckedUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUncheckedUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUncheckedUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUncheckedUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUncheckedUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUncheckedUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
+    departmentWorkItems?: DepartmentWorkItemUncheckedUpdateManyWithoutProgramNestedInput
+    garmentImages?: GarmentImageUncheckedUpdateManyWithoutProgramNestedInput
+  }
+
+  export type ChallanItemUpsertWithoutDerivedItemsInput = {
+    update: XOR<ChallanItemUpdateWithoutDerivedItemsInput, ChallanItemUncheckedUpdateWithoutDerivedItemsInput>
+    create: XOR<ChallanItemCreateWithoutDerivedItemsInput, ChallanItemUncheckedCreateWithoutDerivedItemsInput>
+    where?: ChallanItemWhereInput
+  }
+
+  export type ChallanItemUpdateToOneWithWhereWithoutDerivedItemsInput = {
+    where?: ChallanItemWhereInput
+    data: XOR<ChallanItemUpdateWithoutDerivedItemsInput, ChallanItemUncheckedUpdateWithoutDerivedItemsInput>
+  }
+
+  export type ChallanItemUpdateWithoutDerivedItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemDescription?: StringFieldUpdateOperationsInput | string
+    fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricProcessingStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    garmentCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    styleRef?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: StringFieldUpdateOperationsInput | string
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lotNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bundleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    uom?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    challan?: ChallanUpdateOneRequiredWithoutItemsNestedInput
+    program?: ProgramUpdateOneWithoutChallanItemsNestedInput
+    sourceChallanItem?: ChallanItemUpdateOneWithoutDerivedItemsNestedInput
+  }
+
+  export type ChallanItemUncheckedUpdateWithoutDerivedItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanId?: StringFieldUpdateOperationsInput | string
+    itemDescription?: StringFieldUpdateOperationsInput | string
+    fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricProcessingStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    garmentCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    styleRef?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: StringFieldUpdateOperationsInput | string
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lotNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bundleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    uom?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChallanItemUpsertWithWhereUniqueWithoutSourceChallanItemInput = {
+    where: ChallanItemWhereUniqueInput
+    update: XOR<ChallanItemUpdateWithoutSourceChallanItemInput, ChallanItemUncheckedUpdateWithoutSourceChallanItemInput>
+    create: XOR<ChallanItemCreateWithoutSourceChallanItemInput, ChallanItemUncheckedCreateWithoutSourceChallanItemInput>
+  }
+
+  export type ChallanItemUpdateWithWhereUniqueWithoutSourceChallanItemInput = {
+    where: ChallanItemWhereUniqueInput
+    data: XOR<ChallanItemUpdateWithoutSourceChallanItemInput, ChallanItemUncheckedUpdateWithoutSourceChallanItemInput>
+  }
+
+  export type ChallanItemUpdateManyWithWhereWithoutSourceChallanItemInput = {
+    where: ChallanItemScalarWhereInput
+    data: XOR<ChallanItemUpdateManyMutationInput, ChallanItemUncheckedUpdateManyWithoutSourceChallanItemInput>
+  }
+
   export type ProgramCreateWithoutProductionLogsInput = {
     id?: string
     programNumber: string
@@ -153253,6 +154298,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
     cartons?: CartonCreateNestedManyWithoutProgramInput
@@ -153332,6 +154378,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
     cartons?: CartonUncheckedCreateNestedManyWithoutProgramInput
@@ -153623,6 +154670,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
     cartons?: CartonUpdateManyWithoutProgramNestedInput
@@ -153702,6 +154750,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
     cartons?: CartonUncheckedUpdateManyWithoutProgramNestedInput
@@ -154985,6 +156034,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -155064,6 +156114,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -155264,6 +156315,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -155343,6 +156395,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -155533,6 +156586,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
     cartons?: CartonCreateNestedManyWithoutProgramInput
@@ -155612,6 +156666,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
     cartons?: CartonUncheckedCreateNestedManyWithoutProgramInput
@@ -155810,6 +156865,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
     cartons?: CartonUpdateManyWithoutProgramNestedInput
@@ -155889,6 +156945,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
     cartons?: CartonUncheckedUpdateManyWithoutProgramNestedInput
@@ -156033,6 +157090,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     cartons?: CartonCreateNestedManyWithoutProgramInput
@@ -156112,6 +157170,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     cartons?: CartonUncheckedCreateNestedManyWithoutProgramInput
@@ -156511,6 +157570,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     cartons?: CartonUpdateManyWithoutProgramNestedInput
@@ -156590,6 +157650,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     cartons?: CartonUncheckedUpdateManyWithoutProgramNestedInput
@@ -156892,6 +157953,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -156971,6 +158033,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -157112,6 +158175,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -157191,6 +158255,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -158274,6 +159339,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -158353,6 +159419,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -158787,6 +159854,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -158866,6 +159934,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -159293,6 +160362,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -159372,6 +160442,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -159625,6 +160696,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -159704,6 +160776,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -159894,6 +160967,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -159973,6 +161047,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -160435,6 +161510,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -160514,6 +161590,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -161242,6 +162319,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -161321,6 +162399,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -161659,6 +162738,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -161738,6 +162818,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -162157,6 +163238,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -162236,6 +163318,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -162634,6 +163717,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -162713,6 +163797,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -164257,6 +165342,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -164336,6 +165422,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -164960,6 +166047,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -165039,6 +166127,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -166245,6 +167334,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -166324,6 +167414,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -167035,6 +168126,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -167114,6 +168206,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -170206,6 +171299,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -170285,6 +171379,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -170493,6 +171588,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -170572,6 +171668,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -171528,6 +172625,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteCreateNestedManyWithoutProgramInput
     challans?: ChallanCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
     rolls?: FabricRollCreateNestedManyWithoutProgramInput
     bundles?: BundleCreateNestedManyWithoutProgramInput
@@ -171607,6 +172705,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
     routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
     challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    challanItems?: ChallanItemUncheckedCreateNestedManyWithoutProgramInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
     rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
     bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
@@ -171807,6 +172906,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -171886,6 +172986,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -172963,6 +174064,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -173042,6 +174144,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -173179,6 +174282,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -173258,6 +174362,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -176722,6 +177827,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -176801,6 +177907,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -177189,6 +178296,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
     challans?: ChallanUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUpdateManyWithoutProgramNestedInput
     bundles?: BundleUpdateManyWithoutProgramNestedInput
@@ -177268,6 +178376,7 @@ export namespace Prisma {
     bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
     routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
     challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    challanItems?: ChallanItemUncheckedUpdateManyWithoutProgramNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
     rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
@@ -177722,6 +178831,36 @@ export namespace Prisma {
     defectReason?: string | null
     detectedFromChallanId?: string | null
     detectedFromDepartment?: string | null
+  }
+
+  export type ChallanItemCreateManyProgramInput = {
+    id?: string
+    challanId: string
+    itemDescription: string
+    fabricCode?: string | null
+    colour?: string | null
+    shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
+    fabricProcessingStatus?: string | null
+    garmentCategory?: string | null
+    styleRef?: string | null
+    size?: string | null
+    unitType: string
+    rollNumber?: string | null
+    lotNumber?: string | null
+    bundleNumber?: string | null
+    barcode?: string | null
+    quantity: number
+    grossWeightKg?: number | null
+    netWeightKg?: number | null
+    uom: string
+    remarks?: string | null
+    sourceLotId?: string | null
+    sourceRollId?: string | null
+    sourceBundleId?: string | null
+    sourceChallanItemId?: string | null
+    createdAt?: Date | string
   }
 
   export type ProductionTransactionCreateManyProgramInput = {
@@ -178386,6 +179525,98 @@ export namespace Prisma {
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ChallanItemUpdateWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemDescription?: StringFieldUpdateOperationsInput | string
+    fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricProcessingStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    garmentCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    styleRef?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: StringFieldUpdateOperationsInput | string
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lotNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bundleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    uom?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    challan?: ChallanUpdateOneRequiredWithoutItemsNestedInput
+    sourceChallanItem?: ChallanItemUpdateOneWithoutDerivedItemsNestedInput
+    derivedItems?: ChallanItemUpdateManyWithoutSourceChallanItemNestedInput
+  }
+
+  export type ChallanItemUncheckedUpdateWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanId?: StringFieldUpdateOperationsInput | string
+    itemDescription?: StringFieldUpdateOperationsInput | string
+    fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricProcessingStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    garmentCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    styleRef?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: StringFieldUpdateOperationsInput | string
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lotNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bundleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    uom?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    derivedItems?: ChallanItemUncheckedUpdateManyWithoutSourceChallanItemNestedInput
+  }
+
+  export type ChallanItemUncheckedUpdateManyWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanId?: StringFieldUpdateOperationsInput | string
+    itemDescription?: StringFieldUpdateOperationsInput | string
+    fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricProcessingStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    garmentCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    styleRef?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: StringFieldUpdateOperationsInput | string
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lotNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bundleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    uom?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ProductionTransactionUpdateWithoutProgramInput = {
@@ -179505,6 +180736,8 @@ export namespace Prisma {
     sourceLotId?: string | null
     sourceRollId?: string | null
     sourceBundleId?: string | null
+    programId?: string | null
+    sourceChallanItemId?: string | null
     createdAt?: Date | string
   }
 
@@ -179908,6 +181141,9 @@ export namespace Prisma {
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneWithoutChallanItemsNestedInput
+    sourceChallanItem?: ChallanItemUpdateOneWithoutDerivedItemsNestedInput
+    derivedItems?: ChallanItemUpdateManyWithoutSourceChallanItemNestedInput
   }
 
   export type ChallanItemUncheckedUpdateWithoutChallanInput = {
@@ -179935,7 +181171,10 @@ export namespace Prisma {
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    derivedItems?: ChallanItemUncheckedUpdateManyWithoutSourceChallanItemNestedInput
   }
 
   export type ChallanItemUncheckedUpdateManyWithoutChallanInput = {
@@ -179963,6 +181202,8 @@ export namespace Prisma {
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -180770,6 +182011,128 @@ export namespace Prisma {
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChallanItemCreateManySourceChallanItemInput = {
+    id?: string
+    challanId: string
+    itemDescription: string
+    fabricCode?: string | null
+    colour?: string | null
+    shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
+    fabricProcessingStatus?: string | null
+    garmentCategory?: string | null
+    styleRef?: string | null
+    size?: string | null
+    unitType: string
+    rollNumber?: string | null
+    lotNumber?: string | null
+    bundleNumber?: string | null
+    barcode?: string | null
+    quantity: number
+    grossWeightKg?: number | null
+    netWeightKg?: number | null
+    uom: string
+    remarks?: string | null
+    sourceLotId?: string | null
+    sourceRollId?: string | null
+    sourceBundleId?: string | null
+    programId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ChallanItemUpdateWithoutSourceChallanItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemDescription?: StringFieldUpdateOperationsInput | string
+    fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricProcessingStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    garmentCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    styleRef?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: StringFieldUpdateOperationsInput | string
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lotNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bundleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    uom?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    challan?: ChallanUpdateOneRequiredWithoutItemsNestedInput
+    program?: ProgramUpdateOneWithoutChallanItemsNestedInput
+    derivedItems?: ChallanItemUpdateManyWithoutSourceChallanItemNestedInput
+  }
+
+  export type ChallanItemUncheckedUpdateWithoutSourceChallanItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanId?: StringFieldUpdateOperationsInput | string
+    itemDescription?: StringFieldUpdateOperationsInput | string
+    fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricProcessingStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    garmentCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    styleRef?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: StringFieldUpdateOperationsInput | string
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lotNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bundleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    uom?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    derivedItems?: ChallanItemUncheckedUpdateManyWithoutSourceChallanItemNestedInput
+  }
+
+  export type ChallanItemUncheckedUpdateManyWithoutSourceChallanItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanId?: StringFieldUpdateOperationsInput | string
+    itemDescription?: StringFieldUpdateOperationsInput | string
+    fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricProcessingStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    garmentCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    styleRef?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: StringFieldUpdateOperationsInput | string
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    lotNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bundleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    barcode?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: FloatFieldUpdateOperationsInput | number
+    grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    uom?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceBundleId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DefectLogCreateManyInspectionInput = {

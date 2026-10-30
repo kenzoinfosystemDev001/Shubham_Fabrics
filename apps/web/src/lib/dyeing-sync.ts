@@ -1,5 +1,6 @@
 import { prisma } from '@subham/database';
 import { mapChallanItemsToDyeingLines } from '@/lib/dyeing-instructions.mjs';
+import { lineSheetId } from '@/lib/challan-sheets.mjs';
 
 // Challans count as sent to Dyeing once issued; drafts and cancelled challans never create work.
 const INBOUND_STATUSES = ['ISSUED', 'IN_TRANSIT', 'RECEIVED', 'QC_APPROVED'];
@@ -55,6 +56,9 @@ export async function syncInboundChallansToDyeingOrders() {
     for (const challan of challans) {
       const lines = mapChallanItemsToDyeingLines(challan);
       if (!challan.programId || lines.length === 0) continue;
+      // Each order belongs to its own line's Production Sheet (older lines: the challan's).
+      const sheetOfItem = new Map(challan.items.map((item) => [item.id, lineSheetId(item, challan) as string]));
+      const sheetOf = (itemId: string | null) => (itemId && sheetOfItem.get(itemId)) || challan.programId;
       const isRework = challan.challanType === 'REWORK_RETURN';
 
       // A concurrent request may take the same order numbers; retry with fresh ones.
@@ -69,7 +73,7 @@ export async function syncInboundChallansToDyeingOrders() {
                 await tx.dyeingOrder.create({
                   data: {
                     orderNumber: `DYE-${year}-${String(seq++).padStart(4, '0')}`,
-                    programId: challan.programId,
+                    programId: sheetOf(line.itemId),
                     inboundChallanId: challan.id,
                     inboundChallanItemId: line.itemId,
                     status: 'AWAITING_RECEIPT',
@@ -94,7 +98,7 @@ export async function syncInboundChallansToDyeingOrders() {
                 }),
               );
             }
-            await tx.program.update({ where: { id: challan.programId }, data: { status: 'IN_PRODUCTION' } });
+            await tx.program.updateMany({ where: { id: { in: Array.from(new Set(rows.map((r) => r.programId))) } }, data: { status: 'IN_PRODUCTION' } });
             return rows;
           });
           created.push(...orders);

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Plus, Send, Trash2 } from 'lucide-react';
 import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
+import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 import {
   BTN_PRIMARY,
   BTN_SECONDARY,
@@ -23,6 +24,7 @@ import {
 } from '@/components/dyeing/DyeingUi';
 import { availableForQc, needsColorReview } from '@/lib/dyeing-workflow.mjs';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
+import { NO_INCOMING_CHALLAN, challanSheetRefs, distinct, incomingChallanOptions } from '@/lib/challan-sheets.mjs';
 
 const READY = ['DYED', 'READY_FOR_QC1', 'PARTIALLY_SENT_TO_QC1'];
 
@@ -35,13 +37,16 @@ interface Row {
 }
 
 const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), orderId: '', quantity: '', actualDyedColor: '', remarks: '' });
+const sourceOf = (o: any) => o.inboundChallanId || NO_INCOMING_CHALLAN;
 
 function IssueChallanContent() {
   const params = useSearchParams();
+  // A link may open this page for one incoming challan (?challanId=) or one sheet (?programId=, a filter).
+  const sheetFilter = params.get('programId') || '';
   const [orders, setOrders] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [programId, setProgramId] = useState(params.get('programId') || '');
+  const [sourceIds, setSourceIds] = useState<string[]>(() => (params.get('challanId') ? [params.get('challanId') as string] : []));
   const [challanNumber, setChallanNumber] = useState('');
   const [numberError, setNumberError] = useState<string | null>(null);
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -78,33 +83,64 @@ function IssueChallanContent() {
   }, []);
 
   // Lines that may go to QC now: completed or ready, something left to send, colour reviewed if needed.
-  const eligible = useMemo(() => orders.filter((o) => READY.includes(o.status) && availableForQc(o) > 0 && !needsColorReview(o)), [orders]);
+  const eligible = useMemo(
+    () => orders.filter((o) => READY.includes(o.status) && availableForQc(o) > 0 && !needsColorReview(o) && (!sheetFilter || o.programId === sheetFilter)),
+    [orders, sheetFilter],
+  );
   const waitingReview = useMemo(() => orders.filter((o) => READY.includes(o.status) && needsColorReview(o)), [orders]);
-  const sheets = useMemo(() => {
-    const map = new Map<string, any>();
-    for (const o of eligible) if (o.program) map.set(o.program.id, o.program);
-    return Array.from(map.values());
-  }, [eligible]);
-  const program = sheets.find((p) => p.id === programId) || null;
-  const sheetOrders = eligible.filter((o) => o.programId === programId);
-  const orderById = (id: string) => sheetOrders.find((o) => o.id === id);
-
+  // Step 1: incoming challans with dyed lines still to send.
+  const options = useMemo(() => incomingChallanOptions(eligible, availableForQc), [eligible]);
+  // A selected challan that has nothing left any more is dropped from the selection.
   useEffect(() => {
-    if (!programId && sheets.length === 1) setProgramId(sheets[0].id);
-  }, [sheets, programId]);
+    if (loading) return;
+    setSourceIds((ids) => {
+      const next = ids.filter((id) => options.some((o) => o.id === id));
+      return next.length === ids.length ? ids : next;
+    });
+  }, [options, loading]);
+  // Step 2: only lines of the selected incoming challans can be chosen.
+  const selectable = eligible.filter((o) => sourceIds.includes(sourceOf(o)));
+  const orderById = (id: string) => selectable.find((o) => o.id === id);
+  const selectedOptions = options.filter((o) => sourceIds.includes(o.id));
+
+  const chooseSources = (ids: string[]) => {
+    setSourceIds(ids);
+    // Lines of a challan that is no longer selected leave the form.
+    setRows((rs) => {
+      const kept = rs.filter((r) => !r.orderId || ids.includes(sourceOf(eligible.find((o) => o.id === r.orderId) || {})));
+      return kept.length ? kept : [newRow()];
+    });
+  };
 
   const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const chooseOrder = (key: string, orderId: string) => {
     const o = orderById(orderId);
     updateRow(key, { orderId, quantity: o ? String(availableForQc(o)) : '', actualDyedColor: o?.dyedColor || '' });
   };
+  const addAllLines = () => {
+    const taken = new Set(rows.map((r) => r.orderId));
+    const added = selectable.filter((o) => !taken.has(o.id)).map((o) => ({ ...newRow(), orderId: o.id, quantity: String(availableForQc(o)), actualDyedColor: o.dyedColor || '' }));
+    setRows((rs) => {
+      const next = [...rs.filter((r) => r.orderId), ...added];
+      return next.length ? next : [newRow()];
+    });
+  };
 
   const filled = rows.filter((r) => r.orderId);
-  const totals = filled.reduce<Record<string, number>>((acc, r) => {
-    const o = orderById(r.orderId);
-    if (o) acc[o.uom] = (acc[o.uom] || 0) + (Number(r.quantity) || 0);
-    return acc;
-  }, {});
+  const totals = totalsByUnit(filled.map((r) => ({ quantity: Number(r.quantity) || 0, uom: orderById(r.orderId)?.uom })));
+  const breakdownRows = filled
+    .map((r) => ({ r, o: orderById(r.orderId) }))
+    .filter((x) => x.o)
+    .map(({ r, o }) => ({
+      key: r.key,
+      program: o.program,
+      fabric: o.fabricName,
+      colour: r.actualDyedColor || o.dyedColor || o.targetColor,
+      quantity: Number(r.quantity) || 0,
+      uom: o.uom,
+      source: o.inboundChallan?.challanNumber || null,
+    }));
+  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetRef(s))));
 
   const resetForm = () => {
     setChallanNumber('');
@@ -117,9 +153,14 @@ function IssueChallanContent() {
     e.preventDefault();
     setError(null);
     setNumberError(null);
-    if (!program) return setError('Choose a Production Sheet.');
+    if (sourceIds.length === 0) return setError('Select the incoming challan this challan is issued from.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError('Add at least one item.');
+    const over = filled.find((r) => {
+      const o = orderById(r.orderId);
+      return o && Number(r.quantity) > availableForQc(o);
+    });
+    if (over) return setError(`Requested quantity exceeds the available balance of ${orderById(over.orderId)?.orderNumber}.`);
     setSubmitting(true);
     try {
       const body = await fetchJson('/api/dyeing/qc-challans', {
@@ -131,6 +172,7 @@ function IssueChallanContent() {
           issuedDate: challanDate,
           priority: priority || undefined,
           remarks,
+          sourceChallanIds: sourceIds,
           lines: filled.map((r) => ({ orderId: r.orderId, quantity: r.quantity, actualDyedColor: r.actualDyedColor, remarks: r.remarks })),
         }),
       });
@@ -169,33 +211,17 @@ function IssueChallanContent() {
           </Notice>
         )}
 
+        <IncomingChallanPicker options={options} selected={sourceIds} onChange={chooseSources} loading={loading} availableLabel="Dyed, not sent" />
+
         <form onSubmit={submit} className="space-y-6">
-          <Panel title="Challan">
+          <Panel title="2. Challan">
             <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <ChallanNumberField value={challanNumber} onChange={setChallanNumber} error={numberError} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Challan date</span>
                 <input type="date" value={challanDate} onChange={(e) => setChallanDate(e.target.value)} required className={`${FIELD} mt-1`} />
               </label>
-              <label className="block">
-                <span className="text-xs font-semibold text-neutral-600">Production Sheet</span>
-                <select
-                  value={programId}
-                  onChange={(e) => {
-                    setProgramId(e.target.value);
-                    setRows([newRow()]);
-                  }}
-                  className={`${FIELD} mt-1`}
-                  required
-                >
-                  <option value="">{sheets.length ? 'Choose a sheet' : 'No dyed fabric ready'}</option>
-                  {sheets.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {sheetRef(p)}{p.designNumber ? ` · ${p.designNumber}` : ''}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <ReadOnly label="Incoming challans" value={selectedOptions.map((o) => o.challan?.challanNumber || 'Not recorded').join(', ') || '—'} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Priority</span>
                 <select value={priority} onChange={(e) => setPriority(e.target.value)} className={`${FIELD} mt-1`}>
@@ -208,10 +234,9 @@ function IssueChallanContent() {
               </label>
               <ReadOnly label="Source" value="Dyeing" />
               <ReadOnly label="Destination" value="Dyeing QC" />
-              <ReadOnly label="Design / Serial" value={program ? `${program.designNumber || program.wilcomDesignNumber || '—'} · ${program.programSerialNo || '—'}` : '—'} />
-              <ReadOnly label="Delivery date" value={program ? fmtDate(program.deliveryDate) : '—'} />
+              <ReadOnly label="Production Sheets" value={chosenSheets.join(', ') || '—'} />
               <ReadOnly label="Department incharge" value={incharge || '—'} />
-              <label className="block sm:col-span-2 lg:col-span-3">
+              <label className="block sm:col-span-2 lg:col-span-4">
                 <span className="text-xs font-semibold text-neutral-600">Remarks</span>
                 <input value={remarks} onChange={(e) => setRemarks(e.target.value)} maxLength={500} className={`${FIELD} mt-1`} />
               </label>
@@ -219,18 +244,23 @@ function IssueChallanContent() {
           </Panel>
 
           <Panel
-            title="Color / Fabric / Measurement"
+            title="3. Color / Fabric / Measurement"
             count={filled.length}
             actions={
-              <button
-                type="button"
-                onClick={() => setRows((rs) => [...rs, newRow()])}
-                disabled={!program || rows.length >= sheetOrders.length}
-                className={BTN_SECONDARY}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add item</span>
-              </button>
+              <div className="flex gap-2">
+                <button type="button" onClick={addAllLines} disabled={selectable.length === 0 || filled.length >= selectable.length} className={BTN_SECONDARY}>
+                  <span>Add all lines</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRows((rs) => [...rs, newRow()])}
+                  disabled={selectable.length === 0 || rows.length >= selectable.length}
+                  className={BTN_SECONDARY}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add item</span>
+                </button>
+              </div>
             }
           >
             <div className="overflow-x-auto">
@@ -238,6 +268,8 @@ function IssueChallanContent() {
                 <thead className={THEAD}>
                   <tr>
                     <th className="py-3 px-4 min-w-[200px]">Dyeing Line</th>
+                    <th className="py-3 px-3">Production Sheet</th>
+                    <th className="py-3 px-3">Incoming</th>
                     <th className="py-3 px-3">Colour</th>
                     <th className="py-3 px-3">Fabric</th>
                     <th className="py-3 px-3">Required Dye Colour</th>
@@ -250,8 +282,8 @@ function IssueChallanContent() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {!program && <EmptyRow colSpan={10} text="Choose a Production Sheet to add items" />}
-                  {program &&
+                  {sourceIds.length === 0 && <EmptyRow colSpan={12} text="Select an incoming challan above to add its dyed lines" />}
+                  {sourceIds.length > 0 &&
                     rows.map((r) => {
                       const o = orderById(r.orderId);
                       const taken = new Set(rows.filter((x) => x.key !== r.key).map((x) => x.orderId));
@@ -261,13 +293,15 @@ function IssueChallanContent() {
                           <td className="py-2.5 px-4">
                             <select value={r.orderId} onChange={(e) => chooseOrder(r.key, e.target.value)} className={FIELD} aria-label="Dyeing line">
                               <option value="">Choose a dyed line</option>
-                              {sheetOrders.filter((x) => !taken.has(x.id)).map((x) => (
+                              {selectable.filter((x) => !taken.has(x.id)).map((x) => (
                                 <option key={x.id} value={x.id}>
-                                  {x.orderNumber} · {x.fabricName} · {x.dyedColor || x.targetColor || '—'}
+                                  {sheetRef(x.program)} · {x.orderNumber} · {x.fabricName} · {x.dyedColor || x.targetColor || '—'}
                                 </option>
                               ))}
                             </select>
                           </td>
+                          <td className="py-2.5 px-3 font-mono text-xs">{o ? sheetRef(o.program) : '—'}</td>
+                          <td className="py-2.5 px-3 font-mono text-xs text-neutral-600">{o?.inboundChallan?.challanNumber || '—'}</td>
                           <td className="py-2.5 px-3 text-neutral-700">{o ? baseColour(o) || '—' : '—'}</td>
                           <td className="py-2.5 px-3 font-semibold text-neutral-900">{o?.fabricName || '—'}</td>
                           <td className="py-2.5 px-3 text-brand-900">{o?.targetColor || '—'}</td>
@@ -319,17 +353,16 @@ function IssueChallanContent() {
             </div>
             <div className="px-5 py-4 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <span className="text-sm text-neutral-600">
-                Total to transfer:{' '}
-                <span className="font-semibold text-neutral-900 tabular-nums">
-                  {Object.entries(totals).map(([u, q]) => fmtQty(q, u)).join(' · ') || '—'}
-                </span>
+                Total to transfer: <span className="font-semibold text-neutral-900 tabular-nums">{formatTotals(totals, '—')}</span>
               </span>
-              <button type="submit" disabled={submitting || !program} className={BTN_PRIMARY}>
+              <button type="submit" disabled={submitting || sourceIds.length === 0} className={BTN_PRIMARY}>
                 <Send className="w-3.5 h-3.5" />
                 <span>{submitting ? 'Issuing…' : 'Issue Challan'}</span>
               </button>
             </div>
           </Panel>
+
+          <SheetBreakdown title="4. Review: Production Sheet breakdown" rows={breakdownRows} />
         </form>
 
         <Panel title="Recent Challans to Dyeing QC" count={recent.length}>
@@ -339,7 +372,7 @@ function IssueChallanContent() {
                 <tr>
                   <th className="py-3 px-4">Challan</th>
                   <th className="py-3 px-3">Date</th>
-                  <th className="py-3 px-3">Production Sheet</th>
+                  <th className="py-3 px-3">Production Sheets</th>
                   <th className="py-3 px-3">Incoming Challan</th>
                   <th className="py-3 px-3">Items</th>
                   <th className="py-3 px-3 text-right">Quantity</th>
@@ -355,7 +388,7 @@ function IssueChallanContent() {
                       <Link href={`/challans/${c.id}`} className="hover:underline">{c.challanNumber}</Link>
                     </td>
                     <td className="py-3 px-3 text-xs text-neutral-600">{fmtDate(c.issuedDate || c.createdAt)}</td>
-                    <td className="py-3 px-3 font-mono text-xs">{sheetRef(c.program)}</td>
+                    <td className="py-3 px-3 font-mono text-xs">{challanSheetRefs(c)}</td>
                     <td className="py-3 px-3 font-mono text-xs text-neutral-600">{c.parentChallan?.challanNumber || '—'}</td>
                     <td className="py-3 px-3 text-xs text-neutral-700">
                       {(c.items || []).map((i: any) => i.colour || i.itemDescription).join(', ') || '—'}
@@ -380,7 +413,7 @@ function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <span className="text-xs font-semibold text-neutral-600">{label}</span>
-      <div className="mt-1 h-9 px-3 flex items-center bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 truncate">{value}</div>
+      <div className="mt-1 h-9 px-3 flex items-center bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 truncate" title={value}>{value}</div>
     </div>
   );
 }

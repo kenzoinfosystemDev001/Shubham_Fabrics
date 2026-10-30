@@ -20,6 +20,7 @@ import { useProgramDocument } from '@/hooks/useProgramDocument';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
 import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
+import { lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 
 interface ChallanPrintModalProps {
   challan: any;
@@ -101,6 +102,13 @@ export function ChallanPrintModal({
   const toLabel = deptLabels[toDept] || toDept;
 
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
+  // A challan carrying several Production Sheets names each line's sheet and totals each sheet.
+  const sheets = sheetBreakdown(challan);
+  const sheetPrefix = (it: any) => {
+    if (!sheets.multiSheet) return '';
+    const id = lineSheetId(it, challan);
+    return `[${sheetLabel(sheets.sheets.find((s: any) => s.programId === id)?.program)}] `;
+  };
   // Each line keeps its unit: totals are per unit, never MTR + PCS.
   const unitTotals = challanTotalsByUnit(challan);
   const totalUnits = Object.keys(unitTotals);
@@ -352,7 +360,7 @@ export function ChallanPrintModal({
                       items.map((it, idx) => (
                         <tr key={it.id || idx}>
                           <td className="border-[1.5px] border-neutral-200 p-1 text-center font-bold font-mono">{idx + 1}</td>
-                          <td className="border-[1.5px] border-neutral-200 p-1 font-bold">{it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
+                          <td className="border-[1.5px] border-neutral-200 p-1 font-bold">{sheetPrefix(it)}{it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
                           <td className="border-[1.5px] border-neutral-200 p-1">{it.colour || prog.fabricColor || 'Standard'}</td>
                           <td className="border-[1.5px] border-neutral-200 p-1 font-mono">{it.rollNumber || it.lotNumber || '—'}</td>
                           <td className="border-[1.5px] border-neutral-200 p-1 text-right font-mono font-bold">{it.quantity || 0}</td>
@@ -369,6 +377,15 @@ export function ChallanPrintModal({
                         <td className="border-[1.5px] border-neutral-200 p-1 text-center">{totalUnitLabel}</td>
                       </tr>
                     )}
+                    {sheets.multiSheet &&
+                      sheets.sheets.map((s: any) => (
+                        <tr key={s.programId || 'none'}>
+                          <td colSpan={4} className="border-[1.5px] border-neutral-200 p-1 text-right text-[10px] font-bold">
+                            SHEET {sheetLabel(s.program)} ({s.lines.length} LINE{s.lines.length === 1 ? '' : 'S'}):
+                          </td>
+                          <td colSpan={2} className="border-[1.5px] border-neutral-200 p-1 text-right font-mono font-bold">{formatTotals(s.totals)}</td>
+                        </tr>
+                      ))}
                     <tr className="bg-neutral-50 font-black">
                       <td colSpan={4} className="border-[1.5px] border-neutral-200 p-1 text-right text-[10px] uppercase font-black">
                         TOTAL QUANTITY:

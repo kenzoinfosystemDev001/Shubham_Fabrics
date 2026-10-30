@@ -43,6 +43,7 @@ import {
   generateCode128SvgBars 
 } from '@/lib/barcode';
 import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
+import { distinct, lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 import { 
   downloadChallanHtml, 
   printChallan 
@@ -61,7 +62,8 @@ export default function ChallanDetailPage() {
   const [showSheetModal, setShowSheetModal] = useState(false);
   // Finished garments (Finishing onward) are shown by name and image only, without colour or quantity.
   const finishedGoods = isFinishedGoodsChallan(challan);
-  const { images: garmentImages } = useGarmentImages(finishedGoods ? [challan?.programId] : []);
+  // Garment images of every sheet on the challan.
+  const { images: garmentImages } = useGarmentImages(finishedGoods ? distinct([challan?.programId, ...(challan?.items || []).map((i: any) => lineSheetId(i, challan))]) : []);
 
   useEffect(() => {
     setUser(getCurrentUser());
@@ -743,13 +745,15 @@ export default function ChallanDetailPage() {
                       </span>
                     )}
                   </div>
-                  <div className="border border-neutral-200 rounded-lg overflow-hidden">
+                  <div className="border border-neutral-200 rounded-lg overflow-x-auto">
                     <table className="w-full text-left text-xs">
                       <thead className="bg-neutral-100 text-neutral-700 font-semibold border-b border-neutral-200">
                         <tr>
                           <th className="py-2.5 px-4">#</th>
+                          <th className="py-2.5 px-4">Production Sheet</th>
                           <th className="py-2.5 px-4">Description</th>
                           <th className="py-2.5 px-4">Color</th>
+                          <th className="py-2.5 px-4">Source Challan</th>
                           <th className="py-2.5 px-4 text-right">Quantity</th>
                           <th className="py-2.5 px-4">UOM</th>
                         </tr>
@@ -758,24 +762,49 @@ export default function ChallanDetailPage() {
                         {(challan.items || []).map((item: any, idx: number) => (
                           <tr key={item.id || idx}>
                             <td className="py-3 px-4 font-mono text-neutral-500">{idx + 1}</td>
+                            <td className="py-3 px-4 font-mono font-semibold whitespace-nowrap">
+                              {sheetLabel(item.program || (lineSheetId(item, challan) === challan.programId ? challan.program : null))}
+                            </td>
                             <td className="py-3 px-4 font-medium text-neutral-900">{item.itemDescription}</td>
                             <td className="py-3 px-4">{item.colour || 'Standard'}</td>
+                            <td className="py-3 px-4 font-mono text-neutral-600 whitespace-nowrap">
+                              {item.sourceChallanItem?.challan ? (
+                                <Link href={`/challans/${item.sourceChallanItem.challan.id}`} className="text-brand-700 hover:underline">
+                                  {item.sourceChallanItem.challan.challanNumber}
+                                </Link>
+                              ) : (
+                                '—'
+                              )}
+                            </td>
                             <td className="py-3 px-4 text-right font-mono font-bold">{item.quantity}</td>
                             <td className="py-3 px-4">{item.uom || 'PCS'}</td>
                           </tr>
                         ))}
                         {(!challan.items || challan.items.length === 0) && (
                           <tr>
-                            <td colSpan={5} className="py-4 text-center text-neutral-500">
+                            <td colSpan={7} className="py-4 text-center text-neutral-500">
                               No item records attached to this Challan.
                             </td>
                           </tr>
                         )}
                       </tbody>
-                      {/* TABLE FOOTER WITH EXPLICIT TOTAL PIECES */}
+                      {/* TABLE FOOTER: per Production Sheet when the challan carries several, then the challan total */}
                       <tfoot className="bg-neutral-50 border-t-2 border-neutral-300 font-bold text-xs text-neutral-900">
+                        {(() => {
+                          const breakdown = sheetBreakdown(challan);
+                          return breakdown.multiSheet
+                            ? breakdown.sheets.map((s: any) => (
+                                <tr key={s.programId || 'none'} className="font-semibold">
+                                  <td colSpan={5} className="py-2 px-4 text-right text-[11px] text-neutral-600">
+                                    Sheet {sheetLabel(s.program)} ({s.lines.length} line{s.lines.length === 1 ? '' : 's'}):
+                                  </td>
+                                  <td colSpan={2} className="py-2 px-4 font-mono">{formatTotals(s.totals)}</td>
+                                </tr>
+                              ))
+                            : null;
+                        })()}
                         <tr>
-                          <td colSpan={3} className="py-2.5 px-4 text-right uppercase text-[11px] tracking-wider text-neutral-700">
+                          <td colSpan={5} className="py-2.5 px-4 text-right uppercase text-[11px] tracking-wider text-neutral-700">
                             {isThreadCuttingToQc2
                               ? 'Total Dispatched Pieces for Threadcut QC Inspection:'
                               : 'Total Material Quantity:'}

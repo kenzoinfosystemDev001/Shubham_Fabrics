@@ -33,6 +33,7 @@ import {
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { newSubmissionKey } from '@/components/challan/ChallanNumberField';
 import { addTotals, formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
+import { SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 
 import {
   ColorFabricMeasurementTable,
@@ -88,8 +89,17 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     detectedFromChallanNumber: null,
   });
 
-  // Reusable Color / Fabric / Measurement items (Default blank)
-  const [items, setItems] = useState<ChallanItemData[]>(() => [createBlankChallanItem(challanContext)]);
+  // Production Sheets on this challan, in the order added (the first is the challan's own sheet). The
+  // user adds every sheet explicitly; each sheet has its own Color / Fabric / Measurement lines.
+  const [sheetIds, setSheetIds] = useState<string[]>([]);
+  const [itemsBySheet, setItemsBySheet] = useState<Record<string, ChallanItemData[]>>({});
+  // Lines of the sheet being edited (selectedProgramId).
+  const items = itemsBySheet[selectedProgramId] || [createBlankChallanItem(challanContext)];
+  const setItems = (update: ChallanItemData[] | ((current: ChallanItemData[]) => ChallanItemData[])) =>
+    setItemsBySheet((prev) => {
+      const current = prev[selectedProgramId] || [createBlankChallanItem(challanContext)];
+      return { ...prev, [selectedProgramId]: typeof update === 'function' ? update(current) : update };
+    });
 
   // Store Incharge (Name / Contact)
   const [storeInchargeName, setStoreInchargeName] = useState('Fabric Store Incharge');
@@ -183,13 +193,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         } catch {}
       }
 
-      const targetProg = preselectedProgramId
-        ? progList.find((p) => p.id === preselectedProgramId)
-        : progList[0];
-
-      if (targetProg) {
-        handleProgramSelect(targetProg);
-      }
+      // Only a sheet named in the link is added; otherwise the user chooses (never the first in the list).
+      const targetProg = preselectedProgramId ? progList.find((p) => p.id === preselectedProgramId) : null;
+      if (targetProg) addSheet(targetProg, []);
     } catch (err: any) {
       setError(err.message || 'Failed to load initial data');
     } finally {
@@ -201,7 +207,52 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     loadData();
   }, [preselectedProgramId, destinationDepartment]);
 
-  // Synchronize form reference fields when a Production Sheet / Serial Number is selected
+  // Adds a Production Sheet to the challan and makes it the sheet being edited. The first sheet also
+  // fills the challan's reference fields.
+  const addSheet = (prog: any, current: string[] = sheetIds) => {
+    if (!prog) return;
+    if (current.includes(prog.id)) return activateSheet(prog);
+    const unit: 'MTR' | 'PCS' = prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR';
+    setSheetIds([...current, prog.id]);
+    setItemsBySheet((prev) => ({ ...prev, [prog.id]: prev[prog.id] || [{ ...createBlankChallanItem(challanContext), unit }] }));
+    if (current.length === 0) handleProgramSelect(prog);
+    else activateSheet(prog);
+  };
+
+  // Switches the lines and the stock check to another sheet already on the challan.
+  const activateSheet = (prog: any) => {
+    setSelectedProgramId(prog.id);
+    const unit: 'MTR' | 'PCS' = prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR';
+    setAvailabilityUnit(unit);
+    loadAvailability(prog.id, unit);
+  };
+
+  const removeSheet = (id: string) => {
+    const next = sheetIds.filter((s) => s !== id);
+    setSheetIds(next);
+    setItemsBySheet((prev) => {
+      const { [id]: _removed, ...rest } = prev;
+      return rest;
+    });
+    if (id === selectedProgramId) {
+      const first = programs.find((p) => p.id === next[0]);
+      if (first) activateSheet(first);
+      else {
+        setSelectedProgramId('');
+        setFabricAvailability(null);
+      }
+    }
+    // The challan's reference fields follow its first sheet.
+    if (sheetIds[0] === id && next[0]) {
+      const first = programs.find((p) => p.id === next[0]);
+      if (first) {
+        setSerialNumber(first.programSerialNo || first.programNumber || '');
+        setDesignNumber(first.designNumber || first.wilcomDesignNumber || first.styleCode || '');
+      }
+    }
+  };
+
+  // Synchronize form reference fields from the challan's first Production Sheet
   // All business entry fields remain blank as per Master Prompt rules
   const handleProgramSelect = (prog: any) => {
     if (!prog) return;
@@ -220,7 +271,6 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     const targetQ = Number(prog.targetQuantity || prog.fabricIssuedToDyeing || 0);
     const initialUnit: 'MTR' | 'PCS' = prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR';
     setAvailabilityUnit(initialUnit);
-    setItems((currentItems) => currentItems.map((item) => ({ ...item, unit: initialUnit })));
     setStoreTracking((prev) => ({
       ...prev,
       fabricIn: targetQ,
@@ -246,13 +296,33 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   };
 
   const selectedProgram = programs.find((p) => p.id === selectedProgramId);
+  const sheetOf = (id: string) => programs.find((p) => p.id === id);
+  const sheetName = (p: any) => p?.programSerialNo || p?.programNumber || '—';
+  // Lines with details, per sheet on the challan (only measured rows are material leaving the store).
+  const sheetLines = sheetIds.map((id) => ({
+    id,
+    program: sheetOf(id),
+    rows: (itemsBySheet[id] || []).filter((it) => it.fabric.trim() || it.color.trim() || String(it.measurement).trim()),
+  }));
+  const breakdownRows = sheetLines.flatMap((s) =>
+    s.rows
+      .filter((it) => Number(it.measurement) > 0)
+      .map((it, index) => ({
+        key: `${s.id}-${index}`,
+        program: s.program,
+        fabric: it.fabric || s.program?.fabricName || 'Fabric',
+        colour: it.color,
+        quantity: Number(it.measurement),
+        uom: it.unit === 'PCS' ? 'PCS' : 'MTR',
+      })),
+  );
 
   // Submit Challan Store to Dyeing
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedProgram) {
-      setError('Please select a Serial Number / Production Sheet.');
+    if (sheetIds.length === 0 || !selectedProgram) {
+      setError('Please add the Production Sheet (Serial Number) this challan is issued for.');
       return;
     }
 
@@ -263,13 +333,18 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     }
     setChallanNumberError(null);
 
-    // Only measured rows represent material moving out of the store.
-    const rowsWithDetails = items.filter((it) => it.fabric.trim() || it.color.trim() || String(it.measurement).trim());
-    if (rowsWithDetails.some((item) => !Number.isFinite(Number(item.measurement)) || Number(item.measurement) <= 0)) {
-      setError('Enter a positive measurement for every challan item.');
+    const badSheet = sheetLines.find((s) => s.rows.some((item) => !Number.isFinite(Number(item.measurement)) || Number(item.measurement) <= 0));
+    if (badSheet) {
+      setError(`Sheet ${sheetName(badSheet.program)}: enter a positive measurement for every challan item.`);
       return;
     }
-    const validItems = rowsWithDetails.filter((item) => Number(item.measurement) > 0);
+    const emptySheet = sheetLines.find((s) => s.rows.length === 0);
+    if (emptySheet) {
+      setError(`Sheet ${sheetName(emptySheet.program)} has no items. Add its fabric lines or remove the sheet from this challan.`);
+      return;
+    }
+    // Every line carries its own Production Sheet.
+    const validItems = sheetLines.flatMap((s) => s.rows.filter((item) => Number(item.measurement) > 0).map((item) => ({ ...item, sheet: s.program })));
 
     if (validItems.length === 0) {
       setError('Please enter at least one item in the Color / Fabric / Measurement table.');
@@ -304,11 +379,12 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
       // Map ColorFabricMeasurementTable items to ChallanItem database schema
       const challanItems = validItems.map((item) => ({
+        programId: item.sheet?.id,
         itemDescription: `${item.fabric || 'Fabric'} — ${item.color || 'Standard'}`,
         unitType: 'ROLL',
         quantity: Number(item.measurement),
         uom: lineUnit(item),
-        fabricCode: item.fabric || selectedProgram.fabricName || 'FABRIC',
+        fabricCode: item.fabric || item.sheet?.fabricName || 'FABRIC',
         // Current colour and the colour Dyeing must achieve are stored separately per line.
         colour: item.color || null,
         requiredDyeColor: destinationDepartment === 'DYEING' ? item.requiredDyeColor || null : null,
@@ -331,7 +407,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         idempotencyKey: submissionKey,
         challanNumber: challanNumber.trim(),
         challanType: destinationDepartment === 'DYEING' ? 'STORE_TO_DYEING' : 'STORE_TO_EMBROIDERY',
-        programId: selectedProgram.id,
+        // The challan's own sheet is the first one added; each line names its own.
+        programId: sheetIds[0],
         fromDepartment: 'STORE',
         toDepartment: destinationDepartment,
         priority: priority || 'NORMAL',
@@ -363,7 +440,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
       setIssuedChallan({
         ...data,
-        program: selectedProgram,
+        program: sheetOf(sheetIds[0]) || selectedProgram,
         destinationDepartment,
         storeInchargeName,
         storeInchargeContact,
@@ -388,7 +465,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     setChallanNumber('');
     setChallanNumberError(null);
     setSubmissionKey(newSubmissionKey());
-    setItems([createBlankChallanItem(challanContext)]);
+    setSheetIds([]);
+    setItemsBySheet({});
+    setSelectedProgramId('');
+    setFabricAvailability(null);
     loadData();
   };
 
@@ -833,41 +913,90 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
               {/* 8. SERIAL NUMBER (Production Sheet Selector) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4 sm:self-start sm:pt-2">
                   Serial Number <span className="text-danger-600">*</span>
                 </label>
-                <div className="sm:col-span-2 max-w-lg">
+                <div className="sm:col-span-2 max-w-lg space-y-2">
+                  {sheetIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5" role="list" aria-label="Production Sheets on this challan">
+                      {sheetIds.map((id) => {
+                        const p = sheetOf(id);
+                        const active = id === selectedProgramId;
+                        return (
+                          <span
+                            key={id}
+                            role="listitem"
+                            className={`inline-flex items-center rounded-lg border text-xs font-mono font-bold ${
+                              active ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-neutral-300 text-neutral-900'
+                            }`}
+                          >
+                            <button type="button" onClick={() => p && activateSheet(p)} className="px-2.5 py-1.5 cursor-pointer" title="Edit this sheet's lines">
+                              {sheetName(p)}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeSheet(id)}
+                              className={`px-1.5 py-1.5 border-l ${active ? 'border-white/30 hover:bg-brand-700' : 'border-neutral-200 hover:bg-danger-50 hover:text-danger-700'} rounded-r-lg cursor-pointer`}
+                              aria-label={`Remove sheet ${sheetName(p)} from this challan`}
+                              title="Remove from this challan"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                   <select
-                    value={selectedProgramId}
+                    value=""
                     onChange={(e) => {
                       const prog = programs.find((p) => p.id === e.target.value);
-                      if (prog) handleProgramSelect(prog);
+                      if (prog) addSheet(prog);
                     }}
-                    required
+                    required={sheetIds.length === 0}
+                    aria-label="Add a Production Sheet to this challan"
                     className="w-full text-xs font-mono font-bold text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition cursor-pointer"
                   >
-                    <option value="">Select Production Sheet Serial Number</option>
-                    {programs.map((p) => (
+                    <option value="">{sheetIds.length ? 'Add another Production Sheet to this challan' : 'Select Production Sheet Serial Number'}</option>
+                    {programs.filter((p) => !sheetIds.includes(p.id)).map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.programSerialNo || p.programNumber} — {p.clientName || p.buyerName || 'Buyer'} ({p.mainStyle || p.styleCode || 'Style'})
                       </option>
                     ))}
                   </select>
+                  {sheetIds.length > 1 && (
+                    <p className="text-[11px] text-neutral-500">
+                      The lines below belong to the highlighted sheet. Each line keeps its own sheet on the challan and in every department after it.
+                    </p>
+                  )}
                 </div>
               </div>
 
               {/* 9. COLOR / FABRIC / MEASUREMENT (Universal Challan Item Component with In/Cut/Out Tracking) */}
-              <div className="pt-3 border-t border-neutral-200">
-                <ColorFabricMeasurementTable
-                  items={items}
-                  onChange={handleItemsChange}
-                  context={challanContext}
-                  programId={selectedProgram?.id}
-                  currentDepartment="STORE"
-                  tracking={storeTracking}
-                  onTrackingChange={setStoreTracking}
-                  showInOutController={false}
-                />
+              <div className="pt-3 border-t border-neutral-200 space-y-3">
+                {selectedProgram ? (
+                  <>
+                    {sheetIds.length > 1 && (
+                      <p className="text-xs font-bold text-neutral-800">
+                        Lines of sheet <span className="font-mono text-brand-800">{sheetName(selectedProgram)}</span>
+                      </p>
+                    )}
+                    <ColorFabricMeasurementTable
+                      key={selectedProgram.id}
+                      items={items}
+                      onChange={handleItemsChange}
+                      context={challanContext}
+                      programId={selectedProgram.id}
+                      currentDepartment="STORE"
+                      tracking={storeTracking}
+                      onTrackingChange={setStoreTracking}
+                      showInOutController={false}
+                    />
+                    {sheetIds.length > 1 && <SheetBreakdown title="All sheets on this challan" rows={breakdownRows} />}
+                  </>
+                ) : (
+                  <p className="text-xs text-neutral-500 italic">Select the Production Sheet (Serial Number) to enter its Color / Fabric / Measurement lines.</p>
+                )}
               </div>
 
               {/* 10. STORE INCHARGE (Name / Contact) */}

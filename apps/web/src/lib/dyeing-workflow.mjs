@@ -5,6 +5,7 @@
 // Each stage can only draw from the one before it, so nothing is counted twice.
 
 import { headerUnitOf } from './challan-units.mjs';
+import { checkSourceSelection, distinct } from './challan-sheets.mjs';
 
 export const DYEING_STATUS = /** @type {const} */ ({
   AWAITING_RECEIPT: 'AWAITING_RECEIPT',
@@ -197,23 +198,19 @@ export function validateProcessUpdate(order, input) {
  * Validates the lines of a Dyeing -> QC1 challan against their orders.
  * @param {Array<{ orderId: string, quantity: unknown }>} lines
  * @param {Map<string, any>} ordersById
- * @returns {{ ok: true, unit: string, programId: string } | { ok: false, error: string }}
+ * @param {unknown} [sourceChallanIds] the incoming challans selected; when given, every line must come from one of them
+ * @returns {{ ok: true, unit: string, programId: string, programIds: string[], sourceChallanIds: string[] } | { ok: false, error: string }}
  */
-export function validateQcTransferLines(lines, ordersById) {
+export function validateQcTransferLines(lines, ordersById, sourceChallanIds = undefined) {
   if (!Array.isArray(lines) || lines.length === 0) return { ok: false, error: 'Add at least one item to transfer.' };
   const seen = new Set();
   const units = [];
-  let programId = null;
   for (const [index, line] of lines.entries()) {
     const n = index + 1;
     const order = ordersById.get(line.orderId);
     if (!order) return { ok: false, error: `Line ${n}: dyeing record not found.` };
     if (seen.has(line.orderId)) return { ok: false, error: `Line ${n}: the same dyeing record is listed twice.` };
     seen.add(line.orderId);
-    if (programId && order.programId !== programId) {
-      return { ok: false, error: 'All items on one challan must belong to the same Production Sheet.' };
-    }
-    programId = order.programId;
     // Each line keeps its own unit; meters and pieces are never added together.
     units.push(order.uom);
     if (!['DYED', 'READY_FOR_QC1', 'PARTIALLY_SENT_TO_QC1'].includes(order.status)) {
@@ -229,5 +226,15 @@ export function validateQcTransferLines(lines, ordersById) {
       return { ok: false, error: `Line ${n}: only ${available} ${order.uom} of ${order.orderNumber} is available to transfer.` };
     }
   }
-  return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: /** @type {string} */ (programId) };
+  const orders = lines.map((l) => ordersById.get(l.orderId));
+  /** @type {string[]} */
+  let sources = [];
+  if (sourceChallanIds !== undefined) {
+    const source = checkSourceSelection(sourceChallanIds, orders.map((o) => ({ label: o.orderNumber, inboundChallanId: o.inboundChallanId })));
+    if (!source.ok) return source;
+    sources = source.ids;
+  }
+  // Lines of several Production Sheets may travel together; each keeps its own sheet.
+  const programIds = distinct(orders.map((o) => o.programId));
+  return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: programIds[0], programIds, sourceChallanIds: sources };
 }

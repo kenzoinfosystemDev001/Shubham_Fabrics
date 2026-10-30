@@ -87,19 +87,27 @@ test('rules: outcomes stay separate; only passed, unsent quantity can go to Inve
   assert.equal(rules.qcStatusOf(fqcLine({ processedQuantity: 48, passedQuantity: 45, rejectedQuantity: 3, transferredQuantity: 45, rejectSentQuantity: 3 })), 'TRANSFERRED');
 });
 
-test('rules: transfer lines block over-dispatch, duplicates and other sheets; each line keeps its unit', () => {
-  const a = fqcLine({ processedQuantity: 20, passedQuantity: 18, rejectedQuantity: 2 });
-  const b = fqcLine({ id: 'w2', itemNumber: 'FQC-2026-0002', uom: 'MTR', processedQuantity: 5, passedQuantity: 5 });
-  const c = fqcLine({ id: 'w3', itemNumber: 'FQC-2026-0003', programId: 'p2', processedQuantity: 5, passedQuantity: 5 });
+test('rules: transfer lines block over-dispatch, duplicates and other incoming challans; each line keeps its unit and sheet', () => {
+  const a = fqcLine({ processedQuantity: 20, passedQuantity: 18, rejectedQuantity: 2, inboundChallanId: 'in1' });
+  const b = fqcLine({ id: 'w2', itemNumber: 'FQC-2026-0002', uom: 'MTR', processedQuantity: 5, passedQuantity: 5, inboundChallanId: 'in1' });
+  const c = fqcLine({ id: 'w3', itemNumber: 'FQC-2026-0003', programId: 'p2', processedQuantity: 5, passedQuantity: 5, inboundChallanId: 'in2' });
   const byId = new Map([a, b, c].map((i) => [i.id, i]));
-  const check = (lines, kind) => rules.validateTransferLines(lines, byId, 'FINAL_CHECK', kind);
+  const check = (lines, kind, sources) => rules.validateTransferLines(lines, byId, 'FINAL_CHECK', kind, sources);
   assert.match(check([{ workItemId: 'w1', quantity: 19 }]).error, /only 18 PCS .* passed and not yet transferred/);
   assert.match(check([{ workItemId: 'w1', quantity: 3 }], 'REJECT').error, /only 2 PCS .* rejected/);
   assert.match(check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w1', quantity: 1 }]).error, /listed twice/);
-  assert.deepEqual(check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w2', quantity: 1 }]), { ok: true, unit: 'MIXED', programId: 'p1' }, 'meters and pieces travel on one challan, each line in its own unit');
-  assert.match(check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w3', quantity: 1 }]).error, /same Production Sheet/);
+  assert.deepEqual(
+    check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w2', quantity: 1 }]),
+    { ok: true, unit: 'MIXED', programId: 'p1', programIds: ['p1'], sourceChallanIds: [] },
+    'meters and pieces travel on one challan, each line in its own unit',
+  );
+  // Lines of several Production Sheets may travel together; each keeps its own sheet.
+  assert.deepEqual(check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w3', quantity: 1 }], 'PASS', ['in1', 'in2']).programIds, ['p1', 'p2']);
+  // The selected incoming challans are enforced: a line of another challan is refused, none selected is refused.
+  assert.match(check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w3', quantity: 1 }], 'PASS', ['in1']).error, /FQC-2026-0003 does not belong to the selected incoming challan/);
+  assert.match(check([{ workItemId: 'w1', quantity: 1 }], 'PASS', []).error, /Select the incoming challan/);
   assert.match(rules.validateTransferLines([{ workItemId: 'w1', quantity: 1 }], byId, 'QC3').error, /not found/, 'another department cannot move Final QC lines');
-  assert.deepEqual(check([{ workItemId: 'w1', quantity: 18 }]), { ok: true, unit: 'PCS', programId: 'p1' });
+  assert.deepEqual(check([{ workItemId: 'w1', quantity: 18 }], 'PASS', ['in1']), { ok: true, unit: 'PCS', programId: 'p1', programIds: ['p1'], sourceChallanIds: ['in1'] });
 });
 
 // ---------------------------------------------------------------------------

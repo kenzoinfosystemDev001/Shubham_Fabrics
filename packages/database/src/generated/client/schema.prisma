@@ -467,6 +467,7 @@ model Program {
   bomItems           ProgramBOM[]
   routes             ProgramRoute[]
   challans           Challan[]
+  challanItems       ChallanItem[]           @relation("ChallanItemProgram")
   productionLogs     ProductionTransaction[]
   rolls              FabricRoll[]
   bundles            Bundle[]
@@ -789,10 +790,21 @@ model ChallanItem {
   uom                    String
   remarks                String?
 
-  sourceLotId    String?
-  sourceRollId   String?
-  sourceBundleId String?
-  createdAt      DateTime @default(now())
+  sourceLotId         String?
+  sourceRollId        String?
+  sourceBundleId      String?
+  // Production Sheet this line belongs to. One challan may carry lines of several sheets; null on
+  // lines recorded before per-line sheets, which belong to the challan's own sheet (programId).
+  programId           String?
+  program             Program?      @relation("ChallanItemProgram", fields: [programId], references: [id])
+  // The incoming challan line this line was issued from (null on Fabric Store issues from stock).
+  sourceChallanItemId String?
+  sourceChallanItem   ChallanItem?  @relation("ChallanItemSource", fields: [sourceChallanItemId], references: [id], onDelete: SetNull)
+  derivedItems        ChallanItem[] @relation("ChallanItemSource")
+  createdAt           DateTime      @default(now())
+
+  @@index([programId])
+  @@index([sourceChallanItemId])
 }
 
 model ProductionTransaction {

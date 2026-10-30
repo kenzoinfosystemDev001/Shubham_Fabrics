@@ -26,6 +26,7 @@ import {
   totalsByUnit,
   unitOf,
 } from '@/lib/challan-units.mjs';
+import { ITEMS_WITH_SHEET } from '@/lib/challan-sheets.mjs';
 
 const CHALLAN_CREATE_ENDPOINT = 'POST /api/challans';
 
@@ -34,7 +35,7 @@ function loadCreatedChallan(id: string) {
     where: { id },
     include: {
       program: true,
-      items: true,
+      items: ITEMS_WITH_SHEET,
       createdBy: {
         select: {
           id: true,
@@ -128,7 +129,7 @@ export async function GET(request: Request) {
             fullName: true,
           },
         },
-        items: true,
+        items: ITEMS_WITH_SHEET,
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -216,46 +217,36 @@ export async function POST(request: Request) {
     // 1. The issuing user is always the signed-in user
     const actorId = authUser.id;
 
-    // 2. Resolve Program ID reliably
-    let resolvedProgramId = body.programId;
-
-    if (resolvedProgramId) {
-      const prog = await prisma.program.findFirst({
-        where: {
-          OR: [
-            { id: resolvedProgramId },
-            { programNumber: resolvedProgramId },
-            { programSerialNo: resolvedProgramId },
-          ],
-        },
-        select: { id: true },
+    // 2. Production Sheets, chosen explicitly. Each line may name its own sheet (one challan can carry
+    // several sheets); a line without one belongs to the challan's sheet. Nothing is ever picked for the user.
+    const resolveSheet = async (ref: unknown) => {
+      const value = String(ref ?? '').trim();
+      if (!value) return null;
+      return prisma.program.findFirst({
+        where: { OR: [{ id: value }, { programNumber: value }, { programSerialNo: value }] },
+        select: { id: true, status: true, programSerialNo: true, programNumber: true },
       });
-
-      if (prog) {
-        resolvedProgramId = prog.id;
-      } else {
-        return NextResponse.json(
-          { error: `Production sheet ${resolvedProgramId} was not found.` },
-          { status: 400 }
-        );
+    };
+    const sheetRefs: string[] = Array.from(new Set(
+      [body.programId, ...(Array.isArray(body.items) ? body.items.map((it: any) => it?.programId) : [])]
+        .map((v) => String(v ?? '').trim())
+        .filter(Boolean)
+    ));
+    if (sheetRefs.length === 0) {
+      return NextResponse.json({ error: 'Select the Production Sheet this challan is issued for.' }, { status: 400 });
+    }
+    const sheetIdOf = new Map<string, string>();
+    for (const ref of sheetRefs) {
+      const sheet = await resolveSheet(ref);
+      if (!sheet) return NextResponse.json({ error: `Production sheet ${ref} was not found.` }, { status: 400 });
+      if (sheet.status === 'CANCELLED') {
+        return NextResponse.json({ error: `Production sheet ${sheet.programSerialNo || sheet.programNumber} is cancelled.` }, { status: 400 });
       }
-    } else {
-      const firstProg = await prisma.program.findFirst({
-        select: { id: true },
-      });
-
-      if (firstProg) resolvedProgramId = firstProg.id;
+      sheetIdOf.set(ref, sheet.id);
     }
-
-    if (!resolvedProgramId) {
-      return NextResponse.json(
-        {
-          error:
-            'Cannot issue challan without an active Program in the database.',
-        },
-        { status: 400 }
-      );
-    }
+    // The challan's own sheet: the one named for it, otherwise the first line's.
+    const resolvedProgramId = sheetIdOf.get(String(body.programId ?? '').trim()) || sheetIdOf.get(sheetRefs[0])!;
+    const itemSheetId = (item: any) => sheetIdOf.get(String(item?.programId ?? '').trim()) || resolvedProgramId;
 
     // 3. Ensure departments exist in the Department table
     const fromDept = (body.fromDepartment || 'PROGRAMMING').toUpperCase();
@@ -329,23 +320,29 @@ export async function POST(request: Request) {
 
     if (isMovingOutFromStore || isBypassingToProcessing) {
       const { checkFabricStoreAvailability } = await import('@/lib/fabric-availability');
-      // Each unit on the challan is checked against stock in that same unit; MTR and PCS never mix.
-      const requestedUnits = Array.from(new Set(
-        (Array.isArray(body.items) ? body.items : [])
-          .map((item: any) => unitOf(item?.uom || item?.unit))
-          .filter(Boolean)
-      )) as Array<'MTR' | 'PCS'>;
-      if (requestedUnits.length === 0 && unitOf(body.fabricUnit)) requestedUnits.push(unitOf(body.fabricUnit) as 'MTR' | 'PCS');
-      for (const unitOverride of requestedUnits.length ? requestedUnits : [undefined]) {
-        const availability = await checkFabricStoreAvailability(resolvedProgramId, unitOverride);
-        if (!availability.isAvailable) {
-          return NextResponse.json(
-            {
-              error: `Fabric is not available in Fabric Store for Program ${availability.programSerialNo || resolvedProgramId}. ${availability.message}`,
-              fabricAvailability: availability,
-            },
-            { status: 400 }
-          );
+      // Each sheet is checked for each unit its lines use; MTR and PCS never mix.
+      const unitsBySheet = new Map<string, Set<'MTR' | 'PCS'>>();
+      for (const item of Array.isArray(body.items) ? body.items : []) {
+        const unit = unitOf(item?.uom || item?.unit) as 'MTR' | 'PCS' | null;
+        const sheetId = itemSheetId(item);
+        if (!unitsBySheet.has(sheetId)) unitsBySheet.set(sheetId, new Set());
+        if (unit) unitsBySheet.get(sheetId)!.add(unit);
+      }
+      if (unitsBySheet.size === 0) {
+        unitsBySheet.set(resolvedProgramId, new Set(unitOf(body.fabricUnit) ? [unitOf(body.fabricUnit) as 'MTR' | 'PCS'] : []));
+      }
+      for (const [sheetId, units] of unitsBySheet) {
+        for (const unitOverride of units.size ? Array.from(units) : [undefined]) {
+          const availability = await checkFabricStoreAvailability(sheetId, unitOverride);
+          if (!availability.isAvailable) {
+            return NextResponse.json(
+              {
+                error: `Fabric is not available in Fabric Store for Program ${availability.programSerialNo || sheetId}. ${availability.message}`,
+                fabricAvailability: availability,
+              },
+              { status: 400 }
+            );
+          }
         }
       }
     }
@@ -590,6 +587,8 @@ export async function POST(request: Request) {
             size: item.size || null,
             rollNumber: item.rollNumber || null,
             remarks: itemRemarks || null,
+            // The Production Sheet this line belongs to (the challan's own sheet when the line names none).
+            programId: itemSheetId(item),
           },
         });
       }
@@ -600,10 +599,10 @@ export async function POST(request: Request) {
         await syncChallanStock(tx, challan.id, actorId);
       }
 
-      // Update linked program status
+      // Update the status of every sheet on the challan
       try {
-        await tx.program.update({
-          where: { id: resolvedProgramId },
+        await tx.program.updateMany({
+          where: { id: { in: Array.from(new Set([resolvedProgramId, ...sheetIdOf.values()])) } },
           data: { status: 'ISSUED' },
         });
       } catch (progErr) {
