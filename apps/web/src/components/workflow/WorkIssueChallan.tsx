@@ -30,6 +30,7 @@ import { GarmentImageUpload, GarmentThumb, useGarmentImages } from '@/components
 import { garmentName, groupGarments, imageFor } from '@/lib/finished-garments.mjs';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 import { challanSheetRefs, distinct, incomingChallanOptions, lineSheetId } from '@/lib/challan-sheets.mjs';
+import { ProductionSheetQuickView } from '@/components/challan/ProductionSheetQuickView';
 import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 
 const AVAILABLE_LABEL: Record<TransferKind, string> = { PASS: 'Available', REJECT: 'Rejected', REWORK: 'For Rework' };
@@ -259,6 +260,11 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
       <PageHeader title={title} loading={loading} onRefresh={load} />
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
+        <ProductionSheetQuickView
+          sheets={(selectedOptions.length ? selectedOptions : options).flatMap((o) => o.sheets)}
+          title={selectedOptions.length ? "Production Sheet" : "Production Sheets with work to issue"}
+          emptyText="No Production Sheet has anything to issue yet."
+        />
         {issued && (
           <Notice kind="success" onClose={() => setIssued(null)}>
             <div className="flex flex-wrap items-center gap-3">

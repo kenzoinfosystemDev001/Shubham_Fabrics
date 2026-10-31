@@ -25,6 +25,7 @@ import { CategoryBadge } from '@/components/recutting/RecuttingUi';
 import { AverageField, QuantityUnitField, averageError, quantityPairError, type QtyUnit } from '@/components/challan/AverageField';
 import { CATEGORY_LABEL, GARMENT_CATEGORIES, categoryName, readyForStitching } from '@/lib/recutting.mjs';
 import { distinct, incomingChallanOptions } from '@/lib/challan-sheets.mjs';
+import { ProductionSheetQuickView } from '@/components/challan/ProductionSheetQuickView';
 import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 
 /** An allocation as a line of its incoming challan (for the incoming challan picker). */
@@ -204,6 +205,11 @@ function StitchingChallanContent() {
       </PageHeader>
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
+        <ProductionSheetQuickView
+          sheets={(selectedOptions.length ? selectedOptions : options).flatMap((o) => o.sheets)}
+          title={selectedOptions.length ? "Production Sheet" : "Production Sheets with work to issue"}
+          emptyText="No Production Sheet has anything to issue yet."
+        />
         {issued && (
           <Notice kind="success" onClose={() => setIssued(null)}>
             <div className="flex flex-wrap items-center gap-3">

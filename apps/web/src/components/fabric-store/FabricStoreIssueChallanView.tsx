@@ -35,6 +35,7 @@ import { newSubmissionKey } from '@/components/challan/ChallanNumberField';
 import { quantityPairError } from '@/components/challan/AverageField';
 import { addTotals, formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 import { SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
+import { ProductionSheetQuickView } from '@/components/challan/ProductionSheetQuickView';
 
 import {
   ColorFabricMeasurementTable,
@@ -547,6 +548,11 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       </header>
 
       <main className="p-4 sm:p-8 max-w-6xl mx-auto space-y-6">
+        <ProductionSheetQuickView
+          sheets={sheetIds.map((id) => sheetOf(id)).filter(Boolean)}
+          title={sheetIds.length > 1 ? "Production Sheets on this challan" : "Production Sheet"}
+          emptyText="Select the Production Sheet (Serial Number) below to open it here."
+        />
         {/* ERROR NOTIFICATION */}
         {error && (
           <div className="p-3.5 bg-danger-50 border border-danger-200 rounded-xl text-xs text-danger-800 flex items-center gap-2.5">

@@ -24,6 +24,7 @@ import {
 import { availableForQc, needsColorReview } from '@/lib/dyeing-workflow.mjs';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 import { StockItemsSection, newStockFabric, stockLinesOf, type StockFabric, type StockSource } from '@/components/challan/StockItemsSection';
+import { ProductionSheetQuickView } from '@/components/challan/ProductionSheetQuickView';
 import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 import { NO_INCOMING_CHALLAN, challanSheetRefs, distinct, incomingChallanOptions } from '@/lib/challan-sheets.mjs';
 
@@ -187,6 +188,11 @@ function IssueChallanContent() {
       <PageHeader title="Issue Challan to Dyeing QC" loading={loading} onRefresh={load} />
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
+        <ProductionSheetQuickView
+          sheets={(selectedOptions.length ? selectedOptions : options).flatMap((o) => o.sheets)}
+          title={selectedOptions.length ? "Production Sheet" : "Production Sheets with work to issue"}
+          emptyText="No Production Sheet has anything to issue yet."
+        />
         {issued && (
           <Notice kind="success" onClose={() => setIssued(null)}>
             <div className="flex flex-wrap items-center gap-3">

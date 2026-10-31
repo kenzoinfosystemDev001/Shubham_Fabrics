@@ -1649,14 +1649,27 @@ export default function QC1MyWorkPage() {
                             <FileText className="w-3.5 h-3.5 text-brand-600" />
                             <span>See Challan Slip</span>
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedSheetForModal(selectedChallanForInspect.program)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 border border-brand-300 text-brand-900 rounded-lg text-xs font-bold transition shadow-2xs"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-brand-700" />
-                            <span>See Production Sheet</span>
-                          </button>
+                          {/* One button per Production Sheet on the challan's lines (older challans: its own sheet). */}
+                          {(() => {
+                            const sheets = Array.from(
+                              new Map(
+                                [...(selectedChallanForInspect.items || []).map((i: any) => i.program), selectedChallanForInspect.program]
+                                  .filter((p: any) => p?.id)
+                                  .map((p: any) => [p.id, p])
+                              ).values()
+                            );
+                            return sheets.map((p: any) => (
+                              <button
+                                key={p.id}
+                                type="button"
+                                onClick={() => setSelectedSheetForModal(p)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 border border-brand-300 text-brand-900 rounded-lg text-xs font-bold transition shadow-2xs"
+                              >
+                                <Eye className="w-3.5 h-3.5 text-brand-700" />
+                                <span>{sheets.length > 1 ? `Sheet ${p.programSerialNo || p.programNumber}` : 'See Production Sheet'}</span>
+                              </button>
+                            ));
+                          })()}
                         </div>
                       </div>
 
