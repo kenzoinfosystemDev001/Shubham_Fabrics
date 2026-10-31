@@ -53,9 +53,15 @@ interface Row {
   unitQuantity: string;
   unitQuantityUom: QtyUnit;
   remarks: string;
+  /** This line's fabric width; starts as the incoming line's width and may be changed. */
+  width: string;
 }
 
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', sizeUnit: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
+const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', sizeUnit: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '', width: '' });
+
+/** Fabric width of the incoming challan line an allocation's work line came from ('' when none). */
+const sourceWidthOf = (a: any): string =>
+  (a?.workItem?.inboundChallan?.items || []).find((l: any) => l.id === a?.workItem?.inboundChallanItemId)?.width || '';
 
 function StitchingChallanContent() {
   const params = useSearchParams();
@@ -124,7 +130,7 @@ function StitchingChallanContent() {
   const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const choose = (key: string, allocationId: string) => {
     const a = byId(allocationId);
-    updateRow(key, { allocationId, quantity: a ? String(readyForStitching(a)) : '', sizeUnit: a?.cutUom === 'MTR' || a?.cutUom === 'PCS' ? a.cutUom : '' });
+    updateRow(key, { allocationId, quantity: a ? String(readyForStitching(a)) : '', sizeUnit: a?.cutUom === 'MTR' || a?.cutUom === 'PCS' ? a.cutUom : '', width: sourceWidthOf(a) });
   };
 
   const filled = rows.filter((r) => r.allocationId);
@@ -178,6 +184,7 @@ function StitchingChallanContent() {
             unitQuantity: r.unitQuantity,
             unitQuantityUom: r.unitQuantityUom,
             remarks: r.remarks,
+            width: r.width,
           })),
         }),
       });
@@ -283,12 +290,13 @@ function StitchingChallanContent() {
                     <th className="py-3 px-3 min-w-[220px]">Size</th>
                     <th className="py-3 px-3 min-w-[200px]">Average</th>
                     <th className="py-3 px-3 min-w-[200px]">Unit</th>
+                    <th className="py-3 px-3 min-w-[120px]">Width</th>
                     <th className="py-3 px-3 min-w-[140px]">Remarks</th>
                     <th className="py-3 px-3"><span className="sr-only">Remove</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {!hasSource && <EmptyRow colSpan={14} text="Select an incoming challan above to add its cut allocations" />}
+                  {!hasSource && <EmptyRow colSpan={15} text="Select an incoming challan above to add its cut allocations" />}
                   {hasSource &&
                     rows.map((r) => {
                       const a = byId(r.allocationId);
@@ -348,6 +356,17 @@ function StitchingChallanContent() {
                               onUnit={(unitQuantityUom) => updateRow(r.key, { unitQuantityUom })}
                               required={Boolean(a)}
                               disabled={!a}
+                            />
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <input
+                              value={r.width}
+                              onChange={(e) => updateRow(r.key, { width: e.target.value })}
+                              maxLength={40}
+                              placeholder="e.g. 44 Inch"
+                              disabled={!a}
+                              className={FIELD}
+                              aria-label="Fabric width"
                             />
                           </td>
                           <td className="py-2.5 px-3">

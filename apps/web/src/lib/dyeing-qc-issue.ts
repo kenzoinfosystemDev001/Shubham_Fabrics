@@ -92,9 +92,11 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
     // Base (original) colour of each line, from its Store -> Dyeing challan line.
     const inboundItemIds = orders.map((o) => o.inboundChallanItemId).filter((v): v is string => Boolean(v));
     const inboundItems = inboundItemIds.length
-      ? await prisma.challanItem.findMany({ where: { id: { in: inboundItemIds } }, select: { id: true, colour: true } })
+      ? await prisma.challanItem.findMany({ where: { id: { in: inboundItemIds } }, select: { id: true, colour: true, width: true } })
       : [];
     const baseColour = new Map(inboundItems.map((i) => [i.id, i.colour]));
+    // Fabric width of each line, from its incoming line (kept unless the request names another).
+    const sourceWidth = new Map(inboundItems.map((i) => [i.id, i.width]));
 
     const prepared = lines.map((line, index) => {
       const order = byId.get(line.orderId)!;
@@ -113,7 +115,7 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
       }
       return {
         order,
-        extras: lineExtrasOf(line, index, (m) => new DyeingRequestError(m)),
+        extras: lineExtrasOf(line, index, (m) => new DyeingRequestError(m), order.inboundChallanItemId ? sourceWidth.get(order.inboundChallanItemId) ?? null : null),
         quantity: round(Number(line.quantity)),
         actual,
         base: order.inboundChallanItemId ? baseColour.get(order.inboundChallanItemId) ?? null : null,

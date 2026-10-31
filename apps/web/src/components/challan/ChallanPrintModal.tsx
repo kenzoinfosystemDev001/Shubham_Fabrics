@@ -21,7 +21,7 @@ import { departmentName } from '@/lib/workflow-views';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
-import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText } from '@/lib/challan-units.mjs';
+import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText, widthText } from '@/lib/challan-units.mjs';
 import { lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 
 interface ChallanPrintModalProps {
@@ -296,6 +296,7 @@ export function ChallanPrintModal({
                         {toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
                         <th className="py-2.5 px-3 font-medium">Unit</th>
                         {!toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
+                        <th className="py-2.5 px-3 font-medium">Width</th>
                         <th className="py-2.5 pl-3 pr-4 font-medium">Remarks</th>
                       </tr>
                     </thead>
@@ -309,6 +310,7 @@ export function ChallanPrintModal({
                           {toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(it)}</td>}
                           <td className="py-3 px-3 whitespace-nowrap">{toRecuttingLayout ? unitQuantityText(it) : it.uom || '—'}</td>
                           {!toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(it)}</td>}
+                          <td className="py-3 px-3 whitespace-nowrap font-medium">{widthText(it)}</td>
                           <td className="py-3 pl-3 pr-4 text-neutral-600">
                             {[it.rollNumber ? `Roll ${it.rollNumber}` : null, userChallanRemarks(it.remarks)].filter(Boolean).join(' · ') || '—'}
                           </td>
@@ -316,7 +318,7 @@ export function ChallanPrintModal({
                       ))}
                       {items.length === 0 && (
                         <tr>
-                          <td colSpan={hasDyeColour ? 7 : 6} className="py-6 text-center text-neutral-500">No items on this challan.</td>
+                          <td colSpan={hasDyeColour ? 8 : 7} className="py-6 text-center text-neutral-500">No items on this challan.</td>
                         </tr>
                       )}
                       {sheets.multiSheet &&
@@ -325,7 +327,7 @@ export function ChallanPrintModal({
                             <td colSpan={2} className="py-2 pl-4 pr-3 text-xs font-semibold text-neutral-600">
                               Sheet {sheetLabel(s.program)} ({s.lines.length} line{s.lines.length === 1 ? '' : 's'})
                             </td>
-                            <td colSpan={hasDyeColour ? 5 : 4} className="py-2 px-3 text-xs font-semibold tabular-nums">{formatTotals(s.totals)}</td>
+                            <td colSpan={hasDyeColour ? 6 : 5} className="py-2 px-3 text-xs font-semibold tabular-nums">{formatTotals(s.totals)}</td>
                           </tr>
                         ))}
                     </tbody>
@@ -333,7 +335,7 @@ export function ChallanPrintModal({
                       <tfoot className="bg-neutral-50 border-t border-neutral-200">
                         <tr>
                           <td colSpan={2} className="py-3 pl-4 pr-3 font-semibold">Total</td>
-                          <td colSpan={hasDyeColour ? 5 : 4} className="py-3 px-3 font-bold tabular-nums">{formatTotals(unitTotals)}</td>
+                          <td colSpan={hasDyeColour ? 6 : 5} className="py-3 px-3 font-bold tabular-nums">{formatTotals(unitTotals)}</td>
                         </tr>
                       </tfoot>
                     )}

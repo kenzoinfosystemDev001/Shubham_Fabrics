@@ -25,6 +25,37 @@ export function averageText(item) {
   return pairText(item?.average, item?.averageUnit);
 }
 
+/** Longest fabric width accepted for a line (free text such as "44 Inch" or "112 cm"). */
+export const WIDTH_MAX_LENGTH = 40;
+
+/**
+ * A line's fabric width as entered: trimmed text, or null when blank. Each line keeps its own width;
+ * it is never shared across a challan or converted.
+ * @returns {{ value: string | null } | { error: string }}
+ */
+export function widthOf(raw) {
+  const value = raw === undefined || raw === null ? '' : String(raw).replace(/\s+/g, ' ').trim();
+  if (value === '') return { value: null };
+  if (value.length > WIDTH_MAX_LENGTH) return { error: `Width must be at most ${WIDTH_MAX_LENGTH} characters.` };
+  if (/[\u0000-\u001f]/.test(value)) return { error: 'Width contains characters that are not allowed.' };
+  return { value };
+}
+
+/**
+ * The width to store for an outgoing line: the width entered for it when the request names one (even
+ * blank, which clears it), otherwise the width of the incoming line it was issued from.
+ * @returns {{ value: string | null } | { error: string }}
+ */
+export function lineWidthOf(line, sourceWidth) {
+  if (line && Object.prototype.hasOwnProperty.call(line, 'width')) return widthOf(line.width);
+  return widthOf(sourceWidth);
+}
+
+/** A challan line's fabric width, "—" when none was recorded. */
+export function widthText(item) {
+  return item?.width ? String(item.width) : '—';
+}
+
 /** A challan line's Unit quantity with its own unit, e.g. "40 PCS"; "—" when none was entered. */
 export function unitQuantityText(item) {
   return pairText(item?.unitQuantity, item?.unitQuantityUom);

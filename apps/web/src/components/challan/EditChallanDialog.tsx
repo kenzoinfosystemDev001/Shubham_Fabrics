@@ -31,6 +31,8 @@ interface LineForm {
   averageUnit: QtyUnit;
   unitQuantity: string;
   unitQuantityUom: QtyUnit;
+  /** This line's own fabric width. */
+  width: string;
   remarks: string;
 }
 
@@ -57,6 +59,7 @@ export function EditChallanDialog({ challan, onClose, onSaved }: { challan: any;
       averageUnit: unit(i.averageUnit),
       unitQuantity: str(i.unitQuantity),
       unitQuantityUom: unit(i.unitQuantityUom),
+      width: str(i.width),
       remarks: userChallanRemarks(i.remarks) || '',
     })),
   );
@@ -75,7 +78,7 @@ export function EditChallanDialog({ challan, onClose, onSaved }: { challan: any;
         .map((l) => {
           const o: any = original.get(l.id);
           const out: any = { id: l.id };
-          for (const k of ['itemDescription', 'fabricCode', 'colour', 'shade', 'requiredColour', 'size'] as const) if (l[k] !== str(o[k])) out[k] = l[k];
+          for (const k of ['itemDescription', 'fabricCode', 'colour', 'shade', 'requiredColour', 'size', 'width'] as const) if (l[k] !== str(o[k])) out[k] = l[k];
           if (l.remarks !== (userChallanRemarks(o.remarks) || '')) out.remarks = l.remarks;
           if (l.average !== str(o.average) || l.averageUnit !== unit(o.averageUnit)) Object.assign(out, { average: l.average, averageUnit: l.averageUnit });
           if (l.unitQuantity !== str(o.unitQuantity) || l.unitQuantityUom !== unit(o.unitQuantityUom)) Object.assign(out, { unitQuantity: l.unitQuantity, unitQuantityUom: l.unitQuantityUom });
@@ -159,6 +162,7 @@ export function EditChallanDialog({ challan, onClose, onSaved }: { challan: any;
                   <th className="py-2.5 px-3 min-w-[190px]">Quantity</th>
                   <th className="py-2.5 px-3 min-w-[190px]">Average</th>
                   <th className="py-2.5 px-3 min-w-[190px]">Unit</th>
+                  <th className="py-2.5 px-3 min-w-[120px]">Width</th>
                   <th className="py-2.5 px-3 min-w-[160px]">Remarks</th>
                 </tr>
               </thead>
@@ -196,6 +200,9 @@ export function EditChallanDialog({ challan, onClose, onSaved }: { challan: any;
                         onValue={(unitQuantity) => update(l.id, { unitQuantity })}
                         onUnit={(unitQuantityUom) => update(l.id, { unitQuantityUom })}
                       />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input value={l.width} onChange={(e) => update(l.id, { width: e.target.value })} maxLength={40} placeholder="e.g. 44 Inch" className={FIELD} aria-label="Fabric width" />
                     </td>
                     <td className="py-2 px-3"><input value={l.remarks} onChange={(e) => update(l.id, { remarks: e.target.value })} maxLength={500} className={FIELD} aria-label="Remarks" /></td>
                   </tr>

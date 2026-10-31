@@ -52,9 +52,15 @@ interface Row {
   unitQuantity: string;
   unitQuantityUom: QtyUnit;
   remarks: string;
+  /** This line's fabric width; starts as the incoming line's width and may be changed. */
+  width: string;
 }
 
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), itemId: '', quantity: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
+const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), itemId: '', quantity: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '', width: '' });
+
+/** Fabric width of the incoming challan line a work line came from ('' when none was recorded). */
+const sourceWidthOf = (item: any): string =>
+  (item?.inboundChallan?.items || []).find((l: any) => l.id === item?.inboundChallanItemId)?.width || '';
 
 // Challans from Programming to Recutting share one Items layout: Size | Average | Unit | Remarks, each of the
 // first three a quantity with its own MTR / PCS (the Size keeps the line's own unit: it is what moves).
@@ -166,7 +172,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
   const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const chooseItem = (key: string, itemId: string) => {
     const i = itemById(itemId);
-    updateRow(key, { itemId, quantity: i && available(i) ? String(available(i)) : '' });
+    updateRow(key, { itemId, quantity: i && available(i) ? String(available(i)) : '', width: sourceWidthOf(i) });
   };
 
   const filled = rows.filter((r) => r.itemId);
@@ -240,6 +246,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                 ...(showAverage && r.average.trim() !== '' ? { average: r.average, averageUnit: r.averageUnit } : {}),
                 ...(showAverage ? { unitQuantity: r.unitQuantity, unitQuantityUom: r.unitQuantityUom } : {}),
                 remarks: r.remarks,
+                width: r.width,
               })),
         }),
       });
@@ -420,12 +427,13 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                     <th className={`py-3 px-3 ${showAverage ? 'min-w-[220px]' : 'min-w-[130px] text-right'}`}>{showAverage ? 'Size' : 'Transfer Qty'}</th>
                     {showAverage && <th className="py-3 px-3 min-w-[200px]">Average</th>}
                     <th className={`py-3 px-3 ${showAverage ? 'min-w-[200px]' : ''}`}>Unit</th>
+                    <th className="py-3 px-3 min-w-[120px]">Width</th>
                     <th className="py-3 px-3 min-w-[140px]">Remarks</th>
                     <th className="py-3 px-3"><span className="sr-only">Remove</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {!hasSource && <EmptyRow colSpan={(kind === 'PASS' ? 11 : 12) + (showAverage ? 1 : 0)} text="Select an incoming challan above to add its lines" />}
+                  {!hasSource && <EmptyRow colSpan={(kind === 'PASS' ? 12 : 13) + (showAverage ? 1 : 0)} text="Select an incoming challan above to add its lines" />}
                   {hasSource &&
                     rows.map((r) => {
                       const i = itemById(r.itemId);
@@ -499,6 +507,17 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                           ) : (
                             <td className="py-2.5 px-3 text-xs font-semibold">{i?.uom || '—'}</td>
                           )}
+                          <td className="py-2.5 px-3">
+                            <input
+                              value={r.width}
+                              onChange={(e) => updateRow(r.key, { width: e.target.value })}
+                              maxLength={40}
+                              placeholder="e.g. 44 Inch"
+                              disabled={!i}
+                              className={FIELD}
+                              aria-label="Fabric width"
+                            />
+                          </td>
                           <td className="py-2.5 px-3">
                             <input value={r.remarks} onChange={(e) => updateRow(r.key, { remarks: e.target.value })} maxLength={300} className={FIELD} aria-label="Remarks" />
                           </td>

@@ -61,7 +61,9 @@ const ALLOCATION_INCLUDE = {
       status: true,
       priority: true,
       inboundChallanId: true,
-      inboundChallan: { select: { id: true, challanNumber: true, issuedDate: true, fromDepartment: true, status: true } },
+      inboundChallanItemId: true,
+      // items: the fabric width of each incoming line (pre-fills the Stitching challan line).
+      inboundChallan: { select: { id: true, challanNumber: true, issuedDate: true, fromDepartment: true, status: true, items: { select: { id: true, width: true } } } },
       program: { select: SHEET_SELECT },
     },
   },
@@ -456,9 +458,14 @@ const issueStitchingChallan = (request: Request) =>
       await assertChallanNumbersAvailable(prisma, cfg.code, [{ value: challanNumber }]);
       const issuedDate = body.issuedDate ? new Date(String(body.issuedDate)) : new Date();
       if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
+      // Fabric width of each allocation's incoming line: kept unless the request names another width.
+      const sourceWidths = new Map(
+        (await prisma.challanItem.findMany({ where: { id: { in: allocations.map((a) => a.workItem.inboundChallanItemId) } }, select: { id: true, width: true } })).map((i) => [i.id, i.width]),
+      );
       const prepared = lines.map((l, index) => {
         const a = byId.get(l.allocationId)!;
-        return { a, quantity: round(Number(l.quantity)), ...stitchingLineUse(a, l), extras: lineExtrasOf(l, index, (m) => new WorkRequestError(m)), remarks: textOf(l.remarks, 300) };
+        const extras = lineExtrasOf(l, index, (m) => new WorkRequestError(m), sourceWidths.get(a.workItem.inboundChallanItemId) ?? null);
+        return { a, quantity: round(Number(l.quantity)), ...stitchingLineUse(a, l), extras, remarks: textOf(l.remarks, 300) };
       });
       const extrasOf = await lineExtrasWriter(prepared.map((p) => p.extras));
       const total = round(prepared.reduce((s, p) => s + p.quantity, 0));

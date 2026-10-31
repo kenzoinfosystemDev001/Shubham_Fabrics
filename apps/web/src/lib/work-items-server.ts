@@ -293,7 +293,8 @@ export const LINES_WITH_SHEET = ITEMS_WITH_SHEET;
 export const WORK_ITEM_INCLUDE = {
   program: { select: PROGRAM_SELECT },
   inboundChallan: {
-    select: { id: true, challanNumber: true, challanType: true, fromDepartment: true, status: true, issuedDate: true, receivedDate: true },
+    // items: the fabric width of each incoming line (shown and kept when the line is issued onward).
+    select: { id: true, challanNumber: true, challanType: true, fromDepartment: true, status: true, issuedDate: true, receivedDate: true, items: { select: { id: true, width: true } } },
   },
   transfers: {
     orderBy: { createdAt: 'asc' as const },
@@ -1071,9 +1072,14 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         const priority = body.priority ? String(body.priority).toUpperCase() : null;
         if (priority && !['LOW', 'NORMAL', 'HIGH', 'URGENT'].includes(priority)) throw new WorkRequestError('Choose a valid priority.');
         if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
+        // Fabric width of each line's incoming line: kept unless the request names another width.
+        const sourceWidths = new Map(
+          (await prisma.challanItem.findMany({ where: { id: { in: items.map((i) => i.inboundChallanItemId) } }, select: { id: true, width: true } })).map((i) => [i.id, i.width]),
+        );
         const prepared = lines.map((l, index) => {
           const item = byId.get(l.workItemId)!;
-          return { item, quantity: round(Number(l.quantity)), extras: lineExtrasOf(l, index, (m) => new WorkRequestError(m)), remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
+          const extras = lineExtrasOf(l, index, (m) => new WorkRequestError(m), sourceWidths.get(item.inboundChallanItemId) ?? null);
+          return { item, quantity: round(Number(l.quantity)), extras, remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
         });
         const extrasOf = await lineExtrasWriter(prepared.map((p) => p.extras));
         const total = round(prepared.reduce((s, p) => s + p.quantity, 0));

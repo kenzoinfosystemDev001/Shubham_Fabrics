@@ -416,6 +416,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         requiredDyeQuantity: destinationDepartment === 'DYEING' ? item.requiredDyeQuantity || null : null,
         fabricProcessingStatus: destinationDepartment === 'EMBROIDERY' ? 'Undyed' : undefined,
         rollNumber: item.rollNumber || null,
+        // This fabric's own width (each line keeps its own).
+        width: (item.width || '').trim() || null,
         average: String(item.average ?? '').trim() === '' ? null : Number(item.average),
         averageUnit: String(item.average ?? '').trim() === '' ? null : item.averageUnit || null,
         unitQuantity: Number(item.unitQuantity),

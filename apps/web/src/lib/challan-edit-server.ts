@@ -5,8 +5,8 @@ import { TX, WorkRequestError, round } from '@/lib/work-items-server';
 import { availableFor, isQcItem, qcStatusOf, statusAfterTransfer } from '@/lib/work-items.mjs';
 import { allocationStatusOf } from '@/lib/recutting.mjs';
 import { availableForQc, statusAfterTransfer as dyeingStatusAfterTransfer } from '@/lib/dyeing-workflow.mjs';
-import { MIXED_UNIT, quantityPairOf, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
-import { canStoreChallanAverage, canStoreChallanUnitQuantity } from '@/lib/challan-item-average';
+import { MIXED_UNIT, quantityPairOf, totalsByUnit, unitOf, widthOf } from '@/lib/challan-units.mjs';
+import { canStoreChallanAverage, canStoreChallanUnitQuantity, canStoreChallanWidth } from '@/lib/challan-item-average';
 import { assertChallanNumbersAvailable, requireChallanNumber } from '@/lib/challan-number-server';
 import { STOCK_TRANSACTION_OPTIONS, syncChallanStock } from '@/lib/fabric-stock-ledger';
 import { syncItem as syncRecuttingItem } from '@/lib/recutting-server';
@@ -61,7 +61,7 @@ export async function editChallan(id: string, body: any, user: AuthenticatedUser
   const edits: any[] = Array.isArray(body.items) ? body.items : [];
   const byId = new Map(challan.items.map((i) => [i.id, i]));
   if (edits.some((e) => !byId.has(e?.id))) throw new WorkRequestError('A line does not belong to this challan.');
-  const [storeAverage, storeUnitQuantity] = await Promise.all([canStoreChallanAverage(), canStoreChallanUnitQuantity()]);
+  const [storeAverage, storeUnitQuantity, storeWidth] = await Promise.all([canStoreChallanAverage(), canStoreChallanUnitQuantity(), canStoreChallanWidth()]);
 
   const lineUpdates: Array<{ line: (typeof challan.items)[number]; data: Record<string, any>; quantity: number; uom: string; quantityChanged: boolean }> = [];
   for (const [index, e] of edits.entries()) {
@@ -82,6 +82,12 @@ export async function editChallan(id: string, body: any, user: AuthenticatedUser
       const uq = quantityPairOf(e.unitQuantity, e.unitQuantityUom, 'Unit quantity');
       if ('error' in uq) throw new WorkRequestError(`${n}: ${uq.error}`);
       if (storeUnitQuantity) Object.assign(data, { unitQuantity: uq.value, unitQuantityUom: uq.unit });
+    }
+    // This line's own fabric width (blank clears it); other lines are never touched.
+    if (e.width !== undefined) {
+      const w = widthOf(e.width);
+      if ('error' in w) throw new WorkRequestError(`${n}: ${w.error}`);
+      if (storeWidth) data.width = w.value;
     }
     let quantity = line.quantity;
     let uom = line.uom;

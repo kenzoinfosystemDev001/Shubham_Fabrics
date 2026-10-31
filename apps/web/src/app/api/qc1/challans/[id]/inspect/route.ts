@@ -182,7 +182,12 @@ export async function POST(
     const colourOf = (r: (typeof inspectedLines)[number]) =>
       r.observedColor || (singleLine ? observedColor : null) || r.item.colour || effectiveColor;
     // Each outgoing line comes from one inspected line and keeps its fabric, colour and Production Sheet.
-    const lineSource = (r: (typeof inspectedLines)[number]) => ({ programId: lineSheetId(r.item, challan), sourceChallanItemId: r.item.id });
+    // Each outgoing line keeps its inspected line's fabric width.
+    const lineSource = (r: (typeof inspectedLines)[number]) => ({
+      programId: lineSheetId(r.item, challan),
+      sourceChallanItemId: r.item.id,
+      ...(r.item.width ? { width: r.item.width } : {}),
+    });
     // Lines of an outgoing challan: one per inspected line with quantity; header totals only for one unit.
     const outgoing = (key: 'passed' | 'rework') => {
       const rows = inspectedLines.filter((r) => r[key] > 0);
