@@ -45,7 +45,7 @@ import {
   printBarcodeSticker,
   generateCode128SvgBars 
 } from '@/lib/barcode';
-import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText } from '@/lib/challan-units.mjs';
+import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText, widthText } from '@/lib/challan-units.mjs';
 import { distinct, lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 import { 
   downloadChallanHtml, 
@@ -410,10 +410,12 @@ export default function ChallanDetailPage() {
                       <th className="py-2.5 px-3 font-medium">Fabric</th>
                       <th className="py-2.5 px-3 font-medium">{hasDyeColour ? 'Base Colour' : 'Colour'}</th>
                       {hasDyeColour && <th className="py-2.5 px-3 font-medium">Dye Colour</th>}
+                      <th className="py-2.5 px-3 font-medium">Shade</th>
                       <th className="py-2.5 px-3 font-medium text-right">Size</th>
                       {toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
                       <th className="py-2.5 px-3 font-medium">Unit</th>
                       {!toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
+                      <th className="py-2.5 px-3 font-medium">Width</th>
                       <th className="py-2.5 px-3 font-medium">Source Challan</th>
                       <th className="py-2.5 pl-3 pr-4 font-medium">Remarks</th>
                     </tr>
@@ -427,10 +429,12 @@ export default function ChallanDetailPage() {
                         <td className="py-3 px-3 font-medium">{item.fabricCode || item.itemDescription || '—'}</td>
                         <td className="py-3 px-3">{item.colour || '—'}</td>
                         {hasDyeColour && <td className="py-3 px-3 font-semibold text-brand-800">{item.requiredColour || '—'}</td>}
+                        <td className="py-3 px-3">{item.shade || '—'}</td>
                         <td className="py-3 px-3 text-right tabular-nums font-semibold whitespace-nowrap">{item.quantity}{toRecuttingLayout && item.uom ? ` ${item.uom}` : ''}</td>
                         {toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(item)}</td>}
                         <td className="py-3 px-3 whitespace-nowrap">{toRecuttingLayout ? unitQuantityText(item) : item.uom || '—'}</td>
                         {!toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(item)}</td>}
+                        <td className="py-3 px-3 whitespace-nowrap font-medium">{widthText(item)}</td>
                         <td className="py-3 px-3 font-mono text-xs whitespace-nowrap">
                           {item.sourceChallanItem?.challan ? (
                             <Link href={`/challans/${item.sourceChallanItem.challan.id}`} className="text-brand-700 hover:underline">
@@ -447,7 +451,7 @@ export default function ChallanDetailPage() {
                     ))}
                     {items.length === 0 && (
                       <tr>
-                        <td colSpan={hasDyeColour ? 9 : 8} className="py-6 text-center text-neutral-500">No items on this challan.</td>
+                        <td colSpan={hasDyeColour ? 11 : 10} className="py-6 text-center text-neutral-500">No items on this challan.</td>
                       </tr>
                     )}
                     {/* A challan carrying several Production Sheets: each sheet's total */}
@@ -457,7 +461,7 @@ export default function ChallanDetailPage() {
                           <td colSpan={3} className="py-2 pl-4 pr-3 text-xs font-semibold text-neutral-600">
                             Sheet {sheetLabel(s.program)} ({s.lines.length} line{s.lines.length === 1 ? '' : 's'})
                           </td>
-                          <td colSpan={hasDyeColour ? 6 : 5} className="py-2 px-3 text-xs font-semibold tabular-nums">{formatTotals(s.totals)}</td>
+                          <td colSpan={hasDyeColour ? 8 : 7} className="py-2 px-3 text-xs font-semibold tabular-nums">{formatTotals(s.totals)}</td>
                         </tr>
                       ))}
                   </tbody>
@@ -465,7 +469,7 @@ export default function ChallanDetailPage() {
                     <tfoot className="bg-neutral-50 border-t border-neutral-200 text-neutral-900">
                       <tr>
                         <td colSpan={3} className="py-3 pl-4 pr-3 text-sm font-semibold">Total</td>
-                        <td colSpan={hasDyeColour ? 6 : 5} className="py-3 px-3 text-sm font-bold tabular-nums">
+                        <td colSpan={hasDyeColour ? 8 : 7} className="py-3 px-3 text-sm font-bold tabular-nums">
                           {formatTotals(unitTotals)}
                         </td>
                       </tr>

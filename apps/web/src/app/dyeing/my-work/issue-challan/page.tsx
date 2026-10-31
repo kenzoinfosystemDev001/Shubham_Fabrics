@@ -106,6 +106,8 @@ function IssueChallanContent() {
       baseColour(o) ? `Base ${baseColour(o)}` : '',
       o.targetColor && o.targetColor !== colourOf(o) ? `Required ${o.targetColor}` : '',
     ].filter(Boolean).join(' · '),
+    // Fabric width of the incoming Store -> Dyeing line.
+    width: (o.inboundChallan?.items || []).find((i: any) => i.id === o.inboundChallanItemId)?.width || null,
   }));
   const itemsCheck = stockLinesOf(fabrics, sources);
   const itemLines = 'lines' in itemsCheck ? itemsCheck.lines : [];
@@ -168,6 +170,7 @@ function IssueChallanContent() {
             unitQuantity: l.unitQuantity,
             unitQuantityUom: l.unitQuantityUom,
             remarks: l.remarks,
+            width: l.width,
           })),
         }),
       });

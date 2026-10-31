@@ -17,7 +17,7 @@ import { loadProgramDocument } from '@/lib/program-document';
 import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
 import { generateProductionSheetHtml } from '@/lib/download-production-sheet';
 import { garmentImageUrl, groupGarments, imageFor, isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
-import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText } from '@/lib/challan-units.mjs';
+import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText, widthText } from '@/lib/challan-units.mjs';
 import { lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 
 /** A finished garment as printed on the challan: its name and image (a data URL, so the file works offline). */
@@ -194,7 +194,7 @@ export function generateChallanHtml(challan: any): string {
     .fields > div:first-child { border-left: none; }
     table { width: 100%; border-collapse: collapse; border: 1px solid #e4e0e8; }
     th { background: #faf9fb; font-size: 10px; font-weight: 700; color: #57545e; text-align: left; padding: 8px 10px; border-bottom: 1px solid #e4e0e8; }
-    td { padding: 9px 10px; border-bottom: 1px solid #efedf1; vertical-align: top; }
+    td { padding: 9px 10px; border-bottom: 1px solid #efedf1; vertical-align: top; overflow-wrap: anywhere; }
     .num { text-align: right; font-variant-numeric: tabular-nums; }
     .total td { background: #faf9fb; font-weight: 800; border-bottom: none; }
     .muted { color: #57545e; }
@@ -267,13 +267,14 @@ export function generateChallanHtml(challan: any): string {
         <thead>
           <tr>
             <th>Fabric</th>
-            <th style="width: 15%;">${hasDyeColour ? 'Base Colour' : 'Colour'}</th>
-            ${hasDyeColour ? '<th style="width: 15%;">Dye Colour</th>' : ''}
+            <th style="width: 12%;">${hasDyeColour ? 'Base Colour' : 'Colour'}</th>
+            ${hasDyeColour ? '<th style="width: 12%;">Dye Colour</th>' : ''}
             <th class="num" style="width: 12%;">Size</th>
             ${toRecuttingLayout ? '<th class="num" style="width: 11%;">Average</th>' : ''}
             <th style="width: 9%;">Unit</th>
             ${toRecuttingLayout ? '' : '<th class="num" style="width: 11%;">Average</th>'}
-            <th style="width: 24%;">Remarks</th>
+            <th style="width: 10%;">Width</th>
+            <th style="width: 18%;">Remarks</th>
           </tr>
         </thead>
         <tbody>
@@ -286,17 +287,18 @@ export function generateChallanHtml(challan: any): string {
             ${toRecuttingLayout ? `<td class="num">${esc(averageText(it))}</td>` : ''}
             <td>${esc(toRecuttingLayout ? unitQuantityText(it) : it.uom || '—')}</td>
             ${toRecuttingLayout ? '' : `<td class="num">${esc(averageText(it))}</td>`}
+            <td style="font-weight: 700;">${esc(widthText(it))}</td>
             <td class="muted">${esc([it.rollNumber ? `Roll ${it.rollNumber}` : '', userChallanRemarks(it.remarks)].filter(Boolean).join(' · ') || '—')}</td>
           </tr>`).join('')}
-          ${items.length === 0 ? `<tr><td colspan="${hasDyeColour ? 7 : 6}" class="muted" style="text-align: center;">No items on this challan.</td></tr>` : ''}
+          ${items.length === 0 ? `<tr><td colspan="${hasDyeColour ? 8 : 7}" class="muted" style="text-align: center;">No items on this challan.</td></tr>` : ''}
           ${sheets.multiSheet ? sheets.sheets.map((s: any) => `
           <tr>
             <td colspan="2">Sheet ${esc(sheetLabel(s.program))} (${s.lines.length} line${s.lines.length === 1 ? '' : 's'})</td>
-            <td colspan="${hasDyeColour ? 5 : 4}">${esc(formatTotals(s.totals))}</td>
+            <td colspan="${hasDyeColour ? 6 : 5}">${esc(formatTotals(s.totals))}</td>
           </tr>`).join('') : ''}
           <tr class="total">
             <td colspan="2">Total</td>
-            <td colspan="${hasDyeColour ? 5 : 4}">${esc(totalsText)}</td>
+            <td colspan="${hasDyeColour ? 6 : 5}">${esc(totalsText)}</td>
           </tr>
         </tbody>
       </table>
