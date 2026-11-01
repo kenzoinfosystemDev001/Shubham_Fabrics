@@ -44,6 +44,8 @@ interface OutwardItem {
   inwardVerified?: boolean;
   inwardBillNo?: string | null;
   inwardSupplier?: string | null;
+  /** Width from the matching inward entry; null when none is recorded. */
+  width?: string | null;
 }
 
 export default function OutwardStockPage() {
@@ -408,6 +410,9 @@ export default function OutwardStockPage() {
                   <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black">
                     ITEM NAME
                   </th>
+                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-20">
+                    WIDTH
+                  </th>
                   <th className="border-r-[1.5px] border-neutral-200 px-2.5 py-2 font-black text-center w-24">
                     CATEGORY
                   </th>
@@ -434,7 +439,7 @@ export default function OutwardStockPage() {
               <tbody className="divide-y divide-neutral-200">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={13} className="px-4 py-12 text-center text-neutral-500 space-y-2">
+                    <td colSpan={14} className="px-4 py-12 text-center text-neutral-500 space-y-2">
                       <Send className="w-8 h-8 mx-auto text-neutral-700" />
                       <div className="text-sm font-bold text-neutral-700">No outward records found</div>
                       <p className="text-xs text-neutral-500">
@@ -474,6 +479,9 @@ export default function OutwardStockPage() {
                           <div className="truncate max-w-[200px]" title={item.itemName}>
                             {item.itemName}
                           </div>
+                        </td>
+                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-semibold text-neutral-700 whitespace-nowrap">
+                          {item.width || '—'}
                         </td>
                         <td className="border-r-[1.5px] border-neutral-200 px-2.5 py-2 text-center">
                           <span

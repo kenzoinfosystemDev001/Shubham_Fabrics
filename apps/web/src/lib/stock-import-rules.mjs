@@ -131,11 +131,11 @@ export function parseOptionalAmount(value) {
 const DETAIL_NUMBERS = ['pricePerUnit', 'boxThanQty', 'taxPercent'];
 
 /**
- * The optional bill details of one inward line (price per unit, box/than qty, HSN code, tax %).
+ * The optional bill details of one inward line (width, price per unit, box/than qty, HSN code, tax %).
  * `problems` lists the number fields whose value is not clear (tax must be 0-100); those stay empty.
  */
 export function inwardLineDetails(src) {
-  const details = { pricePerUnit: null, boxThanQty: null, hsnCode: null, taxPercent: null };
+  const details = { width: null, pricePerUnit: null, boxThanQty: null, hsnCode: null, taxPercent: null };
   const problems = [];
   for (const field of DETAIL_NUMBERS) {
     const n = parseOptionalAmount(src?.[field]);
@@ -145,6 +145,9 @@ export function inwardLineDetails(src) {
   }
   const hsn = src?.hsnCode;
   details.hsnCode = cleanText(typeof hsn === 'number' ? String(hsn) : hsn)?.slice(0, 20) || null;
+  // Written as on the bill ("58", "44 inch", "150 cm"); never converted.
+  const width = src?.width;
+  details.width = cleanText(typeof width === 'number' ? String(width) : width)?.slice(0, 30) || null;
   return { details, problems };
 }
 

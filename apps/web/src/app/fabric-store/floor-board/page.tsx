@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { FloorBoardTabs } from '@/components/workflow/IssuedChallansTab';
 import { useRouter } from 'next/navigation';
 import {
   Kanban,
@@ -128,8 +129,10 @@ export default function FabricStoreFloorBoardPage() {
         </div>
       </header>
 
-      {/* PIPELINE KPI SUMMARY */}
       <div className="px-4 sm:px-8 pt-6 max-w-7xl mx-auto">
+      <FloorBoardTabs department="STORE">
+      {/* PIPELINE KPI SUMMARY */}
+      <div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-white border border-brand-500/10 rounded-xl shadow-xs">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600">1. Incoming</span>
@@ -147,7 +150,7 @@ export default function FabricStoreFloorBoardPage() {
       </div>
 
       {/* KANBAN BOARD LANES */}
-      <div className="px-4 sm:px-8 pt-6 max-w-7xl mx-auto">
+      <div className="pt-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
           
           {/* LANE 1: INCOMING CHALLANS */}
@@ -335,6 +338,8 @@ export default function FabricStoreFloorBoardPage() {
           </div>
 
         </div>
+      </div>
+      </FloorBoardTabs>
       </div>
     </div>
   );

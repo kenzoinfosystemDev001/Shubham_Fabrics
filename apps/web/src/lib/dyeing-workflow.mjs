@@ -66,14 +66,28 @@ export function receivedBasis(order) {
   return order.status === 'AWAITING_RECEIPT' ? 0 : round(order.requiredQuantity);
 }
 
-/** Received but not yet dyed. */
-export function remainingToDye(order) {
-  return round(Math.max(0, receivedBasis(order) - (Number(order.dyedQuantity) || 0)));
+/** Still on HOLD on the order (kept in step with its open HOLD records); blocked until released. */
+export function heldOf(order) {
+  return round(Math.max(0, Number(order?.heldQuantity) || 0));
 }
 
-/** Dyed but not yet sent to QC1: the most a new QC challan line may carry. */
+/** Received and not yet sent to QC, less what is on HOLD: what may still be dyed or sent. */
+export function freeQuantity(order) {
+  return round(Math.max(0, receivedBasis(order) - (Number(order.sentToQc1Quantity) || 0) - heldOf(order)));
+}
+
+/** Received but not yet dyed, less what is on HOLD (the HOLD sits on undyed fabric first). */
+export function remainingToDye(order) {
+  const undyed = Math.max(0, receivedBasis(order) - (Number(order.dyedQuantity) || 0));
+  return round(Math.max(0, undyed - heldOf(order)));
+}
+
+/** Dyed but not yet sent to QC1, less what is held beyond the undyed fabric: the most a new QC challan line may carry. */
 export function availableForQc(order) {
-  return round(Math.max(0, (Number(order.dyedQuantity) || 0) - (Number(order.sentToQc1Quantity) || 0)));
+  const undyed = Math.max(0, receivedBasis(order) - (Number(order.dyedQuantity) || 0));
+  const heldOnDyed = Math.max(0, heldOf(order) - undyed);
+  const open = Math.max(0, (Number(order.dyedQuantity) || 0) - (Number(order.sentToQc1Quantity) || 0));
+  return round(Math.min(Math.max(0, open - heldOnDyed), freeQuantity(order)));
 }
 
 function norm(value) {
@@ -149,6 +163,11 @@ export function validateProcessUpdate(order, input) {
   }
   if (dyed > received) {
     return { ok: false, error: `Processed quantity cannot exceed the received ${received} ${order.uom}.` };
+  }
+  // Held fabric is never dyed: more processed than before may not reach into the HOLD.
+  const held = heldOf(order);
+  if (dyed > round(order.dyedQuantity) && dyed > round(received - held)) {
+    return { ok: false, error: `Insufficient Available Quantity. ${held} ${order.uom} is currently on HOLD. Processed quantity can be at most ${round(received - held)} ${order.uom}.` };
   }
   if (dyed < sent) {
     return { ok: false, error: `${sent} ${order.uom} has already been sent to QC; processed quantity cannot be lower.` };
@@ -228,7 +247,13 @@ export function validateQcTransferLines(lines, ordersById) {
     const total = round((sent.get(line.orderId) || 0) + quantity);
     sent.set(line.orderId, total);
     if (total > available) {
-      return { ok: false, error: `Line ${n}: only ${available} ${order.uom} of ${order.fabricName} is available to transfer.` };
+      const held = heldOf(order);
+      return {
+        ok: false,
+        error: held > 0
+          ? `Line ${n}: Insufficient Available Quantity. ${held} ${order.uom} of ${order.fabricName} is currently on HOLD. Maximum transferable quantity is ${available} ${order.uom}.`
+          : `Line ${n}: only ${available} ${order.uom} of ${order.fabricName} is available to transfer.`,
+      };
     }
   }
   return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: /** @type {string} */ (programId) };

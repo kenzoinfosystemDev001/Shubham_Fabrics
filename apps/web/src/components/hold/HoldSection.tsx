@@ -8,7 +8,8 @@ import { HOLD_REASONS } from '@/lib/holds.mjs';
 
 // Hold Quantity section of a department's processing form (Dyeing to Inventory). It sits inside the form but
 // saves on its own (POST /api/holds); the form's Save never sends HOLD fields. The server validates the
-// quantity against what the line still has, in the line's own unit, and allows one open HOLD per line.
+// quantity against what the line still has free, in the line's own unit; more can be added to an open HOLD.
+// Held quantity is blocked from processing and transfer until it is released.
 
 const UNITS = ['MTR', 'PCS'] as const;
 
@@ -17,7 +18,7 @@ const noSubmit = (e: React.KeyboardEvent) => {
   if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') e.preventDefault();
 };
 
-export function HoldSection({ department, sourceId, holdPage }: { department: string; sourceId: string; holdPage: string }) {
+export function HoldSection({ department, sourceId, holdPage, onChanged }: { department: string; sourceId: string; holdPage: string; onChanged?: (message: string) => void }) {
   const [rows, setRows] = useState<Array<{ line: any; hold: any }>>([]);
   const [loading, setLoading] = useState(true);
   const [unit, setUnit] = useState('');
@@ -72,6 +73,8 @@ export function HoldSection({ department, sourceId, holdPage }: { department: st
       setReasonOther('');
       setRemarks('');
       await load();
+      // The form's own figures (available, ready) change with the HOLD.
+      onChanged?.(body.message);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -103,12 +106,12 @@ export function HoldSection({ department, sourceId, holdPage }: { department: st
 
       {!loading && rows.length === 0 && <p className="text-xs text-neutral-500">This line cannot be placed on HOLD yet (nothing received).</p>}
 
-      {line && !row?.hold && (
+      {line && (
         line.outstanding > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <label className="block">
-                <span className="text-xs font-semibold text-neutral-600">Hold quantity *</span>
+                <span className="text-xs font-semibold text-neutral-600">{row?.hold ? 'Add to HOLD *' : 'Hold quantity *'}</span>
                 <input
                   type="number"
                   min="0"
@@ -144,7 +147,7 @@ export function HoldSection({ department, sourceId, holdPage }: { department: st
             </div>
             <p className="text-[11px] text-neutral-500">
               Up to {fmtQty(line.outstanding, line.unit)} (received {fmtQty(line.received, line.unit)}, forwarded {fmtQty(line.forwarded, line.unit)}
-              {line.writtenOff > 0 ? `, written off ${fmtQty(line.writtenOff, line.unit)}` : ''}). Challan {line.challanNumber || '—'}.
+              {line.writtenOff > 0 ? `, written off ${fmtQty(line.writtenOff, line.unit)}` : ''}{line.onHold > 0 ? `, already on HOLD ${fmtQty(line.onHold, line.unit)}` : ''}). Challan {line.challanNumber || '—'}.
             </p>
             {reason === 'OTHER' && (
               <label className="block">
@@ -158,12 +161,12 @@ export function HoldSection({ department, sourceId, holdPage }: { department: st
             </label>
             <div className="flex justify-end">
               <button type="button" onClick={save} disabled={saving} className={BTN_PRIMARY}>
-                {saving ? 'Saving…' : 'Save HOLD'}
+                {saving ? 'Saving…' : row?.hold ? 'Add to HOLD' : 'Save HOLD'}
               </button>
             </div>
           </>
         ) : (
-          <p className="text-xs text-neutral-500">Nothing of this line is left in the department to hold.</p>
+          !row?.hold && <p className="text-xs text-neutral-500">Nothing of this line is left in the department to hold.</p>
         )
       )}
     </fieldset>

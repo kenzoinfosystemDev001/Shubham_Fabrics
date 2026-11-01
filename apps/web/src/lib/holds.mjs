@@ -3,9 +3,10 @@
 // meters and pieces are never added together or converted.
 //
 // A line's figures: received, forwarded (left on challans, allocations or packing) and written off (defective,
-// shrinkage). Outstanding = received - forwarded - written off is what the department still has; a HOLD keeps
-// part or all of it back. Remaining on HOLD = held - released, never more than the outstanding quantity, so
-// forwarding 20 of a 50 HOLD leaves 30 without the HOLD record deducting anything itself.
+// shrinkage; QC REJECT / REWORK not yet sent). Outstanding = received - forwarded - written off is what the
+// department still has; a HOLD keeps part or all of it back. Held quantity is blocked: it is never processed or
+// forwarded (every quantity check takes the line's heldQuantity off) until it is released, so remaining on HOLD
+// = held - released, capped only if quantity is written off.
 
 /** Hold reasons offered in the dropdown; OTHER needs the reason typed in. */
 export const HOLD_REASONS = /** @type {const} */ ([
@@ -32,7 +33,7 @@ export const HOLD_STATUS_LABEL = {
   CLEARED: 'Cleared',
 };
 
-export const HOLD_EVENT_LABEL = { HOLD: 'Placed on HOLD', RELEASE: 'Released', CLOSE: 'Closed', FORWARD: 'Forwarded' };
+export const HOLD_EVENT_LABEL = { HOLD: 'Placed on HOLD', RELEASE: 'Released', CLOSE: 'Closed', FORWARD: 'Forwarded', DECISION: 'Given a QC decision' };
 
 const round = (n) => Math.round((Number(n) || 0) * 1000) / 1000;
 

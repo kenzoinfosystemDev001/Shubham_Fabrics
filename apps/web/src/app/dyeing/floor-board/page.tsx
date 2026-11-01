@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Notice, PageHeader, PriorityBadge, fetchJson, fmtDate, fmtQty, isOverdue, sheetRef } from '@/components/dyeing/DyeingUi';
+import { FloorBoardTabs } from '@/components/workflow/IssuedChallansTab';
 
 const STAGE_HINT: Record<string, string> = {
   AWAITING_RECEIPT: 'Expected',
@@ -48,6 +49,7 @@ export default function DyeingFloorBoardPage() {
 
       <main className="p-4 sm:p-8 space-y-4">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
+        <FloorBoardTabs department="DYEING">
         <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
           {stages.map((stage) => {
             const totals: Record<string, number> = {};
@@ -102,6 +104,7 @@ export default function DyeingFloorBoardPage() {
             );
           })}
         </div>
+        </FloorBoardTabs>
       </main>
     </div>
   );

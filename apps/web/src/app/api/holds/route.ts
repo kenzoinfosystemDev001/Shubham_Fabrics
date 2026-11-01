@@ -6,14 +6,19 @@ import { departmentName } from '@/lib/workflow-views';
 
 export const dynamic = 'force-dynamic';
 
-/** GET ?department=CODE|ALL&view=open|closed|all&search= : HOLD records of the department (ALL: administrators). */
+/** GET ?department=CODE|ALL&view=open|closed|all&search=&reason=&unit=&from=&to= : HOLD records of the department (ALL: administrators). */
 export async function GET(request: Request) {
   const { user, response } = await requireUser(request);
   if (!user) return response;
   try {
     const { searchParams } = new URL(request.url);
     const departments = holdDepartmentsFor(user, searchParams.get('department'));
-    const data = await listHolds(departments, searchParams.get('view'), searchParams.get('search') || '');
+    const data = await listHolds(departments, searchParams.get('view'), searchParams.get('search') || '', {
+      reason: searchParams.get('reason'),
+      unit: searchParams.get('unit'),
+      from: searchParams.get('from'),
+      to: searchParams.get('to'),
+    });
     return NextResponse.json({
       data,
       departments: departments.map((code) => ({ code, name: departmentName(code), receivedLabel: HOLD_DEPARTMENTS[code].receivedLabel })),

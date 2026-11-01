@@ -1,5 +1,6 @@
 'use client';
 
+import { HoldSection } from '@/components/hold/HoldSection';
 import React, { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -339,11 +340,17 @@ function AllocationWorkspace({
           <Info label="Unit">{item.uom}</Info>
           <Info label="Received">{fmtQty(received, item.uom)}</Info>
           <Info label="Allocated">{fmtQty(already, item.uom)}</Info>
+          <Info label="On HOLD">
+            <span className={Number(item.heldQuantity) > 0 ? 'text-danger-700' : ''}>{fmtQty(item.heldQuantity || 0, item.uom)}</span>
+          </Info>
           <Info label="Available">{fmtQty(open, item.uom)}</Info>
           <Info label="After these rows">
             <span className={after < 0 ? 'text-danger-700' : ''}>{fmtQty(after, item.uom)}</span>
           </Info>
         </dl>
+
+        {/* Held fabric is never allocated until released. */}
+        <HoldSection department="RECUTTING" sourceId={item.id} holdPage="/recutting/hold" onChanged={onChanged} />
 
         <datalist id={`styles-${item.id}`}>
           {styles.map((s) => <option key={s} value={s} />)}

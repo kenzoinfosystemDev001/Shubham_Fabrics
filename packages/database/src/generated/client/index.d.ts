@@ -86540,6 +86540,7 @@ export namespace Prisma {
     undyedQuantity: number | null
     readyForQc1Quantity: number | null
     sentToQc1Quantity: number | null
+    heldQuantity: number | null
     receivedQuantity: number | null
     receivedUnitQuantity: number | null
   }
@@ -86550,6 +86551,7 @@ export namespace Prisma {
     undyedQuantity: number | null
     readyForQc1Quantity: number | null
     sentToQc1Quantity: number | null
+    heldQuantity: number | null
     receivedQuantity: number | null
     receivedUnitQuantity: number | null
   }
@@ -86572,6 +86574,7 @@ export namespace Prisma {
     undyedQuantity: number | null
     readyForQc1Quantity: number | null
     sentToQc1Quantity: number | null
+    heldQuantity: number | null
     uom: string | null
     receivedQuantity: number | null
     receivedUnitQuantity: number | null
@@ -86615,6 +86618,7 @@ export namespace Prisma {
     undyedQuantity: number | null
     readyForQc1Quantity: number | null
     sentToQc1Quantity: number | null
+    heldQuantity: number | null
     uom: string | null
     receivedQuantity: number | null
     receivedUnitQuantity: number | null
@@ -86658,6 +86662,7 @@ export namespace Prisma {
     undyedQuantity: number
     readyForQc1Quantity: number
     sentToQc1Quantity: number
+    heldQuantity: number
     uom: number
     receivedQuantity: number
     receivedUnitQuantity: number
@@ -86691,6 +86696,7 @@ export namespace Prisma {
     undyedQuantity?: true
     readyForQc1Quantity?: true
     sentToQc1Quantity?: true
+    heldQuantity?: true
     receivedQuantity?: true
     receivedUnitQuantity?: true
   }
@@ -86701,6 +86707,7 @@ export namespace Prisma {
     undyedQuantity?: true
     readyForQc1Quantity?: true
     sentToQc1Quantity?: true
+    heldQuantity?: true
     receivedQuantity?: true
     receivedUnitQuantity?: true
   }
@@ -86723,6 +86730,7 @@ export namespace Prisma {
     undyedQuantity?: true
     readyForQc1Quantity?: true
     sentToQc1Quantity?: true
+    heldQuantity?: true
     uom?: true
     receivedQuantity?: true
     receivedUnitQuantity?: true
@@ -86766,6 +86774,7 @@ export namespace Prisma {
     undyedQuantity?: true
     readyForQc1Quantity?: true
     sentToQc1Quantity?: true
+    heldQuantity?: true
     uom?: true
     receivedQuantity?: true
     receivedUnitQuantity?: true
@@ -86809,6 +86818,7 @@ export namespace Prisma {
     undyedQuantity?: true
     readyForQc1Quantity?: true
     sentToQc1Quantity?: true
+    heldQuantity?: true
     uom?: true
     receivedQuantity?: true
     receivedUnitQuantity?: true
@@ -86939,6 +86949,7 @@ export namespace Prisma {
     undyedQuantity: number
     readyForQc1Quantity: number
     sentToQc1Quantity: number
+    heldQuantity: number
     uom: string
     receivedQuantity: number | null
     receivedUnitQuantity: number | null
@@ -87001,6 +87012,7 @@ export namespace Prisma {
     undyedQuantity?: boolean
     readyForQc1Quantity?: boolean
     sentToQc1Quantity?: boolean
+    heldQuantity?: boolean
     uom?: boolean
     receivedQuantity?: boolean
     receivedUnitQuantity?: boolean
@@ -87052,6 +87064,7 @@ export namespace Prisma {
     undyedQuantity?: boolean
     readyForQc1Quantity?: boolean
     sentToQc1Quantity?: boolean
+    heldQuantity?: boolean
     uom?: boolean
     receivedQuantity?: boolean
     receivedUnitQuantity?: boolean
@@ -87101,6 +87114,7 @@ export namespace Prisma {
     undyedQuantity?: boolean
     readyForQc1Quantity?: boolean
     sentToQc1Quantity?: boolean
+    heldQuantity?: boolean
     uom?: boolean
     receivedQuantity?: boolean
     receivedUnitQuantity?: boolean
@@ -87150,6 +87164,7 @@ export namespace Prisma {
     undyedQuantity?: boolean
     readyForQc1Quantity?: boolean
     sentToQc1Quantity?: boolean
+    heldQuantity?: boolean
     uom?: boolean
     receivedQuantity?: boolean
     receivedUnitQuantity?: boolean
@@ -87175,7 +87190,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type DyeingOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "programId" | "inboundChallanId" | "inboundChallanItemId" | "status" | "priority" | "fabricName" | "fabricType" | "targetColor" | "dyedColor" | "colorCode" | "requiredQuantity" | "dyedQuantity" | "undyedQuantity" | "readyForQc1Quantity" | "sentToQc1Quantity" | "uom" | "receivedQuantity" | "receivedUnitQuantity" | "receivedUnitQuantityUom" | "receivedAt" | "receivedById" | "receiptRemarks" | "expectedCompletionDate" | "colorMismatch" | "colorReviewNote" | "colorReviewedById" | "colorReviewedAt" | "inchargeId" | "inchargeName" | "batchNumber" | "machineNumber" | "processRemarks" | "qc1ChallanId" | "startedAt" | "completedAt" | "sentToQc1At" | "createdAt" | "updatedAt", ExtArgs["result"]["dyeingOrder"]>
+  export type DyeingOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "programId" | "inboundChallanId" | "inboundChallanItemId" | "status" | "priority" | "fabricName" | "fabricType" | "targetColor" | "dyedColor" | "colorCode" | "requiredQuantity" | "dyedQuantity" | "undyedQuantity" | "readyForQc1Quantity" | "sentToQc1Quantity" | "heldQuantity" | "uom" | "receivedQuantity" | "receivedUnitQuantity" | "receivedUnitQuantityUom" | "receivedAt" | "receivedById" | "receiptRemarks" | "expectedCompletionDate" | "colorMismatch" | "colorReviewNote" | "colorReviewedById" | "colorReviewedAt" | "inchargeId" | "inchargeName" | "batchNumber" | "machineNumber" | "processRemarks" | "qc1ChallanId" | "startedAt" | "completedAt" | "sentToQc1At" | "createdAt" | "updatedAt", ExtArgs["result"]["dyeingOrder"]>
   export type DyeingOrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
@@ -87232,6 +87247,7 @@ export namespace Prisma {
       undyedQuantity: number
       readyForQc1Quantity: number
       sentToQc1Quantity: number
+      heldQuantity: number
       uom: string
       receivedQuantity: number | null
       receivedUnitQuantity: number | null
@@ -87702,6 +87718,7 @@ export namespace Prisma {
     readonly undyedQuantity: FieldRef<"DyeingOrder", 'Float'>
     readonly readyForQc1Quantity: FieldRef<"DyeingOrder", 'Float'>
     readonly sentToQc1Quantity: FieldRef<"DyeingOrder", 'Float'>
+    readonly heldQuantity: FieldRef<"DyeingOrder", 'Float'>
     readonly uom: FieldRef<"DyeingOrder", 'String'>
     readonly receivedQuantity: FieldRef<"DyeingOrder", 'Float'>
     readonly receivedUnitQuantity: FieldRef<"DyeingOrder", 'Float'>
@@ -89443,6 +89460,7 @@ export namespace Prisma {
     reworkQuantity: number | null
     rejectSentQuantity: number | null
     reworkSentQuantity: number | null
+    heldQuantity: number | null
   }
 
   export type DepartmentWorkItemSumAggregateOutputType = {
@@ -89458,6 +89476,7 @@ export namespace Prisma {
     reworkQuantity: number | null
     rejectSentQuantity: number | null
     reworkSentQuantity: number | null
+    heldQuantity: number | null
   }
 
   export type DepartmentWorkItemMinAggregateOutputType = {
@@ -89492,6 +89511,7 @@ export namespace Prisma {
     reworkQuantity: number | null
     rejectSentQuantity: number | null
     reworkSentQuantity: number | null
+    heldQuantity: number | null
     receivedAt: Date | null
     receivedById: string | null
     receiptRemarks: string | null
@@ -89536,6 +89556,7 @@ export namespace Prisma {
     reworkQuantity: number | null
     rejectSentQuantity: number | null
     reworkSentQuantity: number | null
+    heldQuantity: number | null
     receivedAt: Date | null
     receivedById: string | null
     receiptRemarks: string | null
@@ -89580,6 +89601,7 @@ export namespace Prisma {
     reworkQuantity: number
     rejectSentQuantity: number
     reworkSentQuantity: number
+    heldQuantity: number
     receivedAt: number
     receivedById: number
     receiptRemarks: number
@@ -89607,6 +89629,7 @@ export namespace Prisma {
     reworkQuantity?: true
     rejectSentQuantity?: true
     reworkSentQuantity?: true
+    heldQuantity?: true
   }
 
   export type DepartmentWorkItemSumAggregateInputType = {
@@ -89622,6 +89645,7 @@ export namespace Prisma {
     reworkQuantity?: true
     rejectSentQuantity?: true
     reworkSentQuantity?: true
+    heldQuantity?: true
   }
 
   export type DepartmentWorkItemMinAggregateInputType = {
@@ -89656,6 +89680,7 @@ export namespace Prisma {
     reworkQuantity?: true
     rejectSentQuantity?: true
     reworkSentQuantity?: true
+    heldQuantity?: true
     receivedAt?: true
     receivedById?: true
     receiptRemarks?: true
@@ -89700,6 +89725,7 @@ export namespace Prisma {
     reworkQuantity?: true
     rejectSentQuantity?: true
     reworkSentQuantity?: true
+    heldQuantity?: true
     receivedAt?: true
     receivedById?: true
     receiptRemarks?: true
@@ -89744,6 +89770,7 @@ export namespace Prisma {
     reworkQuantity?: true
     rejectSentQuantity?: true
     reworkSentQuantity?: true
+    heldQuantity?: true
     receivedAt?: true
     receivedById?: true
     receiptRemarks?: true
@@ -89875,6 +89902,7 @@ export namespace Prisma {
     reworkQuantity: number
     rejectSentQuantity: number
     reworkSentQuantity: number
+    heldQuantity: number
     receivedAt: Date | null
     receivedById: string | null
     receiptRemarks: string | null
@@ -89938,6 +89966,7 @@ export namespace Prisma {
     reworkQuantity?: boolean
     rejectSentQuantity?: boolean
     reworkSentQuantity?: boolean
+    heldQuantity?: boolean
     receivedAt?: boolean
     receivedById?: boolean
     receiptRemarks?: boolean
@@ -89994,6 +90023,7 @@ export namespace Prisma {
     reworkQuantity?: boolean
     rejectSentQuantity?: boolean
     reworkSentQuantity?: boolean
+    heldQuantity?: boolean
     receivedAt?: boolean
     receivedById?: boolean
     receiptRemarks?: boolean
@@ -90043,6 +90073,7 @@ export namespace Prisma {
     reworkQuantity?: boolean
     rejectSentQuantity?: boolean
     reworkSentQuantity?: boolean
+    heldQuantity?: boolean
     receivedAt?: boolean
     receivedById?: boolean
     receiptRemarks?: boolean
@@ -90092,6 +90123,7 @@ export namespace Prisma {
     reworkQuantity?: boolean
     rejectSentQuantity?: boolean
     reworkSentQuantity?: boolean
+    heldQuantity?: boolean
     receivedAt?: boolean
     receivedById?: boolean
     receiptRemarks?: boolean
@@ -90104,7 +90136,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type DepartmentWorkItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "departmentCode" | "itemNumber" | "programId" | "inboundChallanId" | "inboundChallanItemId" | "sourceDepartment" | "fabricName" | "colour" | "fabricProcessingStatus" | "fabricStatusSource" | "status" | "priority" | "uom" | "expectedQuantity" | "receivedQuantity" | "receivedUnitQuantity" | "receivedUnitQuantityUom" | "processedQuantity" | "transferredQuantity" | "garmentCategory" | "styleRef" | "sourceAllocationId" | "sourceWorkItemId" | "takenQuantity" | "defectQuantity" | "passedQuantity" | "rejectedQuantity" | "reworkQuantity" | "rejectSentQuantity" | "reworkSentQuantity" | "receivedAt" | "receivedById" | "receiptRemarks" | "expectedCompletionDate" | "startedAt" | "completedAt" | "lastTransferredAt" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["departmentWorkItem"]>
+  export type DepartmentWorkItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "departmentCode" | "itemNumber" | "programId" | "inboundChallanId" | "inboundChallanItemId" | "sourceDepartment" | "fabricName" | "colour" | "fabricProcessingStatus" | "fabricStatusSource" | "status" | "priority" | "uom" | "expectedQuantity" | "receivedQuantity" | "receivedUnitQuantity" | "receivedUnitQuantityUom" | "processedQuantity" | "transferredQuantity" | "garmentCategory" | "styleRef" | "sourceAllocationId" | "sourceWorkItemId" | "takenQuantity" | "defectQuantity" | "passedQuantity" | "rejectedQuantity" | "reworkQuantity" | "rejectSentQuantity" | "reworkSentQuantity" | "heldQuantity" | "receivedAt" | "receivedById" | "receiptRemarks" | "expectedCompletionDate" | "startedAt" | "completedAt" | "lastTransferredAt" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["departmentWorkItem"]>
   export type DepartmentWorkItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | ChallanDefaultArgs<ExtArgs>
@@ -90181,6 +90213,7 @@ export namespace Prisma {
       reworkQuantity: number
       rejectSentQuantity: number
       reworkSentQuantity: number
+      heldQuantity: number
       receivedAt: Date | null
       receivedById: string | null
       receiptRemarks: string | null
@@ -90656,6 +90689,7 @@ export namespace Prisma {
     readonly reworkQuantity: FieldRef<"DepartmentWorkItem", 'Float'>
     readonly rejectSentQuantity: FieldRef<"DepartmentWorkItem", 'Float'>
     readonly reworkSentQuantity: FieldRef<"DepartmentWorkItem", 'Float'>
+    readonly heldQuantity: FieldRef<"DepartmentWorkItem", 'Float'>
     readonly receivedAt: FieldRef<"DepartmentWorkItem", 'DateTime'>
     readonly receivedById: FieldRef<"DepartmentWorkItem", 'String'>
     readonly receiptRemarks: FieldRef<"DepartmentWorkItem", 'String'>
@@ -108699,6 +108733,7 @@ export namespace Prisma {
   }
 
   export type DepartmentHoldAvgAggregateOutputType = {
+    processedAtHold: number | null
     receivedQuantity: number | null
     forwardedQuantity: number | null
     forwardedAtHold: number | null
@@ -108708,6 +108743,7 @@ export namespace Prisma {
   }
 
   export type DepartmentHoldSumAggregateOutputType = {
+    processedAtHold: number | null
     receivedQuantity: number | null
     forwardedQuantity: number | null
     forwardedAtHold: number | null
@@ -108733,6 +108769,11 @@ export namespace Prisma {
     fabricName: string | null
     colour: string | null
     size: string | null
+    productionType: string | null
+    requiredColour: string | null
+    challanDate: Date | null
+    sendingDepartment: string | null
+    processedAtHold: number | null
     unit: string | null
     receivedQuantity: number | null
     forwardedQuantity: number | null
@@ -108769,6 +108810,11 @@ export namespace Prisma {
     fabricName: string | null
     colour: string | null
     size: string | null
+    productionType: string | null
+    requiredColour: string | null
+    challanDate: Date | null
+    sendingDepartment: string | null
+    processedAtHold: number | null
     unit: string | null
     receivedQuantity: number | null
     forwardedQuantity: number | null
@@ -108805,6 +108851,11 @@ export namespace Prisma {
     fabricName: number
     colour: number
     size: number
+    productionType: number
+    requiredColour: number
+    challanDate: number
+    sendingDepartment: number
+    processedAtHold: number
     unit: number
     receivedQuantity: number
     forwardedQuantity: number
@@ -108827,6 +108878,7 @@ export namespace Prisma {
 
 
   export type DepartmentHoldAvgAggregateInputType = {
+    processedAtHold?: true
     receivedQuantity?: true
     forwardedQuantity?: true
     forwardedAtHold?: true
@@ -108836,6 +108888,7 @@ export namespace Prisma {
   }
 
   export type DepartmentHoldSumAggregateInputType = {
+    processedAtHold?: true
     receivedQuantity?: true
     forwardedQuantity?: true
     forwardedAtHold?: true
@@ -108861,6 +108914,11 @@ export namespace Prisma {
     fabricName?: true
     colour?: true
     size?: true
+    productionType?: true
+    requiredColour?: true
+    challanDate?: true
+    sendingDepartment?: true
+    processedAtHold?: true
     unit?: true
     receivedQuantity?: true
     forwardedQuantity?: true
@@ -108897,6 +108955,11 @@ export namespace Prisma {
     fabricName?: true
     colour?: true
     size?: true
+    productionType?: true
+    requiredColour?: true
+    challanDate?: true
+    sendingDepartment?: true
+    processedAtHold?: true
     unit?: true
     receivedQuantity?: true
     forwardedQuantity?: true
@@ -108933,6 +108996,11 @@ export namespace Prisma {
     fabricName?: true
     colour?: true
     size?: true
+    productionType?: true
+    requiredColour?: true
+    challanDate?: true
+    sendingDepartment?: true
+    processedAtHold?: true
     unit?: true
     receivedQuantity?: true
     forwardedQuantity?: true
@@ -109056,6 +109124,11 @@ export namespace Prisma {
     fabricName: string
     colour: string | null
     size: string | null
+    productionType: string | null
+    requiredColour: string | null
+    challanDate: Date | null
+    sendingDepartment: string | null
+    processedAtHold: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -109111,6 +109184,11 @@ export namespace Prisma {
     fabricName?: boolean
     colour?: boolean
     size?: boolean
+    productionType?: boolean
+    requiredColour?: boolean
+    challanDate?: boolean
+    sendingDepartment?: boolean
+    processedAtHold?: boolean
     unit?: boolean
     receivedQuantity?: boolean
     forwardedQuantity?: boolean
@@ -109151,6 +109229,11 @@ export namespace Prisma {
     fabricName?: boolean
     colour?: boolean
     size?: boolean
+    productionType?: boolean
+    requiredColour?: boolean
+    challanDate?: boolean
+    sendingDepartment?: boolean
+    processedAtHold?: boolean
     unit?: boolean
     receivedQuantity?: boolean
     forwardedQuantity?: boolean
@@ -109189,6 +109272,11 @@ export namespace Prisma {
     fabricName?: boolean
     colour?: boolean
     size?: boolean
+    productionType?: boolean
+    requiredColour?: boolean
+    challanDate?: boolean
+    sendingDepartment?: boolean
+    processedAtHold?: boolean
     unit?: boolean
     receivedQuantity?: boolean
     forwardedQuantity?: boolean
@@ -109227,6 +109315,11 @@ export namespace Prisma {
     fabricName?: boolean
     colour?: boolean
     size?: boolean
+    productionType?: boolean
+    requiredColour?: boolean
+    challanDate?: boolean
+    sendingDepartment?: boolean
+    processedAtHold?: boolean
     unit?: boolean
     receivedQuantity?: boolean
     forwardedQuantity?: boolean
@@ -109246,7 +109339,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type DepartmentHoldOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "holdNumber" | "departmentCode" | "sourceType" | "sourceId" | "sourceKey" | "activeKey" | "programId" | "challanId" | "challanNumber" | "designNumber" | "serialNumber" | "productionSheetNumber" | "fabricName" | "colour" | "size" | "unit" | "receivedQuantity" | "forwardedQuantity" | "forwardedAtHold" | "holdQuantity" | "releasedQuantity" | "remainingQuantity" | "reason" | "reasonOther" | "remarks" | "status" | "heldById" | "heldByName" | "heldAt" | "closedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["departmentHold"]>
+  export type DepartmentHoldOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "holdNumber" | "departmentCode" | "sourceType" | "sourceId" | "sourceKey" | "activeKey" | "programId" | "challanId" | "challanNumber" | "designNumber" | "serialNumber" | "productionSheetNumber" | "fabricName" | "colour" | "size" | "productionType" | "requiredColour" | "challanDate" | "sendingDepartment" | "processedAtHold" | "unit" | "receivedQuantity" | "forwardedQuantity" | "forwardedAtHold" | "holdQuantity" | "releasedQuantity" | "remainingQuantity" | "reason" | "reasonOther" | "remarks" | "status" | "heldById" | "heldByName" | "heldAt" | "closedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["departmentHold"]>
   export type DepartmentHoldInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     heldBy?: boolean | DepartmentHold$heldByArgs<ExtArgs>
@@ -109286,6 +109379,11 @@ export namespace Prisma {
       fabricName: string
       colour: string | null
       size: string | null
+      productionType: string | null
+      requiredColour: string | null
+      challanDate: Date | null
+      sendingDepartment: string | null
+      processedAtHold: number | null
       unit: string
       receivedQuantity: number
       forwardedQuantity: number
@@ -109745,6 +109843,11 @@ export namespace Prisma {
     readonly fabricName: FieldRef<"DepartmentHold", 'String'>
     readonly colour: FieldRef<"DepartmentHold", 'String'>
     readonly size: FieldRef<"DepartmentHold", 'String'>
+    readonly productionType: FieldRef<"DepartmentHold", 'String'>
+    readonly requiredColour: FieldRef<"DepartmentHold", 'String'>
+    readonly challanDate: FieldRef<"DepartmentHold", 'DateTime'>
+    readonly sendingDepartment: FieldRef<"DepartmentHold", 'String'>
+    readonly processedAtHold: FieldRef<"DepartmentHold", 'Float'>
     readonly unit: FieldRef<"DepartmentHold", 'String'>
     readonly receivedQuantity: FieldRef<"DepartmentHold", 'Float'>
     readonly forwardedQuantity: FieldRef<"DepartmentHold", 'Float'>
@@ -112559,6 +112662,7 @@ export namespace Prisma {
     undyedQuantity: 'undyedQuantity',
     readyForQc1Quantity: 'readyForQc1Quantity',
     sentToQc1Quantity: 'sentToQc1Quantity',
+    heldQuantity: 'heldQuantity',
     uom: 'uom',
     receivedQuantity: 'receivedQuantity',
     receivedUnitQuantity: 'receivedUnitQuantity',
@@ -112634,6 +112738,7 @@ export namespace Prisma {
     reworkQuantity: 'reworkQuantity',
     rejectSentQuantity: 'rejectSentQuantity',
     reworkSentQuantity: 'reworkSentQuantity',
+    heldQuantity: 'heldQuantity',
     receivedAt: 'receivedAt',
     receivedById: 'receivedById',
     receiptRemarks: 'receiptRemarks',
@@ -112970,6 +113075,11 @@ export namespace Prisma {
     fabricName: 'fabricName',
     colour: 'colour',
     size: 'size',
+    productionType: 'productionType',
+    requiredColour: 'requiredColour',
+    challanDate: 'challanDate',
+    sendingDepartment: 'sendingDepartment',
+    processedAtHold: 'processedAtHold',
     unit: 'unit',
     receivedQuantity: 'receivedQuantity',
     forwardedQuantity: 'forwardedQuantity',
@@ -119511,6 +119621,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFilter<"DyeingOrder"> | number
     readyForQc1Quantity?: FloatFilter<"DyeingOrder"> | number
     sentToQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    heldQuantity?: FloatFilter<"DyeingOrder"> | number
     uom?: StringFilter<"DyeingOrder"> | string
     receivedQuantity?: FloatNullableFilter<"DyeingOrder"> | number | null
     receivedUnitQuantity?: FloatNullableFilter<"DyeingOrder"> | number | null
@@ -119561,6 +119672,7 @@ export namespace Prisma {
     undyedQuantity?: SortOrder
     readyForQc1Quantity?: SortOrder
     sentToQc1Quantity?: SortOrder
+    heldQuantity?: SortOrder
     uom?: SortOrder
     receivedQuantity?: SortOrderInput | SortOrder
     receivedUnitQuantity?: SortOrderInput | SortOrder
@@ -119614,6 +119726,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFilter<"DyeingOrder"> | number
     readyForQc1Quantity?: FloatFilter<"DyeingOrder"> | number
     sentToQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    heldQuantity?: FloatFilter<"DyeingOrder"> | number
     uom?: StringFilter<"DyeingOrder"> | string
     receivedQuantity?: FloatNullableFilter<"DyeingOrder"> | number | null
     receivedUnitQuantity?: FloatNullableFilter<"DyeingOrder"> | number | null
@@ -119664,6 +119777,7 @@ export namespace Prisma {
     undyedQuantity?: SortOrder
     readyForQc1Quantity?: SortOrder
     sentToQc1Quantity?: SortOrder
+    heldQuantity?: SortOrder
     uom?: SortOrder
     receivedQuantity?: SortOrderInput | SortOrder
     receivedUnitQuantity?: SortOrderInput | SortOrder
@@ -119715,6 +119829,7 @@ export namespace Prisma {
     undyedQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
     readyForQc1Quantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
     sentToQc1Quantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
+    heldQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
     uom?: StringWithAggregatesFilter<"DyeingOrder"> | string
     receivedQuantity?: FloatNullableWithAggregatesFilter<"DyeingOrder"> | number | null
     receivedUnitQuantity?: FloatNullableWithAggregatesFilter<"DyeingOrder"> | number | null
@@ -119858,6 +119973,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFilter<"DepartmentWorkItem"> | number
     rejectSentQuantity?: FloatFilter<"DepartmentWorkItem"> | number
     reworkSentQuantity?: FloatFilter<"DepartmentWorkItem"> | number
+    heldQuantity?: FloatFilter<"DepartmentWorkItem"> | number
     receivedAt?: DateTimeNullableFilter<"DepartmentWorkItem"> | Date | string | null
     receivedById?: StringNullableFilter<"DepartmentWorkItem"> | string | null
     receiptRemarks?: StringNullableFilter<"DepartmentWorkItem"> | string | null
@@ -119913,6 +120029,7 @@ export namespace Prisma {
     reworkQuantity?: SortOrder
     rejectSentQuantity?: SortOrder
     reworkSentQuantity?: SortOrder
+    heldQuantity?: SortOrder
     receivedAt?: SortOrderInput | SortOrder
     receivedById?: SortOrderInput | SortOrder
     receiptRemarks?: SortOrderInput | SortOrder
@@ -119972,6 +120089,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFilter<"DepartmentWorkItem"> | number
     rejectSentQuantity?: FloatFilter<"DepartmentWorkItem"> | number
     reworkSentQuantity?: FloatFilter<"DepartmentWorkItem"> | number
+    heldQuantity?: FloatFilter<"DepartmentWorkItem"> | number
     receivedAt?: DateTimeNullableFilter<"DepartmentWorkItem"> | Date | string | null
     receivedById?: StringNullableFilter<"DepartmentWorkItem"> | string | null
     receiptRemarks?: StringNullableFilter<"DepartmentWorkItem"> | string | null
@@ -120027,6 +120145,7 @@ export namespace Prisma {
     reworkQuantity?: SortOrder
     rejectSentQuantity?: SortOrder
     reworkSentQuantity?: SortOrder
+    heldQuantity?: SortOrder
     receivedAt?: SortOrderInput | SortOrder
     receivedById?: SortOrderInput | SortOrder
     receiptRemarks?: SortOrderInput | SortOrder
@@ -120079,6 +120198,7 @@ export namespace Prisma {
     reworkQuantity?: FloatWithAggregatesFilter<"DepartmentWorkItem"> | number
     rejectSentQuantity?: FloatWithAggregatesFilter<"DepartmentWorkItem"> | number
     reworkSentQuantity?: FloatWithAggregatesFilter<"DepartmentWorkItem"> | number
+    heldQuantity?: FloatWithAggregatesFilter<"DepartmentWorkItem"> | number
     receivedAt?: DateTimeNullableWithAggregatesFilter<"DepartmentWorkItem"> | Date | string | null
     receivedById?: StringNullableWithAggregatesFilter<"DepartmentWorkItem"> | string | null
     receiptRemarks?: StringNullableWithAggregatesFilter<"DepartmentWorkItem"> | string | null
@@ -121699,6 +121819,11 @@ export namespace Prisma {
     fabricName?: StringFilter<"DepartmentHold"> | string
     colour?: StringNullableFilter<"DepartmentHold"> | string | null
     size?: StringNullableFilter<"DepartmentHold"> | string | null
+    productionType?: StringNullableFilter<"DepartmentHold"> | string | null
+    requiredColour?: StringNullableFilter<"DepartmentHold"> | string | null
+    challanDate?: DateTimeNullableFilter<"DepartmentHold"> | Date | string | null
+    sendingDepartment?: StringNullableFilter<"DepartmentHold"> | string | null
+    processedAtHold?: FloatNullableFilter<"DepartmentHold"> | number | null
     unit?: StringFilter<"DepartmentHold"> | string
     receivedQuantity?: FloatFilter<"DepartmentHold"> | number
     forwardedQuantity?: FloatFilter<"DepartmentHold"> | number
@@ -121738,6 +121863,11 @@ export namespace Prisma {
     fabricName?: SortOrder
     colour?: SortOrderInput | SortOrder
     size?: SortOrderInput | SortOrder
+    productionType?: SortOrderInput | SortOrder
+    requiredColour?: SortOrderInput | SortOrder
+    challanDate?: SortOrderInput | SortOrder
+    sendingDepartment?: SortOrderInput | SortOrder
+    processedAtHold?: SortOrderInput | SortOrder
     unit?: SortOrder
     receivedQuantity?: SortOrder
     forwardedQuantity?: SortOrder
@@ -121780,6 +121910,11 @@ export namespace Prisma {
     fabricName?: StringFilter<"DepartmentHold"> | string
     colour?: StringNullableFilter<"DepartmentHold"> | string | null
     size?: StringNullableFilter<"DepartmentHold"> | string | null
+    productionType?: StringNullableFilter<"DepartmentHold"> | string | null
+    requiredColour?: StringNullableFilter<"DepartmentHold"> | string | null
+    challanDate?: DateTimeNullableFilter<"DepartmentHold"> | Date | string | null
+    sendingDepartment?: StringNullableFilter<"DepartmentHold"> | string | null
+    processedAtHold?: FloatNullableFilter<"DepartmentHold"> | number | null
     unit?: StringFilter<"DepartmentHold"> | string
     receivedQuantity?: FloatFilter<"DepartmentHold"> | number
     forwardedQuantity?: FloatFilter<"DepartmentHold"> | number
@@ -121819,6 +121954,11 @@ export namespace Prisma {
     fabricName?: SortOrder
     colour?: SortOrderInput | SortOrder
     size?: SortOrderInput | SortOrder
+    productionType?: SortOrderInput | SortOrder
+    requiredColour?: SortOrderInput | SortOrder
+    challanDate?: SortOrderInput | SortOrder
+    sendingDepartment?: SortOrderInput | SortOrder
+    processedAtHold?: SortOrderInput | SortOrder
     unit?: SortOrder
     receivedQuantity?: SortOrder
     forwardedQuantity?: SortOrder
@@ -121863,6 +122003,11 @@ export namespace Prisma {
     fabricName?: StringWithAggregatesFilter<"DepartmentHold"> | string
     colour?: StringNullableWithAggregatesFilter<"DepartmentHold"> | string | null
     size?: StringNullableWithAggregatesFilter<"DepartmentHold"> | string | null
+    productionType?: StringNullableWithAggregatesFilter<"DepartmentHold"> | string | null
+    requiredColour?: StringNullableWithAggregatesFilter<"DepartmentHold"> | string | null
+    challanDate?: DateTimeNullableWithAggregatesFilter<"DepartmentHold"> | Date | string | null
+    sendingDepartment?: StringNullableWithAggregatesFilter<"DepartmentHold"> | string | null
+    processedAtHold?: FloatNullableWithAggregatesFilter<"DepartmentHold"> | number | null
     unit?: StringWithAggregatesFilter<"DepartmentHold"> | string
     receivedQuantity?: FloatWithAggregatesFilter<"DepartmentHold"> | number
     forwardedQuantity?: FloatWithAggregatesFilter<"DepartmentHold"> | number
@@ -128963,6 +129108,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -129009,6 +129155,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -129051,6 +129198,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -129097,6 +129245,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -129141,6 +129290,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -129182,6 +129332,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -129221,6 +129372,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -129355,6 +129507,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -129409,6 +129562,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -129455,6 +129609,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -129509,6 +129664,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -129559,6 +129715,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -129599,6 +129756,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -129642,6 +129800,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -131501,6 +131660,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -131539,6 +131703,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -131575,6 +131744,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -131613,6 +131787,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -131650,6 +131829,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -131685,6 +131869,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -131720,6 +131909,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -136443,6 +136637,7 @@ export namespace Prisma {
     undyedQuantity?: SortOrder
     readyForQc1Quantity?: SortOrder
     sentToQc1Quantity?: SortOrder
+    heldQuantity?: SortOrder
     uom?: SortOrder
     receivedQuantity?: SortOrder
     receivedUnitQuantity?: SortOrder
@@ -136474,6 +136669,7 @@ export namespace Prisma {
     undyedQuantity?: SortOrder
     readyForQc1Quantity?: SortOrder
     sentToQc1Quantity?: SortOrder
+    heldQuantity?: SortOrder
     receivedQuantity?: SortOrder
     receivedUnitQuantity?: SortOrder
   }
@@ -136496,6 +136692,7 @@ export namespace Prisma {
     undyedQuantity?: SortOrder
     readyForQc1Quantity?: SortOrder
     sentToQc1Quantity?: SortOrder
+    heldQuantity?: SortOrder
     uom?: SortOrder
     receivedQuantity?: SortOrder
     receivedUnitQuantity?: SortOrder
@@ -136539,6 +136736,7 @@ export namespace Prisma {
     undyedQuantity?: SortOrder
     readyForQc1Quantity?: SortOrder
     sentToQc1Quantity?: SortOrder
+    heldQuantity?: SortOrder
     uom?: SortOrder
     receivedQuantity?: SortOrder
     receivedUnitQuantity?: SortOrder
@@ -136570,6 +136768,7 @@ export namespace Prisma {
     undyedQuantity?: SortOrder
     readyForQc1Quantity?: SortOrder
     sentToQc1Quantity?: SortOrder
+    heldQuantity?: SortOrder
     receivedQuantity?: SortOrder
     receivedUnitQuantity?: SortOrder
   }
@@ -136670,6 +136869,7 @@ export namespace Prisma {
     reworkQuantity?: SortOrder
     rejectSentQuantity?: SortOrder
     reworkSentQuantity?: SortOrder
+    heldQuantity?: SortOrder
     receivedAt?: SortOrder
     receivedById?: SortOrder
     receiptRemarks?: SortOrder
@@ -136695,6 +136895,7 @@ export namespace Prisma {
     reworkQuantity?: SortOrder
     rejectSentQuantity?: SortOrder
     reworkSentQuantity?: SortOrder
+    heldQuantity?: SortOrder
   }
 
   export type DepartmentWorkItemMaxOrderByAggregateInput = {
@@ -136729,6 +136930,7 @@ export namespace Prisma {
     reworkQuantity?: SortOrder
     rejectSentQuantity?: SortOrder
     reworkSentQuantity?: SortOrder
+    heldQuantity?: SortOrder
     receivedAt?: SortOrder
     receivedById?: SortOrder
     receiptRemarks?: SortOrder
@@ -136773,6 +136975,7 @@ export namespace Prisma {
     reworkQuantity?: SortOrder
     rejectSentQuantity?: SortOrder
     reworkSentQuantity?: SortOrder
+    heldQuantity?: SortOrder
     receivedAt?: SortOrder
     receivedById?: SortOrder
     receiptRemarks?: SortOrder
@@ -136798,6 +137001,7 @@ export namespace Prisma {
     reworkQuantity?: SortOrder
     rejectSentQuantity?: SortOrder
     reworkSentQuantity?: SortOrder
+    heldQuantity?: SortOrder
   }
 
   export type DepartmentWorkItemScalarRelationFilter = {
@@ -137809,6 +138013,11 @@ export namespace Prisma {
     fabricName?: SortOrder
     colour?: SortOrder
     size?: SortOrder
+    productionType?: SortOrder
+    requiredColour?: SortOrder
+    challanDate?: SortOrder
+    sendingDepartment?: SortOrder
+    processedAtHold?: SortOrder
     unit?: SortOrder
     receivedQuantity?: SortOrder
     forwardedQuantity?: SortOrder
@@ -137829,6 +138038,7 @@ export namespace Prisma {
   }
 
   export type DepartmentHoldAvgOrderByAggregateInput = {
+    processedAtHold?: SortOrder
     receivedQuantity?: SortOrder
     forwardedQuantity?: SortOrder
     forwardedAtHold?: SortOrder
@@ -137854,6 +138064,11 @@ export namespace Prisma {
     fabricName?: SortOrder
     colour?: SortOrder
     size?: SortOrder
+    productionType?: SortOrder
+    requiredColour?: SortOrder
+    challanDate?: SortOrder
+    sendingDepartment?: SortOrder
+    processedAtHold?: SortOrder
     unit?: SortOrder
     receivedQuantity?: SortOrder
     forwardedQuantity?: SortOrder
@@ -137890,6 +138105,11 @@ export namespace Prisma {
     fabricName?: SortOrder
     colour?: SortOrder
     size?: SortOrder
+    productionType?: SortOrder
+    requiredColour?: SortOrder
+    challanDate?: SortOrder
+    sendingDepartment?: SortOrder
+    processedAtHold?: SortOrder
     unit?: SortOrder
     receivedQuantity?: SortOrder
     forwardedQuantity?: SortOrder
@@ -137910,6 +138130,7 @@ export namespace Prisma {
   }
 
   export type DepartmentHoldSumOrderByAggregateInput = {
+    processedAtHold?: SortOrder
     receivedQuantity?: SortOrder
     forwardedQuantity?: SortOrder
     forwardedAtHold?: SortOrder
@@ -148428,6 +148649,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -148473,6 +148695,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -148524,6 +148747,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -148569,6 +148793,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -148620,6 +148845,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -148665,6 +148891,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -148760,6 +148987,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -148813,6 +149041,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -149072,6 +149301,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -149109,6 +149343,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -150332,6 +150571,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFilter<"DyeingOrder"> | number
     readyForQc1Quantity?: FloatFilter<"DyeingOrder"> | number
     sentToQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    heldQuantity?: FloatFilter<"DyeingOrder"> | number
     uom?: StringFilter<"DyeingOrder"> | string
     receivedQuantity?: FloatNullableFilter<"DyeingOrder"> | number | null
     receivedUnitQuantity?: FloatNullableFilter<"DyeingOrder"> | number | null
@@ -150471,6 +150711,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFilter<"DepartmentWorkItem"> | number
     rejectSentQuantity?: FloatFilter<"DepartmentWorkItem"> | number
     reworkSentQuantity?: FloatFilter<"DepartmentWorkItem"> | number
+    heldQuantity?: FloatFilter<"DepartmentWorkItem"> | number
     receivedAt?: DateTimeNullableFilter<"DepartmentWorkItem"> | Date | string | null
     receivedById?: StringNullableFilter<"DepartmentWorkItem"> | string | null
     receiptRemarks?: StringNullableFilter<"DepartmentWorkItem"> | string | null
@@ -150700,6 +150941,11 @@ export namespace Prisma {
     fabricName?: StringFilter<"DepartmentHold"> | string
     colour?: StringNullableFilter<"DepartmentHold"> | string | null
     size?: StringNullableFilter<"DepartmentHold"> | string | null
+    productionType?: StringNullableFilter<"DepartmentHold"> | string | null
+    requiredColour?: StringNullableFilter<"DepartmentHold"> | string | null
+    challanDate?: DateTimeNullableFilter<"DepartmentHold"> | Date | string | null
+    sendingDepartment?: StringNullableFilter<"DepartmentHold"> | string | null
+    processedAtHold?: FloatNullableFilter<"DepartmentHold"> | number | null
     unit?: StringFilter<"DepartmentHold"> | string
     receivedQuantity?: FloatFilter<"DepartmentHold"> | number
     forwardedQuantity?: FloatFilter<"DepartmentHold"> | number
@@ -155123,6 +155369,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -155167,6 +155414,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -155299,6 +155547,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -155351,6 +155600,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -155439,6 +155689,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -155475,6 +155730,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -161298,6 +161558,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -161342,6 +161603,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -161394,6 +161656,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -161439,6 +161702,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -161534,6 +161798,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -161586,6 +161851,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -177280,6 +177546,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -177325,6 +177592,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -177592,6 +177860,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -177637,6 +177906,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -178225,6 +178495,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -178278,6 +178549,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -178328,6 +178600,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -178380,6 +178653,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -179105,6 +179379,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -179158,6 +179433,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -179420,6 +179696,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -179473,6 +179750,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -179793,6 +180071,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -179846,6 +180125,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -180168,6 +180448,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -180221,6 +180502,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -180422,6 +180704,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -180474,6 +180757,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -180541,6 +180825,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -180594,6 +180879,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -180792,6 +181078,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -180845,6 +181132,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -181021,6 +181309,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -181074,6 +181363,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -183098,6 +183388,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -183151,6 +183442,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -183327,6 +183619,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -183380,6 +183673,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -184295,6 +184589,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -184348,6 +184643,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -184699,6 +184995,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -184752,6 +185049,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -185536,6 +185834,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -185573,6 +185876,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -185739,6 +186047,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -185776,6 +186089,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -186514,6 +186832,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -186556,6 +186875,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -186598,6 +186918,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -186665,6 +186986,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receiptRemarks?: string | null
     expectedCompletionDate?: Date | string | null
@@ -186774,6 +187096,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -188884,6 +189211,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -188929,6 +189257,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -188972,6 +189301,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -189012,6 +189342,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -189057,6 +189388,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -189100,6 +189432,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -189140,6 +189473,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -189185,6 +189519,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -189228,6 +189563,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -189313,6 +189649,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -189366,6 +189703,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -189415,6 +189753,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -189689,6 +190028,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -189726,6 +190070,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -189762,6 +190111,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -192350,6 +192704,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -192434,6 +192789,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -192479,6 +192835,11 @@ export namespace Prisma {
     fabricName: string
     colour?: string | null
     size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
     unit: string
     receivedQuantity: number
     forwardedQuantity: number
@@ -193567,6 +193928,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -193611,6 +193973,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -193654,6 +194017,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -193793,6 +194157,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -193845,6 +194210,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -193894,6 +194260,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -193973,6 +194340,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -194009,6 +194381,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -194045,6 +194422,11 @@ export namespace Prisma {
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
     unit?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: FloatFieldUpdateOperationsInput | number
     forwardedQuantity?: FloatFieldUpdateOperationsInput | number
@@ -194293,6 +194675,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -194336,6 +194719,7 @@ export namespace Prisma {
     undyedQuantity?: number
     readyForQc1Quantity?: number
     sentToQc1Quantity?: number
+    heldQuantity?: number
     uom?: string
     receivedQuantity?: number | null
     receivedUnitQuantity?: number | null
@@ -194402,6 +194786,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -194978,6 +195363,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -195022,6 +195408,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -195065,6 +195452,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -195106,6 +195494,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -195151,6 +195540,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -195194,6 +195584,7 @@ export namespace Prisma {
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
     readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
     sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     receivedQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     receivedUnitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -195279,6 +195670,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -195331,6 +195723,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -195380,6 +195773,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -196877,6 +197271,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -196996,6 +197391,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -197048,6 +197444,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -197097,6 +197494,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -197394,6 +197792,7 @@ export namespace Prisma {
     reworkQuantity?: number
     rejectSentQuantity?: number
     reworkSentQuantity?: number
+    heldQuantity?: number
     receivedAt?: Date | string | null
     receivedById?: string | null
     receiptRemarks?: string | null
@@ -197473,6 +197872,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     expectedCompletionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -197525,6 +197925,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -197574,6 +197975,7 @@ export namespace Prisma {
     reworkQuantity?: FloatFieldUpdateOperationsInput | number
     rejectSentQuantity?: FloatFieldUpdateOperationsInput | number
     reworkSentQuantity?: FloatFieldUpdateOperationsInput | number
+    heldQuantity?: FloatFieldUpdateOperationsInput | number
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     receiptRemarks?: NullableStringFieldUpdateOperationsInput | string | null

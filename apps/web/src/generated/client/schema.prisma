@@ -1526,6 +1526,8 @@ model DyeingOrder {
   undyedQuantity      Float  @default(0)
   readyForQc1Quantity Float  @default(0)
   sentToQc1Quantity   Float  @default(0)
+  // Still on HOLD (open DepartmentHold records of this order), kept in step by lib/holds-server.ts; never sent to QC.
+  heldQuantity        Float  @default(0)
   uom                 String @default("MTR")
 
   // Receipt: what physically arrived (null until received; legacy orders received before this existed).
@@ -1641,6 +1643,9 @@ model DepartmentWorkItem {
   reworkQuantity          Float                @default(0)
   rejectSentQuantity      Float                @default(0)
   reworkSentQuantity      Float                @default(0)
+  // Still on HOLD (open DepartmentHold records of this line), kept in step by lib/holds-server.ts. Held quantity
+  // is never processed, inspected, allocated, packed or transferred until it is released.
+  heldQuantity            Float                @default(0)
 
   receivedAt             DateTime?
   receivedById           String?
@@ -2041,15 +2046,15 @@ model FabricPhoto {
   @@index([workItemId])
 }
 
-// Quantity a department keeps back (HOLD) from one line it received: a work item, a dyeing order, a Dyeing QC
-// challan's MTR or PCS lines, or a Production Sheet's quantity in Programming / Fabric Store (lib/holds-server.ts).
+// Quantity a department (Dyeing to Inventory) keeps back (HOLD) from one line it received: a work item, a dyeing
+// order, or a Dyeing QC challan's MTR or PCS lines (lib/holds-server.ts).
 // Remaining on HOLD is never more than the line still has unforwarded, so forwarding through the normal
 // challan screens lowers it without a second deduction. One active HOLD per line (activeKey).
 model DepartmentHold {
   id                    String                @id @default(uuid())
   holdNumber            String                @unique // e.g. HLD-2026-0001
   departmentCode        String
-  sourceType            String // PROGRAM | STORE_PROGRAM | DYEING_ORDER | QC1_CHALLAN | WORK_ITEM
+  sourceType            String // DYEING_ORDER | QC1_CHALLAN | WORK_ITEM
   sourceId              String
   sourceKey             String // sourceType:sourceId:unit
   activeKey             String?               @unique // departmentCode|sourceKey while the HOLD is open; null once closed
@@ -2064,6 +2069,11 @@ model DepartmentHold {
   fabricName            String
   colour                String?
   size                  String?
+  productionType        String? // TOP | BOTTOM | DUPATTA | OTHERS, once the fabric is cut into garments
+  requiredColour        String? // colour Dyeing must achieve (Dyeing lines)
+  challanDate           DateTime? // issue date of the incoming challan
+  sendingDepartment     String? // department that sent the line
+  processedAtHold       Float? // already processed (QC: inspected; Dyeing: dyed) when the HOLD was placed
   unit                  String // MTR | PCS, the line's own unit; never converted
   receivedQuantity      Float
   forwardedQuantity     Float // forwarded from the line, as last computed

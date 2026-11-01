@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FabricStatusBadge, Notice, PageHeader, PriorityBadge, fetchJson, fmtDate, fmtQty, isOverdue, sheetRef } from '@/components/workflow/WorkflowUi';
 import { departmentName, transferPath, workPath, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
+import { FloorBoardTabs } from '@/components/workflow/IssuedChallansTab';
 
 /** What the quantity on a card means in each stage (matches the floor-board API). */
 const STAGE_HINT: Record<string, string> = {
@@ -22,6 +23,7 @@ const STAGE_HINT: Record<string, string> = {
   PASSED: 'Passed, not sent',
   REJECTED: 'Rejected, not sent',
   REWORK: 'Rework, not returned',
+  ON_HOLD: 'On HOLD (blocked)',
   COMPLETED: 'Inspected',
 };
 
@@ -82,6 +84,7 @@ export function WorkFloorBoard({ flow }: { flow: WorkflowView }) {
 
       <main className="p-4 sm:p-8 space-y-4">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
+        <FloorBoardTabs department={flow.code}>
         <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
           {stages.map((stage) => {
             const totals: Record<string, number> = {};
@@ -143,6 +146,7 @@ export function WorkFloorBoard({ flow }: { flow: WorkflowView }) {
             );
           })}
         </div>
+        </FloorBoardTabs>
       </main>
     </div>
   );

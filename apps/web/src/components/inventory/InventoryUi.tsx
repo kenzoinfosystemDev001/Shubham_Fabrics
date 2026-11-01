@@ -1,5 +1,6 @@
 'use client';
 
+import { HoldSection } from '@/components/hold/HoldSection';
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ImageOff, PackageCheck, Play, Send, Undo2, Upload, X } from 'lucide-react';
@@ -518,6 +519,8 @@ export function RecordDrawer({ id, onClose, onChanged }: { id: string; onClose: 
                     <Fact label="Category / Style" value={[record.garmentCategory ? CATEGORY_LABEL[record.garmentCategory as keyof typeof CATEGORY_LABEL] : null, record.styleRef].filter(Boolean).join(' · ') || '—'} />
                     <Fact label="Colour" value={record.colour || '—'} />
                     <Fact label="Status" value={<InventoryStatusBadge status={record.status} />} />
+                    <Fact label="On HOLD" value={<span className={s.held > 0 ? 'text-danger-700 font-semibold' : ''}>{s.held || 0} PCS</span>} />
+                    <Fact label="Available for packing" value={`${s.available} PCS`} />
                     <Fact
                       label="Final QC challan"
                       value={record.inboundChallan ? <Link href={`/challans/${record.inboundChallan.id}`} className="font-mono text-brand-800 hover:underline">{record.inboundChallan.challanNumber}</Link> : '—'}
@@ -527,6 +530,8 @@ export function RecordDrawer({ id, onClose, onChanged }: { id: string; onClose: 
                     <Fact label="Priority / Delivery" value={<span className="inline-flex items-center gap-2"><PriorityBadge priority={record.priority} /><DeadlineText program={record.program} /></span>} />
                   </dl>
                   {record.receiptRemarks && <p className="text-xs text-danger-700">Receipt: {record.receiptRemarks}</p>}
+                  {/* Held pieces are never sent for packing until released. */}
+                  <HoldSection department="INVENTORY" sourceId={record.id} holdPage="/inventory/hold" onChanged={changed} />
                   <div className="flex flex-wrap items-center gap-2">
                     <DocumentsButton programId={record.programId} challanId={record.inboundChallan?.id} />
                     {s.available > 0 && (

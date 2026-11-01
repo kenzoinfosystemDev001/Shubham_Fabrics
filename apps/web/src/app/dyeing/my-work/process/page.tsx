@@ -282,6 +282,10 @@ function ProcessEditor({ order, onClose, onSaved }: { order: any; onClose: () =>
             <div><dt className="text-xs text-neutral-500">Required dye colour</dt><dd className="font-semibold text-brand-900">{order.targetColor || '—'}</dd></div>
             <div><dt className="text-xs text-neutral-500">Received</dt><dd className="font-semibold tabular-nums">{fmtQty(received, order.uom)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Still to dye</dt><dd className="font-semibold tabular-nums">{fmtQty(remainingToDye(order), order.uom)}</dd></div>
+            <div>
+              <dt className="text-xs text-neutral-500">On HOLD</dt>
+              <dd className={`font-semibold tabular-nums ${Number(order.heldQuantity) > 0 ? 'text-danger-700' : ''}`}>{fmtQty(order.heldQuantity || 0, order.uom)}</dd>
+            </div>
             <div><dt className="text-xs text-neutral-500">Sent to QC</dt><dd className="font-semibold tabular-nums">{fmtQty(order.sentToQc1Quantity, order.uom)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Available for QC</dt><dd className="font-semibold tabular-nums">{fmtQty(availableForQc(order), order.uom)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Started</dt><dd>{fmtDate(order.startedAt, true)}</dd></div>
@@ -353,7 +357,16 @@ function ProcessEditor({ order, onClose, onSaved }: { order: any; onClose: () =>
                 </div>
               )}
 
-              <HoldSection department="DYEING" sourceId={order.id} holdPage="/dyeing/hold" />
+              <HoldSection
+                department="DYEING"
+                sourceId={order.id}
+                holdPage="/dyeing/hold"
+                onChanged={async () => {
+                  // Still to dye / available for QC change with the HOLD.
+                  const body = await fetchJson(`/api/dyeing/orders/${order.id}`).catch(() => null);
+                  if (body?.data) onSaved(body.data);
+                }}
+              />
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label className="block">

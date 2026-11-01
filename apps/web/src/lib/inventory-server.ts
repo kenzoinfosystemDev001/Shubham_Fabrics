@@ -373,7 +373,7 @@ export const sendForPacking = (request: Request) =>
             const id = await prisma.$transaction(async (tx) => {
               // The guard on the sent and packed totals means two people can never send the same pieces.
               const res = await tx.departmentWorkItem.updateMany({
-                where: { id: item.id, takenQuantity: item.takenQuantity, processedQuantity: item.processedQuantity },
+                where: { id: item.id, takenQuantity: item.takenQuantity, processedQuantity: item.processedQuantity, heldQuantity: item.heldQuantity },
                 data: { takenQuantity: after.takenQuantity, status: workStatusOf(after), startedAt: item.startedAt ?? new Date() },
               });
               if (res.count !== 1) throw new WorkRequestError(`${garmentLabel(item)} changed just now. Refresh and try again.`, 409);

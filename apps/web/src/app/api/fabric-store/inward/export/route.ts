@@ -15,6 +15,7 @@ const HEADINGS = [
   'Type',
   'Item Name',
   'Colour',
+  'Width',
   'Bill/Ch. No',
   'Bill/Ch. Date',
   'Receiving Date',
@@ -28,7 +29,7 @@ const HEADINGS = [
   'Biller State/City',
   'Remarks',
 ];
-const WIDTHS = [6, 9, 32, 14, 14, 13, 14, 13, 6, 13, 12, 11, 7, 28, 20, 36];
+const WIDTHS = [6, 9, 32, 14, 10, 14, 13, 14, 13, 6, 13, 12, 11, 7, 28, 20, 36];
 
 function parseDay(value: string | null): Date | null {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
@@ -85,6 +86,7 @@ export async function GET(request: Request) {
         entry.entryType === 'DYED' ? 'Dyed' : 'Undyed',
         entry.itemName,
         entry.colour ?? '',
+        entry.width ?? '',
         entry.billNo,
         dateCell(entry.billDate),
         dateCell(entry.receivingDate),
@@ -101,8 +103,8 @@ export async function GET(request: Request) {
     });
     if (entries.length === 0) rows.push(['', '', 'No inward entries in this period']);
     rows.push([]);
-    rows.push(['', '', 'Total (MTR)', '', '', '', '', Math.round(totals.MTR * 1000) / 1000, 'MTR']);
-    rows.push(['', '', 'Total (PCS)', '', '', '', '', Math.round(totals.PCS * 1000) / 1000, 'PCS']);
+    rows.push(['', '', 'Total (MTR)', '', '', '', '', '', Math.round(totals.MTR * 1000) / 1000, 'MTR']);
+    rows.push(['', '', 'Total (PCS)', '', '', '', '', '', Math.round(totals.PCS * 1000) / 1000, 'PCS']);
 
     const sheet = XLSX.utils.aoa_to_sheet(rows);
     sheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: HEADINGS.length - 1 } }];

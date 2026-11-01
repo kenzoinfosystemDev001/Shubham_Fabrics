@@ -25,10 +25,12 @@ import {
   challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
-import { availableToProcess, pendingReject, pendingRework, readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
+import { availableToProcess, heldOf, pendingReject, pendingRework, readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
+import { QcDecisionEditor, QcDecisionHistory } from '@/components/workflow/QcDecisionEditor';
 import { departmentName, transferPath, workPath, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
 import { FabricPhotos } from '@/components/workflow/FabricPhotos';
+import { HoldSection } from '@/components/hold/HoldSection';
 
 const HELD = 'RECEIVED,IN_PROGRESS,COMPLETED,PARTIALLY_TRANSFERRED';
 const FILTERS = [
@@ -237,6 +239,14 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
   // Blank until the inspector records each one.
   const [checks, setChecks] = useState<Record<string, string>>({});
   const [editingBatch, setEditingBatch] = useState<string | null>(null);
+  // Change Decision: which recorded decision is being changed (a batch's REJECT / REWORK, or the line's HOLD).
+  const [decisionEdit, setDecisionEdit] = useState<{ from: 'REJECT' | 'REWORK' | 'HOLD'; batchId?: string } | null>(null);
+  const [historyKey, setHistoryKey] = useState(0);
+  const decisionSaved = (saved: any, message: string) => {
+    setDecisionEdit(null);
+    setHistoryKey((k) => k + 1);
+    onSaved(saved, message);
+  };
   const [submissionKey] = useState(newSubmissionKey);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -313,8 +323,10 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
               </>
             )}
             <div><dt className="text-xs text-neutral-500">Colour</dt><dd className="font-semibold">{item.colour || '—'}</dd></div>
-            <div><dt className="text-xs text-neutral-500">Received</dt><dd className="font-semibold tabular-nums">{fmtQty(receivedBasis(item), item.uom)}</dd></div>
-            <div><dt className="text-xs text-neutral-500">Uninspected</dt><dd className="font-semibold tabular-nums">{fmtQty(open, item.uom)}</dd></div>
+            <div><dt className="text-xs text-neutral-500">Total received</dt><dd className="font-semibold tabular-nums">{fmtQty(receivedBasis(item), item.uom)}</dd></div>
+            <div><dt className="text-xs text-neutral-500">On HOLD</dt><dd className={`font-semibold tabular-nums ${heldOf(item) > 0 ? 'text-danger-700' : ''}`}>{fmtQty(heldOf(item), item.uom)}</dd></div>
+            <div><dt className="text-xs text-neutral-500">Available to inspect</dt><dd className="font-semibold tabular-nums">{fmtQty(open, item.uom)}</dd></div>
+            <div><dt className="text-xs text-neutral-500">Transferred to {flow.next}</dt><dd className="font-semibold tabular-nums">{fmtQty(item.transferredQuantity, item.uom)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Passed, not sent</dt><dd className="font-semibold tabular-nums">{fmtQty(readyToTransfer(item), item.uom)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Rejected, not sent</dt><dd className="font-semibold tabular-nums text-danger-700">{fmtQty(pendingReject(item), item.uom)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Rework, not returned</dt><dd className="font-semibold tabular-nums">{fmtQty(pendingRework(item), item.uom)}</dd></div>
@@ -330,8 +342,37 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
           {/* Fabric photos: Threadcut QC sees Embroidery's and uploads its own. */}
           <FabricPhotos workItemId={item.id} />
 
+          {heldOf(item) > 0 && (
+            <div className="rounded-lg border border-danger-200 bg-danger-50/60 px-3 py-2.5 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-danger-800">
+                  <span className="font-bold tabular-nums">{fmtQty(heldOf(item), item.uom)}</span> is on HOLD: it is not inspected or sent on until it is released or given a decision.
+                </span>
+                {decisionEdit?.from !== 'HOLD' && (
+                  <button type="button" onClick={() => setDecisionEdit({ from: 'HOLD' })} className="font-semibold text-brand-700 hover:underline">
+                    Change decision
+                  </button>
+                )}
+              </div>
+              {decisionEdit?.from === 'HOLD' && (
+                <QcDecisionEditor flow={flow} item={item} from="HOLD" max={heldOf(item)} onCancel={() => setDecisionEdit(null)} onSaved={decisionSaved} />
+              )}
+            </div>
+          )}
+
+          {/* HOLD is separate from PASS / REJECT / REWORK: held quantity is neither inspected nor routed until released. */}
+          <HoldSection
+            department={flow.code}
+            sourceId={item.id}
+            holdPage={`${flow.base}/hold`}
+            onChanged={async (message) => {
+              const body = await fetchJson(`${flow.api}/items/${item.id}`).catch(() => null);
+              if (body?.data) onSaved(body.data, message);
+            }}
+          />
+
           {open <= 0 ? (
-            <Notice kind="success">All received material on this line has been inspected.</Notice>
+            <Notice kind="success">{heldOf(item) > 0 ? 'Everything not on HOLD has been inspected.' : 'All received material on this line has been inspected.'}</Notice>
           ) : (
             <fieldset className="space-y-4">
               <legend className="text-xs font-semibold text-neutral-600 mb-2">New inspection</legend>
@@ -405,13 +446,32 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
                         {fmtDate(x.createdAt, true)} · {x.inspector?.fullName || '—'}
                         {editingBatch !== x.id && (
                           <button type="button" onClick={() => setEditingBatch(x.id)} className="ml-2 font-semibold text-brand-700 hover:underline">
-                            Edit
+                            Edit quantities
                           </button>
                         )}
+                        {(['REJECT', 'REWORK'] as const)
+                          .filter((d) => (d === 'REJECT' ? x.rejectQuantity : x.reworkQuantity) > 0)
+                          .map((d) => (
+                            <button key={d} type="button" onClick={() => setDecisionEdit({ from: d, batchId: x.id })} className="ml-2 font-semibold text-brand-700 hover:underline">
+                              Change {d}
+                            </button>
+                          ))}
                       </span>
                     </div>
                     {editingBatch === x.id && (
                       <InspectionBatchEditor flow={flow} batch={x} onCancel={() => setEditingBatch(null)} onSaved={onSaved} />
+                    )}
+                    {decisionEdit && decisionEdit.batchId === x.id && decisionEdit.from !== 'HOLD' && (
+                      <QcDecisionEditor
+                        flow={flow}
+                        item={item}
+                        from={decisionEdit.from}
+                        batch={x}
+                        // Only what has not yet left on a challan can change.
+                        max={round(Math.min(decisionEdit.from === 'REJECT' ? x.rejectQuantity : x.reworkQuantity, decisionEdit.from === 'REJECT' ? pendingReject(item) : pendingRework(item)))}
+                        onCancel={() => setDecisionEdit(null)}
+                        onSaved={decisionSaved}
+                      />
                     )}
                     <p className="mt-1 tabular-nums text-neutral-700">
                       Pass {fmtQty(x.passQuantity, x.uom)} · <span className="text-danger-700">Reject {fmtQty(x.rejectQuantity, x.uom)}</span> · Rework {fmtQty(x.reworkQuantity, x.uom)}
@@ -424,6 +484,8 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
               </ul>
             </div>
           )}
+
+          <QcDecisionHistory flow={flow} itemId={item.id} refreshKey={historyKey} />
         </div>
 
         <div className="px-5 py-4 border-t border-neutral-200 flex flex-wrap justify-end gap-2 sticky bottom-0 bg-white">

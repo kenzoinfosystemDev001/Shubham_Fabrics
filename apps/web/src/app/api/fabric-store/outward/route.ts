@@ -173,6 +173,8 @@ export async function GET(request: Request) {
             inwardVerified: !!matched,
             inwardBillNo: matched?.billNo || null,
             inwardSupplier: matched?.supplierName || null,
+            // Fabric width as entered on the matching inward entry.
+            width: matched?.width || null,
           });
         });
       } else {
@@ -215,6 +217,8 @@ export async function GET(request: Request) {
             inwardVerified: !!matched,
             inwardBillNo: matched?.billNo || null,
             inwardSupplier: matched?.supplierName || null,
+            // Fabric width as entered on the matching inward entry.
+            width: matched?.width || null,
           });
         }
       }
@@ -253,6 +257,7 @@ export async function GET(request: Request) {
         inwardVerified: !!matched,
         inwardBillNo: matched?.billNo || null,
         inwardSupplier: matched?.supplierName || null,
+        width: matched?.width || null,
       };
     });
 

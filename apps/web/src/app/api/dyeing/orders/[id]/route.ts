@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { DYEING_ORDER_INCLUDE, TX_OPTIONS, dyeingErrorResponse, parseOptionalDate } from '@/lib/dyeing-server';
-import { remainingToDye, validateProcessUpdate } from '@/lib/dyeing-workflow.mjs';
+import { receivedBasis, validateProcessUpdate } from '@/lib/dyeing-workflow.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +64,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         data: {
           status: check.status,
           dyedQuantity: check.dyedQuantity,
-          undyedQuantity: remainingToDye(updatedFields),
+          undyedQuantity: Math.max(0, receivedBasis(updatedFields) - check.dyedQuantity),
           readyForQc1Quantity: Math.max(0, check.dyedQuantity - existing.sentToQc1Quantity),
           dyedColor: check.dyedColor,
           colorMismatch: check.colorMismatch,
@@ -99,7 +99,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             machineId: text(body.machineNumber, 60) ?? existing.machineNumber,
             inputQuantity: check.dyedQuantity - existing.dyedQuantity,
             goodQuantity: check.dyedQuantity,
-            balanceQuantity: remainingToDye(updatedFields),
+            balanceQuantity: Math.max(0, receivedBasis(updatedFields) - check.dyedQuantity),
             unitOfMeasure: existing.uom,
             notes: `${existing.orderNumber}: processed ${existing.dyedQuantity} -> ${check.dyedQuantity} ${existing.uom}`,
           },

@@ -131,7 +131,7 @@ export function ProductionSheetView({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-200 pb-3">
         <div>
           <span className="text-[10px] font-black uppercase tracking-wider text-neutral-900 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">
-            PRODUCTION SHEET &middot; TRAVELER #{program.programSerialNo || program.programNumber}
+            PRODUCTION SHEET &middot; DESIGN NO: {program.designNumber || program.designName || '—'} &middot; SERIAL NO: {program.programSerialNo || program.programNumber}
           </span>
           <h3 className="text-sm font-black text-neutral-900 mt-1 uppercase tracking-wide flex items-center gap-2">
             <span>{activeCategoryName} Production Sheet Breakdown</span>
