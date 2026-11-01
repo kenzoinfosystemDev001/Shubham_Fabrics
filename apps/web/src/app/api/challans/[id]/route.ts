@@ -4,6 +4,7 @@ import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
 import { workflowReceiving } from '@/lib/work-items-server';
 import { MIXED_UNIT, unitOf } from '@/lib/challan-units.mjs';
+import { ITEMS_WITH_SOURCE } from '@/lib/challan-sheets.mjs';
 
 import {
   FabricStockError,
@@ -24,7 +25,7 @@ export async function GET(
       where: { id },
       include: {
         program: true,
-        items: true,
+        items: ITEMS_WITH_SOURCE,
         fromDeptRel: true,
         toDeptRel: true,
         parentChallan: {

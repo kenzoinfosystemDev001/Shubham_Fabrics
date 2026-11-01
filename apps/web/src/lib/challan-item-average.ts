@@ -1,5 +1,5 @@
 import { Prisma, prisma } from '@shubham/database';
-import { quantityPairOf } from '@/lib/challan-units.mjs';
+import { lineWidthOf, quantityPairOf } from '@/lib/challan-units.mjs';
 
 const confirmed = new Set<string>();
 
@@ -37,32 +37,49 @@ export function canStoreChallanUnitQuantity(): Promise<boolean> {
   return canWriteColumns('ChallanItem', ['unitQuantity', 'unitQuantityUom']);
 }
 
-/** A challan entry's optional Average and Unit quantity (Items section), each with its own MTR / PCS; never converted. */
+/** A challan line's fabric width (manual migration 20261031_challan_item_width.sql). */
+export function canStoreChallanWidth(): Promise<boolean> {
+  return canWriteColumns('ChallanItem', ['width']);
+}
+
+/**
+ * A challan entry's optional Average and Unit quantity (Items section), each with its own MTR / PCS and
+ * never converted, and its own fabric width (each line keeps its own; never one width for the challan).
+ */
 export interface LineExtras {
   average: number | null;
   averageUnit: 'MTR' | 'PCS' | null;
   unitQuantity: number | null;
   unitQuantityUom: 'MTR' | 'PCS' | null;
+  width: string | null;
 }
 
-/** Reads a line's extras; `fail` builds the caller's own request error for a bad value. */
+/**
+ * Reads a line's extras; `fail` builds the caller's own request error for a bad value. `sourceWidth` is the
+ * width of the incoming line this one is issued from: kept when the request does not name a width.
+ */
 export function lineExtrasOf(
-  line: { average?: unknown; averageUnit?: unknown; unitQuantity?: unknown; unitQuantityUom?: unknown },
+  line: { average?: unknown; averageUnit?: unknown; unitQuantity?: unknown; unitQuantityUom?: unknown; width?: unknown },
   index: number,
   fail: (message: string) => Error,
+  sourceWidth: string | null = null,
 ): LineExtras {
   const average = quantityPairOf(line.average, line.averageUnit, 'Average');
   if ('error' in average) throw fail(`Line ${index + 1}: ${average.error}`);
   const unitQuantity = quantityPairOf(line.unitQuantity, line.unitQuantityUom, 'Unit quantity');
   if ('error' in unitQuantity) throw fail(`Line ${index + 1}: ${unitQuantity.error}`);
-  return { average: average.value, averageUnit: average.unit, unitQuantity: unitQuantity.value, unitQuantityUom: unitQuantity.unit };
+  const width = lineWidthOf(line, sourceWidth);
+  if ('error' in width) throw fail(`Line ${index + 1}: ${width.error}`);
+  return { average: average.value, averageUnit: average.unit, unitQuantity: unitQuantity.value, unitQuantityUom: unitQuantity.unit, width: width.value };
 }
 
 /** ChallanItem fields for the entered extras only, each written once its columns exist (manual migrations). */
 export async function lineExtrasWriter(lines: LineExtras[]) {
   const storeAverage = lines.some((l) => l.average !== null) ? await canStoreChallanAverage() : false;
   const storeUnitQuantity = lines.some((l) => l.unitQuantity !== null) ? await canStoreChallanUnitQuantity() : false;
+  const storeWidth = lines.some((l) => l.width !== null) ? await canStoreChallanWidth() : false;
   return (l: LineExtras) => ({
+    ...(storeWidth && l.width !== null ? { width: l.width } : {}),
     ...(storeAverage && l.average !== null ? { average: l.average, averageUnit: l.averageUnit } : {}),
     ...(storeUnitQuantity && l.unitQuantity !== null ? { unitQuantity: l.unitQuantity, unitQuantityUom: l.unitQuantityUom } : {}),
   });

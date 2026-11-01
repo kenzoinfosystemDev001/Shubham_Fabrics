@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { averageText, lineQuantitiesByUnit, secondUnitOf, unitOf } from '@/lib/challan-units.mjs';
+import { averageText, lineQuantitiesByUnit, secondUnitOf, unitOf, widthText } from '@/lib/challan-units.mjs';
 import { userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import { FIELD, THEAD, fmtQty } from '@/components/workflow/WorkflowUi';
 import { departmentName } from '@/lib/workflow-views';
@@ -113,6 +113,7 @@ export function ReceiptLinesTable({
               <th className="py-2.5 px-3 text-right">Qty (MTR)</th>
               <th className="py-2.5 px-3 text-right">Qty (PCS)</th>
               <th className="py-2.5 px-3">Average</th>
+              <th className="py-2.5 px-3">Width</th>
               <th className="py-2.5 px-3">Remarks</th>
               <th className="py-2.5 px-3">From</th>
               {showReceived && <th className="py-2.5 px-3 w-32">Received MTR</th>}
@@ -135,6 +136,7 @@ export function ReceiptLinesTable({
                   <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{cell(sent.MTR, 'MTR')}</td>
                   <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{cell(sent.PCS, 'PCS')}</td>
                   <td className="py-2.5 px-3 whitespace-nowrap">{averageText(r.line)}</td>
+                  <td className="py-2.5 px-3 whitespace-nowrap">{widthText(r.line)}</td>
                   <td className="py-2.5 px-3 max-w-[220px] text-neutral-600">{userChallanRemarks(r.line?.remarks) || '—'}</td>
                   <td className="py-2.5 px-3 whitespace-nowrap">{departmentName(challan?.fromDepartment)}</td>
                   {showReceived &&

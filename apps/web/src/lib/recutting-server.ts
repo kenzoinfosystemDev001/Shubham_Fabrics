@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import { assertChallanNumbersAvailable, challanNumberErrorResponse, requireChallanNumber } from '@/lib/challan-number-server';
 import {
+  LINES_WITH_SHEET,
   PROGRAM_SELECT,
   TX,
   USER_SELECT,
@@ -60,7 +61,9 @@ const ALLOCATION_INCLUDE = {
       status: true,
       priority: true,
       inboundChallanId: true,
-      inboundChallan: { select: { id: true, challanNumber: true, issuedDate: true } },
+      inboundChallanItemId: true,
+      // items: the fabric width of each incoming line (pre-fills the Stitching challan line).
+      inboundChallan: { select: { id: true, challanNumber: true, issuedDate: true, fromDepartment: true, status: true, items: { select: { id: true, width: true } } } },
       program: { select: SHEET_SELECT },
     },
   },
@@ -366,7 +369,7 @@ const loadStitchingChallan = (id: string) =>
   prisma.challan.findUnique({
     where: { id },
     include: {
-      items: { orderBy: { createdAt: 'asc' } },
+      items: LINES_WITH_SHEET,
       program: { select: SHEET_SELECT },
       parentChallan: { select: { id: true, challanNumber: true } },
       issuedBy: { select: USER_SELECT },
@@ -405,7 +408,8 @@ const listStitchingChallans = (request: Request) =>
   }, 'Failed to load Stitching challans.');
 
 /**
- * POST stitching-challans  { idempotencyKey, challanNumber, issuedDate?, remarks?, lines: [{ allocationId, quantity, uom?, average?, averageUnit?, unitQuantity?, unitQuantityUom?, remarks? }] }
+ * POST stitching-challans  { idempotencyKey, challanNumber, issuedDate?, remarks?, sourceChallanIds, lines: [{ allocationId, quantity, uom?, average?, averageUnit?, unitQuantity?, unitQuantityUom?, remarks? }] }
+ * sourceChallanIds: the incoming challans selected; every allocation's line must come from one of them.
  * Issues only cut quantity not yet sent, category/style-wise. A line is in the allocation's cut unit unless
  * `uom` names the other one; such a line carries all the allocation still has to send (stitchingLineUse).
  */
@@ -441,23 +445,33 @@ const issueStitchingChallan = (request: Request) =>
               fabricProcessingStatus: true,
               priority: true,
               inboundChallanId: true,
+              inboundChallanItemId: true,
               inboundChallan: { select: { challanNumber: true } },
             },
           },
         },
       });
       const byId = new Map(allocations.map((a) => [a.id, a]));
-      const check = validateStitchingLines(lines, byId);
+      // The selected incoming challans are required: an allocation of any other challan's line is refused.
+      const check = validateStitchingLines(lines, byId, Array.isArray(body.sourceChallanIds) ? body.sourceChallanIds : []);
       if (!check.ok) throw new WorkRequestError(check.error);
       await assertChallanNumbersAvailable(prisma, cfg.code, [{ value: challanNumber }]);
       const issuedDate = body.issuedDate ? new Date(String(body.issuedDate)) : new Date();
       if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
+      // Fabric width of each allocation's incoming line: kept unless the request names another width.
+      const sourceWidths = new Map(
+        (await prisma.challanItem.findMany({ where: { id: { in: allocations.map((a) => a.workItem.inboundChallanItemId) } }, select: { id: true, width: true } })).map((i) => [i.id, i.width]),
+      );
       const prepared = lines.map((l, index) => {
         const a = byId.get(l.allocationId)!;
-        return { a, quantity: round(Number(l.quantity)), ...stitchingLineUse(a, l), extras: lineExtrasOf(l, index, (m) => new WorkRequestError(m)), remarks: textOf(l.remarks, 300) };
+        const extras = lineExtrasOf(l, index, (m) => new WorkRequestError(m), sourceWidths.get(a.workItem.inboundChallanItemId) ?? null);
+        return { a, quantity: round(Number(l.quantity)), ...stitchingLineUse(a, l), extras, remarks: textOf(l.remarks, 300) };
       });
       const extrasOf = await lineExtrasWriter(prepared.map((p) => p.extras));
       const total = round(prepared.reduce((s, p) => s + p.quantity, 0));
+      // Header parent: the first selected incoming challan used; every line also records its own source line.
+      const usedSources = new Set(prepared.map((p) => p.a.workItem.inboundChallanId));
+      const parentChallanId = check.sourceChallanIds.find((id) => usedSources.has(id)) || prepared[0].a.workItem.inboundChallanId;
       const now = new Date();
 
       const challanId = await prisma.$transaction(async (tx) => {
@@ -467,7 +481,7 @@ const issueStitchingChallan = (request: Request) =>
             challanNumber,
             challanType: cfg.next.challanType,
             programId: check.programId,
-            parentChallanId: first.inboundChallanId,
+            parentChallanId,
             fromDepartment: cfg.code,
             toDepartment: cfg.next.code,
             status: 'ISSUED',
@@ -499,6 +513,8 @@ const issueStitchingChallan = (request: Request) =>
               fabricProcessingStatus: w.fabricProcessingStatus,
               garmentCategory: a.category,
               styleRef: a.otherName && !a.styleRef ? a.otherName : a.styleRef,
+              programId: w.programId,
+              sourceChallanItemId: w.inboundChallanItemId,
               unitType: unit === 'PCS' ? 'PCS' : 'ROLL',
               quantity,
               uom: unit,
@@ -531,7 +547,7 @@ const issueStitchingChallan = (request: Request) =>
           });
           await tx.productionTransaction.create({
             data: {
-              programId: check.programId,
+              programId: w.programId,
               challanId: challan.id,
               departmentCode: cfg.code,
               operationName: 'RECUTTING_TO_STITCHING',
@@ -559,7 +575,7 @@ const issueStitchingChallan = (request: Request) =>
           },
         });
         await tx.auditLog.create({
-          data: { actorId: user.id, action: 'RECUTTING_TO_STITCHING', entity: 'Challan', entityId: challan.id, afterState: JSON.stringify({ challanNumber, total, unit: check.unit, lines: prepared.length }) },
+          data: { actorId: user.id, action: 'RECUTTING_TO_STITCHING', entity: 'Challan', entityId: challan.id, afterState: JSON.stringify({ challanNumber, total, unit: check.unit, lines: prepared.length, sheets: check.programIds, sourceChallanIds: check.sourceChallanIds }) },
         });
         if (key) {
           await tx.idempotencyRecord.create({ data: { key, endpoint: STITCH_ENDPOINT, method: 'POST', statusCode: 201, responseBody: JSON.stringify({ challanId: challan.id }) } });

@@ -21,7 +21,8 @@ import { departmentName } from '@/lib/workflow-views';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
-import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText } from '@/lib/challan-units.mjs';
+import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText, widthText } from '@/lib/challan-units.mjs';
+import { lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 
 interface ChallanPrintModalProps {
   challan: any;
@@ -103,6 +104,13 @@ export function ChallanPrintModal({
   const toLabel = deptLabels[toDept] || toDept;
 
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
+  // A challan carrying several Production Sheets names each line's sheet and totals each sheet.
+  const sheets = sheetBreakdown(challan);
+  const sheetPrefix = (it: any) => {
+    if (!sheets.multiSheet) return '';
+    const id = lineSheetId(it, challan);
+    return `[${sheetLabel(sheets.sheets.find((s: any) => s.programId === id)?.program)}] `;
+  };
   // Store → Dyeing lines carry the colour Dyeing must achieve next to the current (base) colour.
   const hasDyeColour = items.some((i: any) => String(i.requiredColour || '').trim());
   // Programming to Recutting: Size | Average | Unit | Remarks, each of the first three a quantity with its own unit;
@@ -288,19 +296,21 @@ export function ChallanPrintModal({
                         {toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
                         <th className="py-2.5 px-3 font-medium">Unit</th>
                         {!toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
+                        <th className="py-2.5 px-3 font-medium">Width</th>
                         <th className="py-2.5 pl-3 pr-4 font-medium">Remarks</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-neutral-100">
                       {items.map((it: any, idx: number) => (
                         <tr key={it.id || idx}>
-                          <td className="py-3 pl-4 pr-3 font-medium">{it.fabricCode || it.itemDescription || '—'}</td>
+                          <td className="py-3 pl-4 pr-3 font-medium">{sheetPrefix(it)}{it.fabricCode || it.itemDescription || '—'}</td>
                           <td className="py-3 px-3">{it.colour || '—'}</td>
                           {hasDyeColour && <td className="py-3 px-3 font-semibold text-brand-800">{it.requiredColour || '—'}</td>}
                           <td className="py-3 px-3 text-right tabular-nums font-semibold whitespace-nowrap">{it.quantity}{toRecuttingLayout && it.uom ? ` ${it.uom}` : ''}</td>
                           {toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(it)}</td>}
                           <td className="py-3 px-3 whitespace-nowrap">{toRecuttingLayout ? unitQuantityText(it) : it.uom || '—'}</td>
                           {!toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(it)}</td>}
+                          <td className="py-3 px-3 whitespace-nowrap font-medium">{widthText(it)}</td>
                           <td className="py-3 pl-3 pr-4 text-neutral-600">
                             {[it.rollNumber ? `Roll ${it.rollNumber}` : null, userChallanRemarks(it.remarks)].filter(Boolean).join(' · ') || '—'}
                           </td>
@@ -308,15 +318,24 @@ export function ChallanPrintModal({
                       ))}
                       {items.length === 0 && (
                         <tr>
-                          <td colSpan={hasDyeColour ? 7 : 6} className="py-6 text-center text-neutral-500">No items on this challan.</td>
+                          <td colSpan={hasDyeColour ? 8 : 7} className="py-6 text-center text-neutral-500">No items on this challan.</td>
                         </tr>
                       )}
+                      {sheets.multiSheet &&
+                        sheets.sheets.map((s: any) => (
+                          <tr key={s.programId || 'none'} className="bg-neutral-50/70">
+                            <td colSpan={2} className="py-2 pl-4 pr-3 text-xs font-semibold text-neutral-600">
+                              Sheet {sheetLabel(s.program)} ({s.lines.length} line{s.lines.length === 1 ? '' : 's'})
+                            </td>
+                            <td colSpan={hasDyeColour ? 6 : 5} className="py-2 px-3 text-xs font-semibold tabular-nums">{formatTotals(s.totals)}</td>
+                          </tr>
+                        ))}
                     </tbody>
                     {items.length > 0 && (
                       <tfoot className="bg-neutral-50 border-t border-neutral-200">
                         <tr>
                           <td colSpan={2} className="py-3 pl-4 pr-3 font-semibold">Total</td>
-                          <td colSpan={hasDyeColour ? 5 : 4} className="py-3 px-3 font-bold tabular-nums">{formatTotals(unitTotals)}</td>
+                          <td colSpan={hasDyeColour ? 6 : 5} className="py-3 px-3 font-bold tabular-nums">{formatTotals(unitTotals)}</td>
                         </tr>
                       </tfoot>
                     )}

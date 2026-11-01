@@ -333,6 +333,7 @@ function senderNoteOf(challan: any, item: any): string {
   return [
     average !== '—' ? `Average ${average}` : null,
     unitQuantity !== '—' ? `Unit ${unitQuantity}` : null,
+    line.width ? `Width ${line.width}` : null,
     line.rollNumber ? `Roll ${line.rollNumber}` : null,
     userChallanRemarks(line.remarks) || null,
   ]

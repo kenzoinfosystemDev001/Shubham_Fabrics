@@ -38,7 +38,7 @@ export const DYEING_ORDER_INCLUDE = {
       receivedDate: true,
       remarks: true,
       // Base (current) colour of each line, before dyeing.
-      items: { select: { id: true, colour: true, shade: true } },
+      items: { select: { id: true, colour: true, shade: true, width: true } },
     },
   },
   qcTransfers: {

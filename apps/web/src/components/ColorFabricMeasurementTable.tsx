@@ -392,6 +392,12 @@ export function ColorFabricMeasurementTable({
     replaceCard(cardIndex, pinned(cardIndex).map((item) => ({ ...item, fabric: value })));
   };
 
+  // Width belongs to the fabric: every line of this fabric card takes it (other fabrics keep their own).
+  const handleFabricWidthChange = (cardIndex: number, value: string) => {
+    if (readOnly) return;
+    replaceCard(cardIndex, pinned(cardIndex).map((item) => ({ ...item, width: value })));
+  };
+
   const colourKeyOf = (item: ChallanItemData) =>
     item.colourGroup || (item.color.trim() ? `colour:${item.color.trim().toLowerCase()}` : item.id);
   const colourGroupsOf = (lines: Array<{ item: ChallanItemData; index: number }>) => {
@@ -758,6 +764,25 @@ export function ColorFabricMeasurementTable({
                   </label>
                 )}
               </div>
+              {/* This fabric's own width, saved on each of its lines (never one width for the whole challan). */}
+              {readOnly ? (
+                <span className="text-xs text-neutral-600">
+                  Width: <span className="font-semibold text-neutral-900">{first.width || '—'}</span>
+                </span>
+              ) : (
+                <label className="flex items-center gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500 shrink-0">Width</span>
+                  <input
+                    type="text"
+                    aria-label={`Width of fabric ${cardIndex + 1}`}
+                    value={first.width || ''}
+                    onChange={(e) => handleFabricWidthChange(cardIndex, e.target.value)}
+                    maxLength={40}
+                    placeholder="e.g. 44 Inch"
+                    className={`${FIELD} w-32`}
+                  />
+                </label>
+              )}
               <span className="text-xs text-neutral-500 tabular-nums">
                 {colourGroups.length} {colourGroups.length === 1 ? 'colour' : 'colours'}
                 {card.lines.length !== colourGroups.length && ` · ${card.lines.length} entries`}

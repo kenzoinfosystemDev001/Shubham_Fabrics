@@ -53,6 +53,8 @@ const MIGRATIONS = [
   '20261029_received_unit_quantity.sql',
   '20261031_hold_balances.sql',
   '20261101_hold_details.sql',
+  '20261030_challan_item_sheet_source.sql',
+  '20261031_challan_item_width.sql',
 ];
 
 const args = new Set(process.argv.slice(2));

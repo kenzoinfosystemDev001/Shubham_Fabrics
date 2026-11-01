@@ -20,6 +20,8 @@ export interface StockSource {
   available: number;
   /** Extra detail shown with the colour choice, e.g. "Challan 100 · Dyed". */
   detail?: string;
+  /** Fabric width of the incoming line (pre-fills the colour's Width; the user may change it). */
+  width?: string | null;
 }
 
 export interface StockEntry {
@@ -34,6 +36,8 @@ export interface StockEntry {
 export interface StockColour {
   key: string;
   sourceId: string;
+  /** This line's own fabric width, sent with each of its entries. */
+  width: string;
   entries: StockEntry[];
 }
 export interface StockFabric {
@@ -51,11 +55,13 @@ export interface StockLine {
   unitQuantity: number;
   unitQuantityUom: 'MTR' | 'PCS';
   remarks: string;
+  /** Fabric width of this line as entered ('' sends no width). */
+  width: string;
 }
 
 const uid = () => Math.random().toString(36).slice(2);
 export const newStockEntry = (): StockEntry => ({ key: uid(), size: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
-export const newStockColour = (): StockColour => ({ key: uid(), sourceId: '', entries: [newStockEntry()] });
+export const newStockColour = (): StockColour => ({ key: uid(), sourceId: '', width: '', entries: [newStockEntry()] });
 export const newStockFabric = (): StockFabric => ({ key: uid(), fabric: '', colours: [newStockColour()] });
 
 const FIELD_BASE =
@@ -93,6 +99,7 @@ export function stockLinesOf(fabrics: StockFabric[], sources: StockSource[]): { 
           unitQuantity: Number(e.unitQuantity),
           unitQuantityUom: e.unitQuantityUom as 'MTR' | 'PCS',
           remarks: e.remarks.trim(),
+          width: (c.width || '').trim(),
         });
       }
     }
@@ -212,7 +219,10 @@ export function StockItemsSection({
                             required
                             aria-label={`Colour ${ci + 1} of fabric ${fi + 1}`}
                             value={c.sourceId}
-                            onChange={(e) => setColour(f.key, c.key, (x) => ({ ...x, sourceId: e.target.value }))}
+                            onChange={(e) => {
+                              const next = sourceById.get(e.target.value);
+                              setColour(f.key, c.key, (x) => ({ ...x, sourceId: e.target.value, width: next?.width || '' }));
+                            }}
                             disabled={!f.fabric}
                             className={`${FIELD} font-semibold cursor-pointer disabled:bg-neutral-50`}
                           >
@@ -224,6 +234,19 @@ export function StockItemsSection({
                               </option>
                             ))}
                           </select>
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500 shrink-0">Width</span>
+                          <input
+                            type="text"
+                            aria-label={`Width of colour ${ci + 1} of fabric ${fi + 1}`}
+                            value={c.width}
+                            onChange={(e) => setColour(f.key, c.key, (x) => ({ ...x, width: e.target.value }))}
+                            maxLength={40}
+                            placeholder="e.g. 44 Inch"
+                            disabled={!c.sourceId}
+                            className={`${FIELD} w-32 disabled:bg-neutral-50`}
+                          />
                         </label>
                         <span className="ml-auto text-xs text-neutral-500 tabular-nums">
                           {c.entries.length} {c.entries.length === 1 ? 'entry' : 'entries'}
