@@ -57,6 +57,8 @@ const MIGRATIONS = [
   '20261031_challan_item_width.sql',
   '20261102_remove_retired_users.sql',
   '20261102_station_account_names.sql',
+  // Keep last: it deletes every role, including any an earlier file adds when re-applied.
+  '20261102_remove_roles.sql',
 ];
 
 const args = new Set(process.argv.slice(2));

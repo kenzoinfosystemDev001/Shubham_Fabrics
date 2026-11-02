@@ -12,29 +12,7 @@ async function setup() {
   }
   const hash = await bcrypt.hash(initialPin, 10);
 
-  // 1. Ensure Roles
-  let adminRole = await prisma.role.findFirst({ where: { code: 'ADMIN' } });
-  if (!adminRole) {
-    adminRole = await prisma.role.create({
-      data: { code: 'ADMIN', name: 'Administrator', description: 'Full MES system access', isSystem: true },
-    });
-  }
-
-  let progRole = await prisma.role.findFirst({ where: { code: 'PROGRAMMING_INCHARGE' } });
-  if (!progRole) {
-    progRole = await prisma.role.create({
-      data: { code: 'PROGRAMMING_INCHARGE', name: 'Programming Incharge', description: 'Programming department head', isSystem: true },
-    });
-  }
-
-  let storeRole = await prisma.role.findFirst({ where: { code: 'FABRIC_STORE' } });
-  if (!storeRole) {
-    storeRole = await prisma.role.create({
-      data: { code: 'FABRIC_STORE', name: 'Fabric Store Incharge', description: 'Fabric store operations and inventory', isSystem: true },
-    });
-  }
-
-  // Ensure Departments
+  // 1. Departments. Users have no roles: their access comes from their department.
   await prisma.department.upsert({
     where: { code: 'ADMIN' },
     update: { name: 'Administration' },
@@ -63,16 +41,7 @@ async function setup() {
       departmentCode: 'ADMIN',
     },
   });
-  let superAdminRole = await prisma.role.findFirst({ where: { code: 'SUPER_ADMIN' } });
-  if (!superAdminRole) {
-    superAdminRole = await prisma.role.create({
-      data: { code: 'SUPER_ADMIN', name: 'Super Administrator', isSystem: true },
-    });
-  }
-  await prisma.userRole.deleteMany({ where: { userId: adminUser.id } });
-  await prisma.userRole.create({ data: { userId: adminUser.id, roleId: superAdminRole.id } });
-  await prisma.userRole.create({ data: { userId: adminUser.id, roleId: adminRole.id } });
-  console.log('✓ Admin user ready: admin (SUPER_ADMIN)');
+  console.log('✓ Admin user ready: admin');
 
   // 3. Programming User
   const progUser = await prisma.user.upsert({
@@ -86,8 +55,6 @@ async function setup() {
       departmentCode: 'PROGRAMMING',
     },
   });
-  await prisma.userRole.deleteMany({ where: { userId: progUser.id } });
-  await prisma.userRole.create({ data: { userId: progUser.id, roleId: progRole.id } });
   console.log('✓ Programming user ready: program');
 
   // 4. Fabric Store User
@@ -102,12 +69,10 @@ async function setup() {
       departmentCode: 'STORE',
     },
   });
-  await prisma.userRole.deleteMany({ where: { userId: storeUser.id } });
-  await prisma.userRole.create({ data: { userId: storeUser.id, roleId: storeRole.id } });
   console.log('✓ Fabric Store user ready: store');
 
 
-  // 5. QC Washing Department & Role & User
+  // 5. QC Washing Department & User
   await prisma.department.upsert({
     where: { code: 'QC3' },
     update: { name: 'QC Washing', sequenceOrder: 8 },
@@ -120,19 +85,7 @@ async function setup() {
     create: { code: 'QCWASHING', name: 'QC Washing', sequenceOrder: 8, description: 'QC Washing Inspection Department' },
   });
 
-  let qcWashingRole = await prisma.role.findFirst({ where: { code: 'QC3_INSPECTOR' } });
-  if (!qcWashingRole) {
-    qcWashingRole = await prisma.role.create({
-      data: { code: 'QC3_INSPECTOR', name: 'Washing QC Inspector', description: 'Washing QC inspection & verification', isSystem: true },
-    });
-  }
 
-  let qcInspectorRole = await prisma.role.findFirst({ where: { code: 'QC_INSPECTOR' } });
-  if (!qcInspectorRole) {
-    qcInspectorRole = await prisma.role.create({
-      data: { code: 'QC_INSPECTOR', name: 'Quality Inspector', description: 'General QC Inspector', isSystem: true },
-    });
-  }
 
   // washingqc is the Washing QC account; "qc3" and "qcwashing" are older sign-in names for it (lib/departments.ts).
   const existingQc3 =
@@ -151,12 +104,9 @@ async function setup() {
           departmentCode: 'QC3',
         },
       });
-  await prisma.userRole.deleteMany({ where: { userId: qc3User.id } });
-  await prisma.userRole.create({ data: { userId: qc3User.id, roleId: qcWashingRole.id } });
-  await prisma.userRole.create({ data: { userId: qc3User.id, roleId: qcInspectorRole.id } });
-  console.log('✓ Washing QC user ready: washingqc (QC3_INSPECTOR)');
+  console.log('✓ Washing QC user ready: washingqc');
 
-  // 6. Recutting & Stitching Departments, Roles, and User
+  // 6. Recutting & Stitching Departments and User
   await prisma.department.upsert({
     where: { code: 'RECUTTING' },
     update: { name: 'Embroidery Recutting', sequenceOrder: 10 },
@@ -169,12 +119,6 @@ async function setup() {
     create: { code: 'STITCHING', name: 'Stitching Department', sequenceOrder: 11, description: 'Garment Assembly & Stitching Lines' },
   });
 
-  let recuttingRole = await prisma.role.findFirst({ where: { code: 'RECUTTING_SUPERVISOR' } });
-  if (!recuttingRole) {
-    recuttingRole = await prisma.role.create({
-      data: { code: 'RECUTTING_SUPERVISOR', name: 'Recutting Supervisor', description: 'Embroidery recutting and panel separation supervisor', isSystem: true },
-    });
-  }
 
   const recuttingUser = await prisma.user.upsert({
     where: { username: 'recutting' },
@@ -187,17 +131,9 @@ async function setup() {
       departmentCode: 'RECUTTING',
     },
   });
-  await prisma.userRole.deleteMany({ where: { userId: recuttingUser.id } });
-  await prisma.userRole.create({ data: { userId: recuttingUser.id, roleId: recuttingRole.id } });
-  console.log('✓ Recutting user ready: recutting (RECUTTING_SUPERVISOR)');
+  console.log('✓ Recutting user ready: recutting');
 
-  // 7. Stitching Department & Role & User
-  let stitchingRole = await prisma.role.findFirst({ where: { code: 'STITCHING_SUPERVISOR' } });
-  if (!stitchingRole) {
-    stitchingRole = await prisma.role.create({
-      data: { code: 'STITCHING_SUPERVISOR', name: 'Stitching Supervisor', description: 'Garment assembly and stitching line supervisor', isSystem: true },
-    });
-  }
+  // 7. Stitching Department & User
 
   const stitchingUser = await prisma.user.upsert({
     where: { username: 'stitching' },
@@ -210,17 +146,9 @@ async function setup() {
       departmentCode: 'STITCHING',
     },
   });
-  await prisma.userRole.deleteMany({ where: { userId: stitchingUser.id } });
-  await prisma.userRole.create({ data: { userId: stitchingUser.id, roleId: stitchingRole.id } });
-  console.log('✓ Stitching user ready: stitching (STITCHING_SUPERVISOR)');
+  console.log('✓ Stitching user ready: stitching');
 
-  // 8. Finishing Department & Role & User
-  let finishingRole = await prisma.role.findFirst({ where: { code: 'FINISHING_SUPERVISOR' } });
-  if (!finishingRole) {
-    finishingRole = await prisma.role.create({
-      data: { code: 'FINISHING_SUPERVISOR', name: 'Finishing Supervisor', description: 'Garment finishing, trimming, and pressing supervisor', isSystem: true },
-    });
-  }
+  // 8. Finishing Department & User
 
   const finishingUser = await prisma.user.upsert({
     where: { username: 'finishing' },
@@ -233,9 +161,7 @@ async function setup() {
       departmentCode: 'FINISHING',
     },
   });
-  await prisma.userRole.deleteMany({ where: { userId: finishingUser.id } });
-  await prisma.userRole.create({ data: { userId: finishingUser.id, roleId: finishingRole.id } });
-  console.log('✓ Finishing user ready: finishing (FINISHING_SUPERVISOR)');
+  console.log('✓ Finishing user ready: finishing');
 
   // 9. Downstream factory route departments
   await prisma.department.upsert({
@@ -263,12 +189,6 @@ async function setup() {
   });
 
   // 10. Steam Press Department & User
-  let steamPressRole = await prisma.role.findFirst({ where: { code: 'STEAM_PRESS_SUPERVISOR' } });
-  if (!steamPressRole) {
-    steamPressRole = await prisma.role.create({
-      data: { code: 'STEAM_PRESS_SUPERVISOR', name: 'Steam Press Supervisor', description: 'Steam pressing, ironing, and crease setting supervisor', isSystem: true },
-    });
-  }
 
   const steamPressUser = await prisma.user.upsert({
     where: { username: 'steampress' },
@@ -281,17 +201,9 @@ async function setup() {
       departmentCode: 'STEAM_PRESS',
     },
   });
-  await prisma.userRole.deleteMany({ where: { userId: steamPressUser.id } });
-  await prisma.userRole.create({ data: { userId: steamPressUser.id, roleId: steamPressRole.id } });
-  console.log('✓ Steam Press user ready: steampress (STEAM_PRESS_SUPERVISOR)');
+  console.log('✓ Steam Press user ready: steampress');
 
   // 11. Final QC Department & User
-  let finalCheckRole = await prisma.role.findFirst({ where: { code: 'FINAL_CHECK_INSPECTOR' } });
-  if (!finalCheckRole) {
-    finalCheckRole = await prisma.role.create({
-      data: { code: 'FINAL_CHECK_INSPECTOR', name: 'Final QC Inspector', description: 'Final garment inspection and quality verification', isSystem: true },
-    });
-  }
 
   // finalqc is the Final QC account; "finalcheck" is its older sign-in name.
   const existingFinalCheck =
@@ -310,9 +222,7 @@ async function setup() {
           departmentCode: 'FINAL_CHECK',
         },
       });
-  await prisma.userRole.deleteMany({ where: { userId: finalCheckUser.id } });
-  await prisma.userRole.create({ data: { userId: finalCheckUser.id, roleId: finalCheckRole.id } });
-  console.log('✓ Final QC user ready: finalqc (FINAL_CHECK_INSPECTOR)');
+  console.log('✓ Final QC user ready: finalqc');
 
   // 12. Inventory Department & User (Packing is a module of Inventory, not a department).
   // An existing "packing" station user (the earlier Packing & Inventory department) is reused.
@@ -322,12 +232,6 @@ async function setup() {
     create: { code: 'INVENTORY', name: 'Inventory Department', sequenceOrder: 16, description: 'Finished garment receipt, inventory and packing' },
   });
 
-  let inventoryRole = await prisma.role.findFirst({ where: { code: 'INVENTORY_SUPERVISOR' } });
-  if (!inventoryRole) {
-    inventoryRole = await prisma.role.create({
-      data: { code: 'INVENTORY_SUPERVISOR', name: 'Inventory Supervisor', description: 'Finished garment inventory and packing', isSystem: true },
-    });
-  }
 
   const existingInventoryUser =
     (await prisma.user.findUnique({ where: { username: 'inventory' } })) || (await prisma.user.findUnique({ where: { username: 'packing' } }));
@@ -345,9 +249,7 @@ async function setup() {
           departmentCode: 'INVENTORY',
         },
       });
-  await prisma.userRole.deleteMany({ where: { userId: inventoryUser.id } });
-  await prisma.userRole.create({ data: { userId: inventoryUser.id, roleId: inventoryRole.id } });
-  console.log('✓ Inventory user ready: inventory (INVENTORY_SUPERVISOR)');
+  console.log('✓ Inventory user ready: inventory');
 
   console.log('✓ Downstream factory route departments verified');
 

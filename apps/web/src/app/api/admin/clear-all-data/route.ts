@@ -81,26 +81,12 @@ export async function POST(request: Request) {
           });
         }
 
-        const roles = [
-          { code: 'ADMIN', name: 'System Administrator' },
-          { code: 'PROGRAMMING_INCHARGE', name: 'Programming Incharge' },
-          { code: 'FABRIC_STORE', name: 'Fabric Store Incharge' },
-          { code: 'DYEING_INCHARGE', name: 'Dyeing Incharge' },
-        ];
-
-        for (const r of roles) {
-          await tx.role.upsert({
-            where: { code: r.code },
-            update: { name: r.name },
-            create: { code: r.code, name: r.name, isSystem: true },
-          });
-        }
-
+        // Core station accounts. Access comes from the department; users have no roles.
         const coreUsers = [
-          { username: 'admin', fullName: 'System Administrator', email: 'admin@subhamfabrics.com', role: 'ADMIN', dept: 'ADMIN' },
-          { username: 'program', fullName: 'Programming Incharge', email: 'programming@subhamfabrics.com', role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING' },
-          { username: 'store', fullName: 'Fabric Store Incharge', email: 'store@subhamfabrics.com', role: 'FABRIC_STORE', dept: 'STORE' },
-          { username: 'dyeing', fullName: 'Dyeing Incharge', email: 'dyeing@subhamfabrics.com', role: 'DYEING_INCHARGE', dept: 'DYEING' },
+          { username: 'admin', fullName: 'System Administrator', email: 'admin@subhamfabrics.com', dept: 'ADMIN' },
+          { username: 'program', fullName: 'Programming Incharge', email: 'programming@subhamfabrics.com', dept: 'PROGRAMMING' },
+          { username: 'store', fullName: 'Fabric Store Incharge', email: 'store@subhamfabrics.com', dept: 'STORE' },
+          { username: 'dyeing', fullName: 'Dyeing Incharge', email: 'dyeing@subhamfabrics.com', dept: 'DYEING' },
         ];
 
         for (const u of coreUsers) {
@@ -116,12 +102,6 @@ export async function POST(request: Request) {
                 isActive: true,
               },
             });
-            const role = await tx.role.findFirst({ where: { code: u.role } });
-            if (role) {
-              await tx.userRole.create({
-                data: { userId: created.id, roleId: role.id },
-              });
-            }
           } else {
             await tx.user.update({
               where: { id: existing.id },
