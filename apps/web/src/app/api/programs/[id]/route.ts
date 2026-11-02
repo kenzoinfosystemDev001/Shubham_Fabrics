@@ -3,14 +3,18 @@ import { prisma } from '@shubham/database';
 import { getSessionUser } from '@/lib/auth/require-user';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { programSheetInclude, shapeProgramSheet } from '@/lib/program-sheet';
+import { assignWilcomSheets, wilcomEntriesForSheet, wilcomSheetError } from '@/lib/wilcom-sheets';
 
 import { syncChallanStock } from '@/lib/fabric-stock-ledger';
 
 export const dynamic = 'force-dynamic';
 
-/** A TOP design (or a legacy one with no category) is the only one that shares the root Wilcom photo. */
+/**
+ * A legacy TOP design (or one with no category), saved before designs carried their sheetId, is the only one
+ * that shares the root Wilcom photo; a design linked to its sheet shows only its own artwork.
+ */
 function isTopWilcomEntry(entry: any): boolean {
-  return String(entry?.category || 'TOP').trim().toUpperCase() === 'TOP';
+  return !entry?.sheetId && String(entry?.category || 'TOP').trim().toUpperCase() === 'TOP';
 }
 
 export async function GET(
@@ -34,10 +38,18 @@ export async function GET(
     }
 
     if (!program) {
-      program = await prisma.program.findFirst({
+      // A serial number can repeat across sheets: it opens a sheet only when exactly one sheet has it.
+      const matches = await prisma.program.findMany({
         where: { programSerialNo: id },
-        include: programInclude,
-      }).catch(() => null);
+        select: { id: true },
+        take: 2,
+      }).catch(() => []);
+      if (matches.length === 1) {
+        program = await prisma.program.findUnique({
+          where: { id: matches[0].id },
+          include: programInclude,
+        }).catch(() => null);
+      }
     }
 
     if (!program) {
@@ -299,8 +311,9 @@ export async function PATCH(
     }).catch(() => null);
 
     if (!prog) {
-      prog = await prisma.program.findFirst({
-        where: { OR: [{ programNumber: id }, { programSerialNo: id }] },
+      // Only the unique program number identifies a sheet to change; a serial number can repeat across sheets.
+      prog = await prisma.program.findUnique({
+        where: { programNumber: id },
         select: { id: true, metadataJson: true },
       }).catch(() => null);
     }
@@ -324,14 +337,27 @@ export async function PATCH(
     }
 
     if (Array.isArray(body.wilcomEntries)) {
-      if (!resolvedPhoto) {
-        resolvedPhoto = body.wilcomEntries.find((e: any) => e?.photoUrl)?.photoUrl || null;
+      // Each design stays linked to its own Production Sheet of this program (lib/wilcom-sheets).
+      const sheetComponents = meta.components && typeof meta.components === 'object' ? meta.components : null;
+      const previousRootPhoto = typeof meta.wilcomDesignPhoto === 'string' ? meta.wilcomDesignPhoto : '';
+      const entries = assignWilcomSheets<any>(
+        body.wilcomEntries
+          .filter((e: any) => e && typeof e === 'object')
+          // Only a legacy TOP design (no sheetId) borrows the program's earlier root photo.
+          .map((e: any) => ({ ...e, photoUrl: e.photoUrl || (isTopWilcomEntry(e) ? previousRootPhoto : '') || undefined })),
+        sheetComponents,
+      );
+      const wilcomError = wilcomSheetError(entries, sheetComponents);
+      if (wilcomError) {
+        return NextResponse.json({ error: wilcomError }, { status: 400 });
       }
-      // Only a TOP design falls back to the root Wilcom photo; other sheets keep their own artwork.
-      meta.wilcomEntries = body.wilcomEntries.map((e: any) => ({
-        ...e,
-        photoUrl: e.photoUrl || (isTopWilcomEntry(e) ? resolvedPhoto : null) || undefined,
-      }));
+      if (!resolvedPhoto) {
+        resolvedPhoto =
+          wilcomEntriesForSheet(entries, 'TOP', sheetComponents).find((e: any) => e.photoUrl)?.photoUrl ||
+          entries.find((e: any) => e.photoUrl)?.photoUrl ||
+          null;
+      }
+      meta.wilcomEntries = entries;
     } else if (body.wilcomDesignPhoto) {
       if (Array.isArray(meta.wilcomEntries) && meta.wilcomEntries.length > 0) {
         meta.wilcomEntries = meta.wilcomEntries.map((e: any) => ({

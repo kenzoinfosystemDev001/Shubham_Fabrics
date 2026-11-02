@@ -3,6 +3,7 @@ import { prisma } from '@shubham/database';
 import { canViewClientCode, getSessionUser } from '@/lib/auth/require-user';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { unitOf } from '@/lib/challan-units.mjs';
+import { assignWilcomSheets, wilcomEntriesForSheet, wilcomSheetError } from '@/lib/wilcom-sheets';
 
 export const dynamic = 'force-dynamic';
 
@@ -309,18 +310,34 @@ export async function POST(request: Request) {
         }
       }
     }
-    // Resolve wilcom photo and design number across all entries and root fields
+    // Wilcom designs: each is linked by sheetId to its own Production Sheet of this program (lib/wilcom-sheets),
+    // never matched by design or serial number. A design for a sheet that is not on this program is refused.
+    const sheetComponents = metadataObj.components && typeof metadataObj.components === 'object' ? metadataObj.components : null;
+    // The program's earlier root photo is only borrowed by a legacy TOP design saved before designs had a sheetId.
+    const previousRootPhoto = typeof metadataObj.wilcomDesignPhoto === 'string' ? metadataObj.wilcomDesignPhoto : '';
     const submittedWilcomEntries = Array.isArray(data.wilcomEntries)
-      ? data.wilcomEntries
-          .filter((entry: any) => entry && typeof entry === 'object')
-          .map((entry: any) => ({
-            ...entry,
-            photoUrl: entry.photoUrl || entry.photo || entry.imageUrl || entry.image || '',
-          }))
+      ? assignWilcomSheets<any>(
+          data.wilcomEntries
+            .filter((entry: any) => entry && typeof entry === 'object')
+            .map((entry: any) => ({
+              ...entry,
+              photoUrl:
+                entry.photoUrl || entry.photo || entry.imageUrl || entry.image ||
+                (!entry.sheetId && String(entry.category || 'TOP').trim().toUpperCase() === 'TOP' ? previousRootPhoto : '') ||
+                '',
+            })),
+          sheetComponents,
+        )
       : [];
+    const wilcomError = wilcomSheetError(submittedWilcomEntries, sheetComponents);
+    if (wilcomError) {
+      return NextResponse.json({ error: wilcomError }, { status: 400 });
+    }
+    // The program's own Wilcom photo (lists, thumbnails) is the TOP sheet's artwork when it has one.
     const resolvedWilcomPhoto =
-      submittedWilcomEntries.find((entry: any) => entry.photoUrl)?.photoUrl ||
+      wilcomEntriesForSheet(submittedWilcomEntries, 'TOP', sheetComponents).find((entry: any) => entry.photoUrl)?.photoUrl ||
       data.wilcomDesignPhoto ||
+      submittedWilcomEntries.find((entry: any) => entry.photoUrl)?.photoUrl ||
       null;
 
     const resolvedWilcomNumber =
@@ -331,12 +348,10 @@ export async function POST(request: Request) {
     metadataObj.wilcomDesignPhoto = resolvedWilcomPhoto;
     metadataObj.wilcomDesignNumber = resolvedWilcomNumber;
 
-    if (submittedWilcomEntries.length > 0) {
-      // Each production sheet keeps its own artwork; only a TOP design falls back to the root Wilcom photo.
-      metadataObj.wilcomEntries = submittedWilcomEntries.map((entry: any) => ({
-        ...entry,
-        photoUrl: entry.photoUrl || (String(entry.category || 'TOP').trim().toUpperCase() === 'TOP' ? resolvedWilcomPhoto : '') || '',
-      }));
+    if (Array.isArray(data.wilcomEntries)) {
+      // The form sends every sheet's designs; one it no longer sends was removed and stays removed. Each design
+      // keeps only its own artwork (another sheet's photo is never copied onto it).
+      metadataObj.wilcomEntries = submittedWilcomEntries;
     } else if (resolvedWilcomNumber || resolvedWilcomPhoto) {
       metadataObj.wilcomEntries = [
         {

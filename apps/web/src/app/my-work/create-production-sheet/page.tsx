@@ -50,6 +50,7 @@ import {
   calculateProductionMeasurementTotal
 } from '@/lib/download-production-sheet';
 import { WilcomDesignModal } from '@/components/wilcom/WilcomDesignModal';
+import { assignWilcomSheets, wilcomEntriesForSheet, wilcomEntrySheetId } from '@/lib/wilcom-sheets';
 import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
 import { 
   WilcomEntry, 
@@ -757,9 +758,9 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
         setFabricWidth(program.fabricWidth || '');
         setFabricDyeingRequired(Boolean(program.fabricDyeingRequired));
         if (program.fabricColorAvailable) setFabricColorAvailable(program.fabricColorAvailable);
-        setWilcomEntries(Array.isArray(program.wilcomEntries) ? program.wilcomEntries : []);
-
         const saved: Record<string, any> = meta.components && typeof meta.components === 'object' ? meta.components : {};
+        // Each saved design is linked to its own Production Sheet; older designs are linked by their category.
+        setWilcomEntries(assignWilcomSheets(Array.isArray(program.wilcomEntries) ? program.wilcomEntries : [], saved));
         const savedCats = Object.keys(saved) as GarmentCategory[];
         if (savedCats.length > 0) {
           const loaded = {} as Record<GarmentCategory, ComponentState>;
@@ -1413,6 +1414,19 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
       }
     }
 
+    // An added style is printed under its name (its Wilcom sheet too), so two sheets never share a name.
+    const usedSheetNames = new Set(['TOP', 'BOTTOM', 'DUPATTA']);
+    for (const cat of componentCategories) {
+      const name = cat === 'OTHER' || isCustomCategory(cat) ? components[cat].styleName.trim().toUpperCase() : '';
+      if (!name) continue;
+      if (usedSheetNames.has(name)) {
+        setError(`Another Production Sheet is already named ${name}. Give each style its own name.`);
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      usedSheetNames.add(name);
+    }
+
     // Only the sheets selected for forwarding must be complete; the others are saved as they are.
     for (const cat of forwardedComponents) {
       if ((cat === 'OTHER' || isCustomCategory(cat)) && !components[cat].styleName.trim()) {
@@ -1480,10 +1494,12 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
       const primaryAvg = getTotalMtrAverage(primaryCat);
       const primaryPieces = getTotalPieces(primaryCat);
 
-      const wilcomEntriesToSubmit = wilcomEntries.map((entry) => ({
+      // Every design goes with the Production Sheet it was added to, labelled with that sheet's current name.
+      const wilcomEntriesToSubmit = assignWilcomSheets(wilcomEntries, components).map((entry) => ({
         ...entry,
         photoUrl: entry.photoUrl || '',
       }));
+      const topWilcomPhoto = wilcomEntriesForSheet(wilcomEntriesToSubmit, 'TOP', components).find((e) => e.photoUrl)?.photoUrl;
       const payload: any = {
         id: createdProgramId || undefined,
         // The version this form was loaded from or last saved as; a newer save by someone else is refused.
@@ -1521,7 +1537,7 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
         forwardedComponents: forwardedComponents,
         wilcomEntries: wilcomEntriesToSubmit,
         wilcomDesignNumber: wilcomEntriesToSubmit.find((e) => e.wilcomDesignNumber)?.wilcomDesignNumber || wilcomEntriesToSubmit[0]?.wilcomDesignNumber || '',
-        wilcomDesignPhoto: wilcomEntriesToSubmit.find((e) => e.photoUrl)?.photoUrl || '',
+        wilcomDesignPhoto: topWilcomPhoto || wilcomEntriesToSubmit.find((e) => e.photoUrl)?.photoUrl || '',
       };
 
       const result = await api.createProductionSheet(payload);
@@ -1785,7 +1801,6 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
                       <button
                         type="button"
                         onClick={() => {
-                          const removedName = comp.styleName.trim().toUpperCase();
                           // Land on another enabled sheet; fall back to TOP, enabled as the STYLE dropdown would.
                           const nextCat =
                             componentCategories.find((category) => category !== cat && components[category].enabled) || 'TOP';
@@ -1802,16 +1817,8 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
                               : Array.from(new Set([...remaining, nextCat]));
                           });
                           setSelectedCategory(nextCat);
-                          // Designs are filed under the style's name; keep them while another sheet still has that name.
-                          const nameStillUsed =
-                            !removedName ||
-                            componentCategories.some((category) =>
-                              category !== cat &&
-                              (category === removedName || components[category].styleName.trim().toUpperCase() === removedName)
-                            );
-                          setWilcomEntries((prev) => prev.filter((entry) =>
-                            entry.category !== cat && (nameStillUsed || entry.category !== removedName)
-                          ));
+                          // Only the removed sheet's own designs go with it; other sheets' designs are untouched.
+                          setWilcomEntries((prev) => prev.filter((entry) => wilcomEntrySheetId(entry, components) !== cat));
                         }}
                         className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-danger-700 border border-danger-200 hover:bg-danger-50 rounded cursor-pointer"
                       >
@@ -1858,9 +1865,8 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
                           />
                         </div>
                         {(() => {
-                          // Wilcom designs saved for this sheet (an "Other" style's designs are stored under its name).
-                          const customName = cat === 'OTHER' || isCustomCategory(cat) ? comp.styleName.trim().toUpperCase() || null : null;
-                          const catEntries = wilcomEntries.filter((e) => e.category === cat || (customName !== null && e.category === customName));
+                          // Only the Wilcom designs linked to this Production Sheet.
+                          const catEntries = wilcomEntriesForSheet(wilcomEntries, cat, components);
                           const withPhoto = catEntries.filter((e) => e.photoUrl);
                           const openWilcom = () => {
                             setWilcomCategory(cat);
@@ -2809,7 +2815,7 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
         onProgramUpdate={(updated) => {
           setSuccess((prev: any) => ({ ...prev, ...updated }));
           if (Array.isArray(updated?.wilcomEntries) && updated.wilcomEntries.length > 0) {
-            setWilcomEntries(updated.wilcomEntries);
+            setWilcomEntries(assignWilcomSheets(updated.wilcomEntries, components));
           }
         }}
       />

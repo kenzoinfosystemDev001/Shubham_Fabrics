@@ -12,6 +12,7 @@ import {
   X 
 } from 'lucide-react';
 import { WilcomEntry, GarmentCategory, compressImageForUpload } from '@/lib/download-wilcom';
+import { wilcomEntriesForSheet, wilcomSheetLabel } from '@/lib/wilcom-sheets';
 
 interface WilcomDesignModalProps {
   isOpen: boolean;
@@ -31,14 +32,6 @@ export function WilcomDesignModal({
   defaultStyleName = '',
 }: WilcomDesignModalProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [category, setCategory] = useState<GarmentCategory>(activeCategory);
-  // Added styles have internal ids (CUSTOM_...); the user-facing category is the style's name.
-  const [customCategory, setCustomCategory] = useState(
-    !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory) ? defaultStyleName : ''
-  );
-  const [isCustomCategory, setIsCustomCategory] = useState(
-    activeCategory === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory)
-  );
   const [styleName, setStyleName] = useState('');
   const [designNumber, setDesignNumber] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
@@ -46,18 +39,27 @@ export function WilcomDesignModal({
   const [dragging, setDragging] = useState(false);
   const fileInput = React.useRef<HTMLInputElement>(null);
 
-  // Synchronize state when modal opens or active category changes
+  // The form starts empty each time the modal opens or another sheet is shown, so an edit begun on one
+  // Production Sheet never carries over to another.
   React.useEffect(() => {
-    if (isOpen && !editingId) {
-      const isCustom = activeCategory === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory);
-      setIsCustomCategory(isCustom);
-      setCategory(isCustom ? 'OTHER' : activeCategory);
-      setCustomCategory(isCustom ? defaultStyleName : '');
-      setStyleName('');
-    }
-  }, [isOpen, activeCategory, defaultStyleName, editingId]);
+    if (!isOpen) return;
+    setEditingId(null);
+    setStyleName('');
+    setDesignNumber('');
+    setPhotoUrl('');
+    setRemarks('');
+  }, [isOpen, activeCategory]);
 
   if (!isOpen) return null;
+
+  // This modal works on one Production Sheet: activeCategory is its key (TOP, CUSTOM_...), and every design
+  // added here is linked to it by sheetId. An added style's designs print under the style's name.
+  const sheetComponents = { [activeCategory]: { styleName: defaultStyleName } };
+  const sheetLabel = wilcomSheetLabel(activeCategory, sheetComponents);
+  const sheetNeedsName = !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory) && !defaultStyleName.trim();
+  const sheetEntries = wilcomEntriesForSheet(wilcomEntries, activeCategory, sheetComponents);
+  const sheetEntry = (id: string | null) => (id ? sheetEntries.find((entry) => entry.id === id) : undefined);
+  const newEntryId = () => `wilcom-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,16 +98,16 @@ export function WilcomDesignModal({
         });
       }
 
+      if (sheetNeedsName) {
+        alert('Enter the Production Sheet name before adding Wilcom designs.');
+        return;
+      }
       setPhotoUrl(uploadedPhoto);
-      const finalCategory = isCustomCategory
-        ? customCategory.trim().toUpperCase() || 'OTHER'
-        : category;
-      const existingEntry = editingId
-        ? wilcomEntries.find((entry) => entry.id === editingId)
-        : undefined;
+      const existingEntry = sheetEntry(editingId);
       const entry: WilcomEntry = {
-        id: existingEntry?.id || `wilcom-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-        category: finalCategory,
+        id: existingEntry?.id || newEntryId(),
+        sheetId: activeCategory,
+        category: sheetLabel,
         styleName: styleName.trim(),
         wilcomDesignNumber:
           designNumber.trim().toUpperCase() ||
@@ -127,24 +129,17 @@ export function WilcomDesignModal({
   };
 
   const handleEdit = (entry: WilcomEntry) => {
+    if (!sheetEntry(entry.id)) return;
     setEditingId(entry.id);
-    const isStandard = ['TOP', 'BOTTOM', 'DUPATTA'].includes(entry.category);
-    if (isStandard) {
-      setCategory(entry.category);
-      setIsCustomCategory(false);
-      setCustomCategory('');
-    } else {
-      setCategory('OTHER');
-      setIsCustomCategory(true);
-      setCustomCategory(entry.category === 'OTHER' ? '' : entry.category);
-    }
     setStyleName(entry.styleName);
     setDesignNumber(entry.wilcomDesignNumber);
     setPhotoUrl(entry.photoUrl || '');
     setRemarks(entry.remarks || '');
   };
 
+  // Removes only this design of this sheet, by its own id.
   const handleDelete = (id: string) => {
+    if (!sheetEntry(id)) return;
     if (confirm('Are you sure you want to remove this Wilcom design?')) {
       const updated = wilcomEntries.filter((e) => e.id !== id);
       onSaveEntries(updated);
@@ -156,10 +151,6 @@ export function WilcomDesignModal({
 
   const resetForm = () => {
     setEditingId(null);
-    const isCustom = activeCategory === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory);
-    setIsCustomCategory(isCustom);
-    setCategory(isCustom ? 'OTHER' : activeCategory);
-    setCustomCategory(isCustom ? defaultStyleName : '');
     setStyleName('');
     setDesignNumber('');
     setPhotoUrl('');
@@ -169,23 +160,19 @@ export function WilcomDesignModal({
   const handleSaveCurrent = () => {
     const finalDesignNumber = designNumber.trim().toUpperCase() || defaultStyleName?.trim().toUpperCase() || 'WLC-01';
 
-    let finalCategory = category;
-    if (isCustomCategory) {
-      const trimmedCustom = customCategory.trim().toUpperCase();
-      if (!trimmedCustom) {
-        alert('Please enter a category name (e.g. Koti, Jacket, Belt, Sleeve)');
-        return;
-      }
-      finalCategory = trimmedCustom;
+    if (sheetNeedsName) {
+      alert('Enter the Production Sheet name before adding Wilcom designs.');
+      return;
     }
 
-    if (editingId) {
-      const existingEntry = wilcomEntries.find((entry) => entry.id === editingId);
+    const existingEntry = sheetEntry(editingId);
+    if (existingEntry) {
       const updated = wilcomEntries.map((e) =>
-        e.id === editingId
+        e.id === existingEntry.id
           ? {
               ...e,
-              category: finalCategory,
+              sheetId: activeCategory,
+              category: sheetLabel,
               styleName: styleName.trim(),
               wilcomDesignNumber: finalDesignNumber,
               photoUrl: photoUrl.trim() || undefined,
@@ -197,8 +184,9 @@ export function WilcomDesignModal({
       onSaveEntries(updated);
     } else {
       const newEntry: WilcomEntry = {
-        id: `wilcom-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-        category: finalCategory,
+        id: newEntryId(),
+        sheetId: activeCategory,
+        category: sheetLabel,
         styleName: styleName.trim(),
         wilcomDesignNumber: finalDesignNumber,
         photoUrl: photoUrl.trim() || undefined,
@@ -212,27 +200,6 @@ export function WilcomDesignModal({
   };
 
   const categoryLabel = (c: string) => STANDARD_LABEL[c] || c;
-  // Each production sheet has its own Wilcom designs; an added style's are stored under its name.
-  const sheetStyleName = !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory) ? defaultStyleName.trim().toUpperCase() : '';
-  const sheetEntries = wilcomEntries.filter((e) =>
-    e.category === activeCategory || (sheetStyleName !== '' && e.category === sheetStyleName)
-  );
-  const counts = sheetEntries.reduce<Record<string, number>>((acc, e) => {
-    acc[e.category] = (acc[e.category] || 0) + 1;
-    return acc;
-  }, {});
-  const selectedChip = isCustomCategory ? 'OTHER' : category;
-  const chooseCategory = (val: string) => {
-    if (val === 'OTHER') {
-      setIsCustomCategory(true);
-      setCategory('OTHER');
-      setCustomCategory(defaultStyleName);
-    } else {
-      setIsCustomCategory(false);
-      setCategory(val as GarmentCategory);
-      setCustomCategory('');
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-canvas overflow-hidden" role="dialog" aria-modal="true" aria-label="Wilcom Sheet">
@@ -280,41 +247,14 @@ export function WilcomDesignModal({
             </div>
 
             <div className="p-5 space-y-5">
-              {/* Category */}
+              {/* Production Sheet: designs added here belong to this sheet only */}
               <div>
-                <span className="block text-xs font-semibold text-neutral-600 mb-2">
-                  Category <span className="text-danger-600">*</span>
+                <span className="block text-xs font-semibold text-neutral-600 mb-2">Production Sheet</span>
+                <span className={`inline-flex px-3 py-1.5 rounded-lg text-xs font-bold uppercase ${CATEGORY_TONE[sheetLabel] || 'bg-neutral-100 text-neutral-700'}`}>
+                  {sheetNeedsName ? 'New Style' : categoryLabel(sheetLabel)}
                 </span>
-                <div role="radiogroup" aria-label="Category" className="grid grid-cols-4 gap-1.5 p-1 bg-neutral-100 rounded-xl">
-                  {CATEGORY_CHIPS.map((c) => (
-                    <button
-                      key={c.value}
-                      type="button"
-                      role="radio"
-                      aria-checked={selectedChip === c.value}
-                      onClick={() => chooseCategory(c.value)}
-                      className={`py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                        selectedChip === c.value ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-600 hover:text-neutral-900'
-                      }`}
-                    >
-                      {c.label}
-                    </button>
-                  ))}
-                </div>
-                {isCustomCategory && (
-                  <label className="block mt-3">
-                    <span className="block text-xs font-semibold text-neutral-600 mb-1.5">
-                      Category name <span className="text-danger-600">*</span>
-                    </span>
-                    <input
-                      type="text"
-                      value={customCategory}
-                      onChange={(e) => setCustomCategory(e.target.value)}
-                      placeholder="e.g. Koti, Jacket, Belt, Sleeve"
-                      className={FIELD_CLASS}
-                      autoFocus
-                    />
-                  </label>
+                {sheetNeedsName && (
+                  <p className="mt-2 text-xs text-danger-700">Enter the Production Sheet name on the sheet before adding Wilcom designs.</p>
                 )}
               </div>
 
@@ -485,7 +425,7 @@ export function WilcomDesignModal({
                 </span>
                 <p className="text-sm font-semibold text-neutral-800">No Wilcom designs yet</p>
                 <p className="text-xs text-neutral-500 max-w-xs">
-                  Add each embroidery design with its category, design number and artwork. They appear here and on the printed Wilcom sheet.
+                  Add each embroidery design with its design number and artwork. They belong to this Production Sheet only and appear here and on its printed Wilcom sheet.
                 </p>
               </div>
             )}
@@ -499,11 +439,9 @@ export function WilcomDesignModal({
           {sheetEntries.length === 0 ? (
             <span>No designs attached</span>
           ) : (
-            Object.entries(counts).map(([cat, n]) => (
-              <span key={cat} className={`inline-flex px-2 py-0.5 rounded-md font-semibold ${CATEGORY_TONE[cat] || 'bg-neutral-100 text-neutral-700'}`}>
-                {categoryLabel(cat)} · {n}
-              </span>
-            ))
+            <span className={`inline-flex px-2 py-0.5 rounded-md font-semibold ${CATEGORY_TONE[sheetLabel] || 'bg-neutral-100 text-neutral-700'}`}>
+              {categoryLabel(sheetLabel)} · {sheetEntries.length}
+            </span>
           )}
         </div>
         <button
@@ -520,13 +458,6 @@ export function WilcomDesignModal({
 
 const FIELD_CLASS =
   'w-full h-11 px-3.5 rounded-xl border border-neutral-200 bg-white text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition';
-
-const CATEGORY_CHIPS = [
-  { value: 'TOP', label: 'Top' },
-  { value: 'BOTTOM', label: 'Bottom' },
-  { value: 'DUPATTA', label: 'Dupatta' },
-  { value: 'OTHER', label: 'Other' },
-];
 
 const STANDARD_LABEL: Record<string, string> = { TOP: 'Top', BOTTOM: 'Bottom', DUPATTA: 'Dupatta', OTHER: 'Other' };
 
