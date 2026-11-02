@@ -72,7 +72,7 @@ export function SteamPressNavigation() {
 
   const linkClass = (href: string, exact = false) => {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
-    return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+    return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition ${
       active
         ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
         : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'

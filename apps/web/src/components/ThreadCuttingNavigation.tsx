@@ -67,7 +67,7 @@ export function ThreadCuttingNavigation() {
 
   const linkClass = (href: string, exact = false) => {
     const active = exact ? pathname === href : pathname.startsWith(href);
-    return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+    return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition ${
       active
         ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
         : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
@@ -180,7 +180,7 @@ export function ThreadCuttingNavigation() {
           {/* 2. My Work */}
           <div>
             <div
-              className={`px-3 py-2.5 text-xs font-semibold ${
+              className={`px-3 py-2.5 text-xs font-bold ${
                 pathname.startsWith('/thread-cutting/my-work') ? 'text-neutral-900' : 'text-neutral-700'
               }`}
             >
@@ -200,7 +200,7 @@ export function ThreadCuttingNavigation() {
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     aria-current={active ? 'page' : undefined}
-                    className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                    className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-bold transition ${
                       active
                         ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
                         : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'

@@ -78,7 +78,7 @@ export function FabricStoreNavigation() {
 
   const linkClass = (href: string, exact = false) => {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
-    return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+    return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition ${
       active
         ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
         : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
@@ -87,7 +87,7 @@ export function FabricStoreNavigation() {
 
   const subLinkClass = (href: string, exact = false) => {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
-    return `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+    return `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-bold transition ${
       active
         ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
         : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
@@ -97,7 +97,7 @@ export function FabricStoreNavigation() {
   const sectionHeader = (label: string, isOpen: boolean, toggle: () => void, isAnyActive: boolean) => (
     <div
       onClick={toggle}
-      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition ${
+      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold cursor-pointer transition ${
         isAnyActive ? 'text-neutral-900' : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
       }`}
     >
