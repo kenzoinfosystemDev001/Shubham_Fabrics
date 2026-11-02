@@ -10,6 +10,8 @@ export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | string;
 
 export interface WilcomEntry {
   id: string;
+  /** The Production Sheet (its key in metadata.components) this design belongs to; see lib/wilcom-sheets. */
+  sheetId?: string;
   category: GarmentCategory;
   styleName: string;
   wilcomDesignNumber: string;
@@ -89,7 +91,7 @@ export function wilcomCategoryFor(category: GarmentCategory | 'ALL', meta?: any)
 /**
  * Only the designs of one production sheet; another sheet's designs never stand in for a sheet that has none.
  */
-export function filterWilcomEntriesByCategory<T extends { category?: string }>(
+export function filterWilcomEntriesByCategory<T extends { category?: string; sheetId?: string }>(
   entries: T[],
   category: GarmentCategory | 'ALL',
   meta?: any
@@ -97,16 +99,22 @@ export function filterWilcomEntriesByCategory<T extends { category?: string }>(
   const id = String(category || 'ALL').trim().toUpperCase();
   const name = wilcomCategoryFor(category, meta);
   if (id === 'ALL') return entries;
+  // A sheet key (TOP, CUSTOM_...) selects that sheet's own designs; a label selects the designs printed under it.
+  const components = meta?.components && typeof meta.components === 'object' ? meta.components : null;
+  const isSheetKey = ['TOP', 'BOTTOM', 'DUPATTA'].includes(id) || Boolean(components && category in components);
   return entries.filter((e) => {
+    if (isSheetKey && e.sheetId) return e.sheetId === category;
     const cat = String(e.category || '').trim().toUpperCase();
     return cat === id || cat === name;
   });
 }
 
 /**
- * The root Wilcom photo is the TOP sheet's legacy artwork; another sheet's design never borrows it.
+ * The root Wilcom photo is the TOP sheet's legacy artwork. Only a legacy TOP design (saved before designs
+ * carried their sheetId) borrows it; a design linked to its sheet shows only its own artwork.
  */
-export function inheritedWilcomPhoto(entry: { category?: string } | null | undefined, rootPhoto: string): string {
+export function inheritedWilcomPhoto(entry: { category?: string; sheetId?: string } | null | undefined, rootPhoto: string): string {
+  if (entry?.sheetId) return '';
   return String(entry?.category || 'TOP').trim().toUpperCase() === 'TOP' ? rootPhoto : '';
 }
 
