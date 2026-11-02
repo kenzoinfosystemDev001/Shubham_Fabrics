@@ -55,6 +55,7 @@ const MIGRATIONS = [
   '20261101_hold_details.sql',
   '20261030_challan_item_sheet_source.sql',
   '20261031_challan_item_width.sql',
+  '20261102_remove_retired_users.sql',
 ];
 
 const args = new Set(process.argv.slice(2));

@@ -278,12 +278,12 @@ export default function AdminConsolePage() {
 
   // Delete User handler
   const handleDeleteUser = async (id: string, username: string) => {
-    if (!confirm(`Are you sure you want to delete / deactivate user "${username}"?`)) return;
+    if (!confirm(`Permanently delete user "${username}" and their role from the database? Earlier challans and records they made are kept and will show "Deleted User".`)) return;
     try {
       const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete user');
-      showNotification(`User "${username}" removed successfully.`);
+      showNotification(data.message || `User "${username}" deleted.`);
       loadData();
     } catch (err: any) {
       showNotification(err.message, 'error');
@@ -1252,23 +1252,7 @@ export default function AdminConsolePage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                  Security Role *
-                </label>
-                <select
-                  value={newUser.roleCode}
-                  onChange={(e) => setNewUser({ ...newUser, roleCode: e.target.value })}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                >
-                  {ROLE_OPTIONS.map((r) => (
-                    <option key={r} value={r}>
-                      {r === 'ADMIN' ? 'ADMIN (Full Access)' : r}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+              {/* A new user gets the default role of the chosen department (set with the Department above). */}
               <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
                 <button
                   type="button"
