@@ -14,8 +14,8 @@ import {
   Eye,
   Printer,
   Download,
-  Lock,
   Check,
+  XCircle,
   ShieldCheck,
   ShieldAlert,
   AlertTriangle,
@@ -30,6 +30,7 @@ export default function IncomingChallansPage() {
   const [loading, setLoading] = useState(true);
   const [challans, setChallans] = useState<any[]>([]);
   const [availabilityMap, setAvailabilityMap] = useState<Record<string, any>>({});
+  const [actionError, setActionError] = useState<string | null>(null);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [selectedSheetModal, setSelectedSheetModal] = useState<any | null>(null);
 
@@ -41,7 +42,6 @@ export default function IncomingChallansPage() {
         fetch('/api/challans?toDepartment=STORE'),
         fetch('/api/fabric-store/check-availability').catch(() => null),
       ]);
-
       const json = await res.json();
       const data = Array.isArray(json) ? json : json.data || [];
 
@@ -51,16 +51,15 @@ export default function IncomingChallansPage() {
         if (Array.isArray(availJson.data)) {
           for (const item of availJson.data) {
             if (item.programId) map[item.programId] = item;
-            if (item.programNumber) map[item.programNumber] = item;
           }
         }
         setAvailabilityMap(map);
       }
 
-      // Filter: addressed to store and active
-      setChallans(data.filter((c: any) => 
-        (c.toDepartment === 'STORE' || c.toDepartmentCode === 'STORE') && 
-        ['ISSUED', 'SUBMITTED', 'DRAFT', 'RECEIVED'].includes(c.status)
+      // Filter: addressed to store and active (cancelled ones stay listed as CANCELLED)
+      setChallans(data.filter((c: any) =>
+        (c.toDepartment === 'STORE' || c.toDepartmentCode === 'STORE') &&
+        ['ISSUED', 'SUBMITTED', 'DRAFT', 'RECEIVED', 'CANCELLED'].includes(c.status)
       ));
     } catch {
       setChallans([]);
@@ -69,19 +68,48 @@ export default function IncomingChallansPage() {
     }
   };
 
-  const handleQuickVerify = async (programId: string, isAvailable: boolean) => {
+  // Confirm Stock: the store incharge confirms the sheet's fabric is in the store.
+  const handleConfirmStock = async (programId: string) => {
+    setActionError(null);
     try {
       setActionInProgress(programId);
       const res = await fetch('/api/fabric-store/check-availability', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ programId, isAvailable }),
+        body: JSON.stringify({ programId, isAvailable: true }),
       });
-      if (res.ok) {
-        await loadChallans();
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setActionError(body.error || 'Could not confirm the stock.');
+        return;
       }
-    } catch (err) {
-      console.error('Failed to update fabric availability:', err);
+      await loadChallans();
+    } catch {
+      setActionError('Could not confirm the stock.');
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  // Not in Stock: the fabric is not in the store, so the challan is cancelled (Programming sees it as CANCELLED).
+  const handleNotInStock = async (ch: any) => {
+    if (!window.confirm(`Fabric is not in stock. Cancel challan ${ch.challanNumber}?`)) return;
+    setActionError(null);
+    try {
+      setActionInProgress(ch.id);
+      const res = await fetch(`/api/challans/${ch.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'CANCELLED', remarks: 'Cancelled by Fabric Store: fabric not in stock' }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setActionError(body.error || 'Could not cancel the challan.');
+        return;
+      }
+      await loadChallans();
+    } catch {
+      setActionError('Could not cancel the challan.');
     } finally {
       setActionInProgress(null);
     }
@@ -124,6 +152,7 @@ export default function IncomingChallansPage() {
       SUBMITTED: 'bg-accent-100 text-accent-800 border-accent-200',
       ISSUED: 'bg-brand-100 text-brand-800 border-brand-200',
       RECEIVED: 'bg-accent-100 text-accent-800 border-accent-200',
+      CANCELLED: 'bg-danger-50 text-danger-700 border-danger-200',
     };
     return (
       <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${colors[status] || 'bg-neutral-100 text-neutral-700 border-neutral-200'}`}>
@@ -152,6 +181,11 @@ export default function IncomingChallansPage() {
       </header>
 
       <main className="p-4 sm:p-8 max-w-6xl mx-auto space-y-4">
+        {actionError && (
+          <div role="alert" className="px-4 py-2.5 rounded-lg border border-danger-200 bg-danger-50 text-xs font-semibold text-danger-700">
+            {actionError}
+          </div>
+        )}
         <div className="bg-white border border-neutral-200/90 rounded-xl shadow-xs overflow-hidden">
           <div className="p-4 border-b border-neutral-200/80 flex items-center justify-between">
             <div>
@@ -193,8 +227,8 @@ export default function IncomingChallansPage() {
                     const progNum = ch.program?.programSerialNo || ch.program?.programNumber || '—';
                     const client = ch.program?.clientName || ch.program?.buyerName || '';
                     const style = ch.program?.mainStyle || ch.program?.styleCode || '';
-                    const avail = progId ? availabilityMap[progId] : null;
-                    const isFabricInStore = avail ? avail.isAvailable : false;
+                    const isCancelled = ch.status === 'CANCELLED';
+                    const stockConfirmed = Boolean(progId && availabilityMap[progId]?.isAvailable);
 
                     return (
                       <tr key={ch.id} className="hover:bg-neutral-50/70 transition">
@@ -239,45 +273,40 @@ export default function IncomingChallansPage() {
                           )}
                         </td>
 
-                        {/* FABRIC IN STORE STATUS */}
+                        {/* FABRIC IN STORE: Confirm Stock, or Not in Stock (cancels the challan) */}
                         <td className="py-3 px-4">
-                          {avail ? (
-                            isFabricInStore ? (
-                              <div className="space-y-1">
+                          {isCancelled ? (
+                            <span className="text-[10px] text-neutral-500">—</span>
+                          ) : (
+                            <div className="flex flex-col items-start gap-1">
+                              {stockConfirmed ? (
                                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 bg-accent-50 border border-accent-200 px-2 py-0.5 rounded-full">
                                   <Check className="w-3 h-3 text-accent-700" />
-                                  <span>In Store ({avail.totalStoreStockMeters} M)</span>
+                                  <span>Stock Confirmed</span>
                                 </span>
+                              ) : (
                                 <button
                                   type="button"
-                                  disabled={actionInProgress === progId}
-                                  onClick={() => handleQuickVerify(progId, false)}
-                                  className="block text-[9px] text-danger-600 hover:underline font-medium cursor-pointer"
-                                  title="Mark Out of Stock / Hold"
-                                >
-                                  Hold Sheet
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-danger-800 bg-danger-50 border border-danger-200 px-2 py-0.5 rounded-full">
-                                  <Lock className="w-3 h-3 text-danger-600" />
-                                  <span>Not in Store</span>
-                                </span>
-                                <button
-                                  type="button"
-                                  disabled={actionInProgress === progId}
-                                  onClick={() => handleQuickVerify(progId, true)}
-                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 hover:text-accent-800 bg-accent-100/90 hover:bg-accent-200 border border-accent-300 px-1.5 py-0.5 rounded transition cursor-pointer"
-                                  title="Store incharge confirms fabric received in store"
+                                  disabled={!progId || actionInProgress === progId}
+                                  onClick={() => handleConfirmStock(progId)}
+                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 bg-accent-100/90 hover:bg-accent-200 border border-accent-300 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60"
+                                  title="Fabric is in the store"
                                 >
                                   <Check className="w-3 h-3 text-accent-700" />
                                   <span>{actionInProgress === progId ? '…' : 'Confirm Stock'}</span>
                                 </button>
-                              </div>
-                            )
-                          ) : (
-                            <span className="text-[10px] text-neutral-500 italic">Checking…</span>
+                              )}
+                              <button
+                                type="button"
+                                disabled={actionInProgress === ch.id}
+                                onClick={() => handleNotInStock(ch)}
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-danger-700 bg-danger-50 hover:bg-danger-100 border border-danger-200 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60"
+                                title="Fabric is not in the store: cancel this challan"
+                              >
+                                <XCircle className="w-3 h-3 text-danger-600" />
+                                <span>{actionInProgress === ch.id ? 'Cancelling…' : 'Not in Stock'}</span>
+                              </button>
+                            </div>
                           )}
                         </td>
 
@@ -286,7 +315,7 @@ export default function IncomingChallansPage() {
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1.5 flex-wrap">
                             {/* Receive button if status is not yet RECEIVED */}
-                            {ch.status !== 'RECEIVED' && (
+                            {ch.status !== 'RECEIVED' && !isCancelled && (
                               <button
                                 type="button"
                                 disabled={actionInProgress === ch.id}
@@ -302,9 +331,8 @@ export default function IncomingChallansPage() {
                               </button>
                             )}
 
-                            {/* NEXT DEPARTMENT MOVEMENT BUTTONS (GATED BY FABRIC AVAILABILITY) */}
-                            {isFabricInStore ? (
-                              ch.program?.fabricDyeingRequired ? (
+                            {/* NEXT DEPARTMENT MOVEMENT BUTTONS */}
+                            {isCancelled ? null : ch.program?.fabricDyeingRequired ? (
                                 <>
                                   <Link
                                     href={`/fabric-store/my-work/challan-to-dyeing?programId=${progId || ''}`}
@@ -342,16 +370,7 @@ export default function IncomingChallansPage() {
                                     <span>Store to Dyeing</span>
                                   </Link>
                                 </>
-                              )
-                            ) : (
-                              <span
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-neutral-100 border border-neutral-200 px-2 py-1 rounded cursor-not-allowed opacity-80"
-                                title="Fabric is not available in Fabric Store. Production sheet cannot move to next department until fabric arrives."
-                              >
-                                <Lock className="w-3 h-3 text-neutral-500" />
-                                <span>Held (Need Fabric)</span>
-                              </span>
-                            )}
+                              )}
 
                             <TransferDocuments challan={ch} size="xs" />
                           </div>

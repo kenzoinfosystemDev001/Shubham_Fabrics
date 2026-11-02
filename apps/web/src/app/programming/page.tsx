@@ -384,7 +384,7 @@ export default function ProgrammingDashboardPage() {
               <h2 className="text-sm font-bold text-neutral-900">Recent Challans</h2>
               <span className={countPill}>{challans.length}</span>
             </div>
-            <Link href="/challans" className="flex items-center gap-1 text-xs font-semibold text-brand-700 hover:text-brand-900">
+            <Link href="/floor-board?tab=completed" className="flex items-center gap-1 text-xs font-semibold text-brand-700 hover:text-brand-900">
               <span>View all</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -437,7 +437,7 @@ export default function ProgrammingDashboardPage() {
                         {formatTotals(totalsByUnit(ch.items || []), '—')}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-brand-50 text-brand-800 border border-brand-200">
+                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold border ${ch.status === 'CANCELLED' ? 'bg-danger-50 text-danger-700 border-danger-200' : 'bg-brand-50 text-brand-800 border-brand-200'}`}>
                           {String(ch.status || '').replace(/_/g, ' ')}
                         </span>
                       </td>

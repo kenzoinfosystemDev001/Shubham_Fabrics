@@ -19,9 +19,6 @@ import {
   Palette,
   Ruler,
   Plus,
-  Lock,
-  ShieldCheck,
-  Check,
   Building,
   RefreshCw,
   Upload,
@@ -48,7 +45,6 @@ import {
   extractRootWilcomPhoto,
   inheritedWilcomPhoto
 } from '@/lib/download-wilcom';
-import { ChallanListTable } from '@/components/challan/ChallanListTable';
 import { 
   downloadChallanHtml, 
   printChallan 
@@ -59,8 +55,6 @@ export default function ProgramDetailPage() {
   const router = useRouter();
   const [program, setProgram] = useState<any>(null);
   const [challans, setChallans] = useState<any[]>([]);
-  const [storeAvailability, setStoreAvailability] = useState<any>(null);
-  const [verifyingStore, setVerifyingStore] = useState(false);
   const [viewingPhotoModal, setViewingPhotoModal] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,14 +77,6 @@ export default function ProgramDetailPage() {
       }
       setProgram(data);
       setChallans(data.challans || []);
-
-      // Non-blocking fetch of fabric store availability
-      fetch(`/api/fabric-store/check-availability?programId=${encodeURIComponent(id)}`)
-        .then((r) => r.json())
-        .then((availRes) => {
-          if (availRes?.data) setStoreAvailability(availRes.data);
-        })
-        .catch(() => {});
     } catch (err: any) {
       console.error('Failed to load production sheet:', err);
       const rawMsg = err.message || '';
@@ -100,34 +86,6 @@ export default function ProgramDetailPage() {
       setError(displayMsg);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleToggleStoreVerification = async (isAvailable: boolean) => {
-    try {
-      setVerifyingStore(true);
-      const res = await fetch('/api/fabric-store/check-availability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          programId: id,
-          isAvailable,
-          actorName: currentUser?.name || 'Fabric Store Incharge',
-          remarks: isAvailable 
-            ? 'Physical fabric confirmed present in Store' 
-            : 'Marked on Hold / Out of Stock in Store'
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.error || 'Failed to update store availability');
-        return;
-      }
-      await loadProgram();
-    } catch (err: any) {
-      alert(`Error updating store status: ${err.message}`);
-    } finally {
-      setVerifyingStore(false);
     }
   };
 
@@ -405,113 +363,6 @@ export default function ProgramDetailPage() {
       {/* BODY CONTENT - 8 SECTIONS */}
       <main className="p-4 sm:p-8 max-w-5xl mx-auto space-y-6">
 
-        {/* FABRIC STORE CLEARANCE GATE BANNER */}
-        <div
-          className={`p-4 rounded-xl border transition-all ${
-            storeAvailability?.isAvailable
-              ? 'bg-accent-50/80 border-accent-300 text-accent-800'
-              : 'bg-accent-50/90 border-accent-300 text-accent-800'
-          }`}
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <div
-                className={`p-2.5 rounded-lg shrink-0 ${
-                  storeAvailability?.isAvailable ? 'bg-accent-400 text-neutral-900' : 'bg-accent-400 text-neutral-900'
-                }`}
-              >
-                {storeAvailability?.isAvailable ? (
-                  <ShieldCheck className="w-5 h-5" />
-                ) : (
-                  <Lock className="w-5 h-5" />
-                )}
-              </div>
-              <div className="space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded font-mono bg-white/90 border border-neutral-200">
-                    Fabric Store Gatekeeper
-                  </span>
-                  <span
-                    className={`text-[11px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
-                      storeAvailability?.isAvailable
-                        ? 'bg-accent-200 text-accent-800 border border-accent-300'
-                        : 'bg-accent-200 text-accent-800 border border-accent-300'
-                    }`}
-                  >
-                    {storeAvailability?.isAvailable ? (
-                      <>
-                        <Check className="w-3 h-3 text-accent-800" />
-                        Movement Cleared
-                      </>
-                    ) : (
-                      <>
-                        <Lock className="w-3 h-3 text-accent-800" />
-                        Movement Blocked (Awaiting Fabric in Store)
-                      </>
-                    )}
-                  </span>
-                  <span className="text-[10px] font-mono text-neutral-600">
-                    Next Dept:{' '}
-                    <strong>{program.fabricDyeingRequired ? 'Dyeing' : 'Embroidery / Cutting'}</strong>
-                  </span>
-                </div>
-
-                <h3 className="text-sm font-bold text-neutral-900">
-                  {storeAvailability?.isAvailable
-                    ? `Fabric available in store (${storeAvailability.totalStoreStockMeters || 0}m). Production Sheet authorized to move.`
-                    : `Production Sheet cannot move to ${program.fabricDyeingRequired ? 'Dyeing' : 'Embroidery'} until fabric is in Store.`}
-                </h3>
-
-                <p className="text-xs text-neutral-600 leading-relaxed max-w-2xl">
-                  {storeAvailability?.message ||
-                    (storeAvailability?.isAvailable
-                      ? 'Physical fabric stock confirmed in store inventory.'
-                      : 'Required fabric rolls or inward balance not found in store.')}
-                </p>
-
-                {storeAvailability?.fabricStoreVerified && (
-                  <p className="text-[11px] text-accent-800 font-semibold pt-0.5">
-                    Verified by {storeAvailability.fabricStoreVerifiedBy || 'Store Incharge'}
-                    {storeAvailability.fabricStoreVerifiedAt &&
-                      ` on ${new Date(storeAvailability.fabricStoreVerifiedAt).toLocaleDateString()}`}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 self-start sm:self-center shrink-0">
-              <Link
-                href="/fabric-store/inventory/inward"
-                className="text-xs font-semibold px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-300 rounded-md transition shadow-2xs"
-              >
-                Inward Stock
-              </Link>
-              {storeAvailability?.isAvailable ? (
-                <button
-                  type="button"
-                  onClick={() => handleToggleStoreVerification(false)}
-                  disabled={verifyingStore}
-                  className="text-xs font-semibold px-3 py-1.5 bg-white hover:bg-danger-50 text-danger-700 border border-danger-300 rounded-md transition cursor-pointer"
-                  title="Mark fabric missing/out of stock and hold movement"
-                >
-                  {verifyingStore ? 'Updating…' : 'Mark Out of Stock'}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleToggleStoreVerification(true)}
-                  disabled={verifyingStore}
-                  className="text-xs font-semibold px-3 py-1.5 bg-brand-700 hover:bg-brand-800 text-white rounded-md transition cursor-pointer flex items-center gap-1 shadow-xs"
-                  title="Confirm physical fabric presence in store to authorize movement"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                  <span>{verifyingStore ? 'Confirming…' : 'Confirm Fabric in Store'}</span>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-        
         {/* SUMMARY STRIP */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-white border border-neutral-200/90 rounded-xl shadow-xs text-xs">
           <div>
@@ -877,27 +728,6 @@ export default function ProgramDetailPage() {
             </div>
           </div>
 
-          {/* DISPATCHED CHALLANS ACCOMPANYING THIS PRODUCTION SHEET */}
-          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-4 md:col-span-2">
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
-              <div>
-                <h3 className="text-sm font-bold text-neutral-900">
-                  Accompanying Departmental Challans ({challans.length})
-                </h3>
-                <p className="text-[11px] text-neutral-500 mt-0.5">
-                  Physical and digital challans traveling department-to-department with this Production Sheet
-                </p>
-              </div>
-              <Link
-                href={`/my-work/issue-challan?programId=${program.id}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md shadow-xs transition"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>+ Issue New Challan</span>
-              </Link>
-            </div>
-            <ChallanListTable challans={challans} emptyMessage="No dispatch challans issued for this production sheet yet." />
-          </div>
 
         </div>
 
