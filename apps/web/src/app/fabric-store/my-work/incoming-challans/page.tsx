@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   RefreshCw, 
   ArrowDownToLine, 
@@ -14,8 +15,8 @@ import {
   Eye,
   Printer,
   Download,
-  Lock,
   Check,
+  XCircle,
   ShieldCheck,
   ShieldAlert,
   AlertTriangle,
@@ -27,9 +28,11 @@ import { ReceiveChallanConfirm } from '@/components/challan/ReceiptLines';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 export default function IncomingChallansPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [challans, setChallans] = useState<any[]>([]);
   const [availabilityMap, setAvailabilityMap] = useState<Record<string, any>>({});
+  const [actionError, setActionError] = useState<string | null>(null);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [selectedSheetModal, setSelectedSheetModal] = useState<any | null>(null);
 
@@ -41,7 +44,6 @@ export default function IncomingChallansPage() {
         fetch('/api/challans?toDepartment=STORE'),
         fetch('/api/fabric-store/check-availability').catch(() => null),
       ]);
-
       const json = await res.json();
       const data = Array.isArray(json) ? json : json.data || [];
 
@@ -51,16 +53,15 @@ export default function IncomingChallansPage() {
         if (Array.isArray(availJson.data)) {
           for (const item of availJson.data) {
             if (item.programId) map[item.programId] = item;
-            if (item.programNumber) map[item.programNumber] = item;
           }
         }
         setAvailabilityMap(map);
       }
 
-      // Filter: addressed to store and active
-      setChallans(data.filter((c: any) => 
-        (c.toDepartment === 'STORE' || c.toDepartmentCode === 'STORE') && 
-        ['ISSUED', 'SUBMITTED', 'DRAFT', 'RECEIVED'].includes(c.status)
+      // Filter: addressed to store and active (cancelled ones stay listed as CANCELLED)
+      setChallans(data.filter((c: any) =>
+        (c.toDepartment === 'STORE' || c.toDepartmentCode === 'STORE') &&
+        ['ISSUED', 'SUBMITTED', 'DRAFT', 'RECEIVED', 'CANCELLED'].includes(c.status)
       ));
     } catch {
       setChallans([]);
@@ -69,19 +70,84 @@ export default function IncomingChallansPage() {
     }
   };
 
-  const handleQuickVerify = async (programId: string, isAvailable: boolean) => {
-    try {
-      setActionInProgress(programId);
-      const res = await fetch('/api/fabric-store/check-availability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ programId, isAvailable }),
-      });
-      if (res.ok) {
-        await loadChallans();
+  // The next challan for a sheet: Store to Dyeing when the fabric needs dyeing, otherwise Store to Embroidery.
+  const issueHref = (ch: any) => {
+    const progId = ch.programId || ch.program?.id || '';
+    const dest = ch.program?.fabricDyeingRequired ? 'challan-to-dyeing' : 'challan-to-embroidery';
+    return `/fabric-store/my-work/${dest}?programId=${progId}`;
+  };
+
+  // Fabric is in the store: confirm the stock (once per sheet), receive the challan, then open the next challan.
+  const [issueAfterReceive, setIssueAfterReceive] = useState<string | null>(null);
+  const handleFabricAvailable = async (ch: any, stockConfirmed: boolean) => {
+    const progId = ch.programId || ch.program?.id;
+    if (!progId) return;
+    setActionError(null);
+    if (!stockConfirmed) {
+      try {
+        setActionInProgress(progId);
+        const res = await fetch('/api/fabric-store/check-availability', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ programId: progId, isAvailable: true }),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          setActionError(body.error || 'Could not confirm the stock.');
+          return;
+        }
+      } catch {
+        setActionError('Could not confirm the stock.');
+        return;
+      } finally {
+        setActionInProgress(null);
       }
-    } catch (err) {
-      console.error('Failed to update fabric availability:', err);
+    }
+    if (ch.status === 'RECEIVED') {
+      router.push(issueHref(ch));
+      return;
+    }
+    if (!stockConfirmed) await loadChallans();
+    setReceiveError(null);
+    setIssueAfterReceive(issueHref(ch));
+    setConfirmReceive(ch);
+  };
+
+  // Not in Stock: the challan is cancelled with a reason (Programming sees it as CANCELLED).
+  const DEFAULT_CANCEL_REASON = 'Fabric is not available in the store';
+  const [cancelTarget, setCancelTarget] = useState<any | null>(null);
+  const [cancelReason, setCancelReason] = useState(DEFAULT_CANCEL_REASON);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  const openCancel = (ch: any) => {
+    setCancelReason(DEFAULT_CANCEL_REASON);
+    setCancelError(null);
+    setCancelTarget(ch);
+  };
+  const handleNotInStock = async () => {
+    const ch = cancelTarget;
+    const reason = cancelReason.trim();
+    if (!ch) return;
+    if (!reason) {
+      setCancelError('Enter the reason for cancelling.');
+      return;
+    }
+    setCancelError(null);
+    try {
+      setActionInProgress(ch.id);
+      const res = await fetch(`/api/challans/${ch.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'CANCELLED', remarks: `Cancelled by Fabric Store: ${reason}` }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setCancelError(body.error || 'Could not cancel the challan.');
+        return;
+      }
+      setCancelTarget(null);
+      await loadChallans();
+    } catch {
+      setCancelError('Could not cancel the challan.');
     } finally {
       setActionInProgress(null);
     }
@@ -105,6 +171,10 @@ export default function IncomingChallansPage() {
       });
       if (res.ok) {
         setConfirmReceive(null);
+        if (issueAfterReceive) {
+          router.push(issueAfterReceive);
+          return;
+        }
         await loadChallans();
       } else {
         const body = await res.json().catch(() => ({}));
@@ -124,6 +194,7 @@ export default function IncomingChallansPage() {
       SUBMITTED: 'bg-accent-100 text-accent-800 border-accent-200',
       ISSUED: 'bg-brand-100 text-brand-800 border-brand-200',
       RECEIVED: 'bg-accent-100 text-accent-800 border-accent-200',
+      CANCELLED: 'bg-danger-50 text-danger-700 border-danger-200',
     };
     return (
       <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${colors[status] || 'bg-neutral-100 text-neutral-700 border-neutral-200'}`}>
@@ -152,6 +223,11 @@ export default function IncomingChallansPage() {
       </header>
 
       <main className="p-4 sm:p-8 max-w-6xl mx-auto space-y-4">
+        {actionError && (
+          <div role="alert" className="px-4 py-2.5 rounded-lg border border-danger-200 bg-danger-50 text-xs font-semibold text-danger-700">
+            {actionError}
+          </div>
+        )}
         <div className="bg-white border border-neutral-200/90 rounded-xl shadow-xs overflow-hidden">
           <div className="p-4 border-b border-neutral-200/80 flex items-center justify-between">
             <div>
@@ -193,8 +269,8 @@ export default function IncomingChallansPage() {
                     const progNum = ch.program?.programSerialNo || ch.program?.programNumber || '—';
                     const client = ch.program?.clientName || ch.program?.buyerName || '';
                     const style = ch.program?.mainStyle || ch.program?.styleCode || '';
-                    const avail = progId ? availabilityMap[progId] : null;
-                    const isFabricInStore = avail ? avail.isAvailable : false;
+                    const isCancelled = ch.status === 'CANCELLED';
+                    const stockConfirmed = Boolean(progId && availabilityMap[progId]?.isAvailable);
 
                     return (
                       <tr key={ch.id} className="hover:bg-neutral-50/70 transition">
@@ -239,59 +315,53 @@ export default function IncomingChallansPage() {
                           )}
                         </td>
 
-                        {/* FABRIC IN STORE STATUS */}
+                        {/* FABRIC IN STORE: Confirm Stock, or Not in Stock (cancels the challan) */}
                         <td className="py-3 px-4">
-                          {avail ? (
-                            isFabricInStore ? (
-                              <div className="space-y-1">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 bg-accent-50 border border-accent-200 px-2 py-0.5 rounded-full">
-                                  <Check className="w-3 h-3 text-accent-700" />
-                                  <span>In Store ({avail.totalStoreStockMeters} M)</span>
-                                </span>
-                                <button
-                                  type="button"
-                                  disabled={actionInProgress === progId}
-                                  onClick={() => handleQuickVerify(progId, false)}
-                                  className="block text-[9px] text-danger-600 hover:underline font-medium cursor-pointer"
-                                  title="Mark Out of Stock / Hold"
-                                >
-                                  Hold Sheet
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-danger-800 bg-danger-50 border border-danger-200 px-2 py-0.5 rounded-full">
-                                  <Lock className="w-3 h-3 text-danger-600" />
-                                  <span>Not in Store</span>
-                                </span>
-                                <button
-                                  type="button"
-                                  disabled={actionInProgress === progId}
-                                  onClick={() => handleQuickVerify(progId, true)}
-                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 hover:text-accent-800 bg-accent-100/90 hover:bg-accent-200 border border-accent-300 px-1.5 py-0.5 rounded transition cursor-pointer"
-                                  title="Store incharge confirms fabric received in store"
-                                >
-                                  <Check className="w-3 h-3 text-accent-700" />
-                                  <span>{actionInProgress === progId ? '…' : 'Confirm Stock'}</span>
-                                </button>
-                              </div>
-                            )
+                          {isCancelled ? (
+                            <span className="text-[10px] text-neutral-500">—</span>
                           ) : (
-                            <span className="text-[10px] text-neutral-500 italic">Checking…</span>
+                            <div className="flex flex-col items-start gap-1">
+                              <button
+                                type="button"
+                                disabled={!progId || actionInProgress === progId}
+                                onClick={() => handleFabricAvailable(ch, stockConfirmed)}
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 bg-accent-100/90 hover:bg-accent-200 border border-accent-300 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60"
+                                title="Fabric is in the store: receive this challan and issue the next one"
+                              >
+                                <Check className="w-3 h-3 text-accent-700" />
+                                <span>{actionInProgress === progId ? '…' : stockConfirmed ? 'Stock Confirmed' : 'Confirm Stock'}</span>
+                              </button>
+                              <button
+                                type="button"
+                                disabled={actionInProgress === ch.id}
+                                onClick={() => openCancel(ch)}
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-danger-700 bg-danger-50 hover:bg-danger-100 border border-danger-200 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60"
+                                title="Fabric is not in the store: cancel this challan"
+                              >
+                                <XCircle className="w-3 h-3 text-danger-600" />
+                                <span>{actionInProgress === ch.id ? 'Cancelling…' : 'Not in Stock'}</span>
+                              </button>
+                            </div>
                           )}
                         </td>
 
-                        <td className="py-3 px-4">{statusBadge(ch.status)}</td>
+                        <td className="py-3 px-4">
+                          {statusBadge(ch.status)}
+                          {isCancelled && ch.remarks && (
+                            <span className="block text-[10px] text-danger-700 mt-1 max-w-[180px]">{ch.remarks}</span>
+                          )}
+                        </td>
 
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1.5 flex-wrap">
                             {/* Receive button if status is not yet RECEIVED */}
-                            {ch.status !== 'RECEIVED' && (
+                            {ch.status !== 'RECEIVED' && !isCancelled && (
                               <button
                                 type="button"
                                 disabled={actionInProgress === ch.id}
                                 onClick={() => {
                                   setReceiveError(null);
+                                  setIssueAfterReceive(null);
                                   setConfirmReceive(ch);
                                 }}
                                 className="inline-flex items-center gap-1 text-[11px] font-bold text-accent-800 hover:text-accent-800 bg-accent-50 hover:bg-accent-100 border border-accent-200 px-2 py-1 rounded transition cursor-pointer"
@@ -302,9 +372,8 @@ export default function IncomingChallansPage() {
                               </button>
                             )}
 
-                            {/* NEXT DEPARTMENT MOVEMENT BUTTONS (GATED BY FABRIC AVAILABILITY) */}
-                            {isFabricInStore ? (
-                              ch.program?.fabricDyeingRequired ? (
+                            {/* NEXT DEPARTMENT MOVEMENT BUTTONS */}
+                            {isCancelled ? null : ch.program?.fabricDyeingRequired ? (
                                 <>
                                   <Link
                                     href={`/fabric-store/my-work/challan-to-dyeing?programId=${progId || ''}`}
@@ -342,16 +411,7 @@ export default function IncomingChallansPage() {
                                     <span>Store to Dyeing</span>
                                   </Link>
                                 </>
-                              )
-                            ) : (
-                              <span
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-neutral-100 border border-neutral-200 px-2 py-1 rounded cursor-not-allowed opacity-80"
-                                title="Fabric is not available in Fabric Store. Production sheet cannot move to next department until fabric arrives."
-                              >
-                                <Lock className="w-3 h-3 text-neutral-500" />
-                                <span>Held (Need Fabric)</span>
-                              </span>
-                            )}
+                              )}
 
                             <TransferDocuments challan={ch} size="xs" />
                           </div>
@@ -375,6 +435,45 @@ export default function IncomingChallansPage() {
           onConfirm={() => handleMarkReceived(confirmReceive.id)}
           onClose={() => setConfirmReceive(null)}
         />
+      )}
+      {cancelTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/50 p-4" role="dialog" aria-modal="true" aria-labelledby="cancel-challan-title">
+          <div className="w-full max-w-md bg-white rounded-xl shadow-xl p-5 space-y-4">
+            <div>
+              <h3 id="cancel-challan-title" className="text-sm font-bold text-neutral-900">Cancel challan {cancelTarget.challanNumber}</h3>
+              <p className="text-[11px] text-neutral-500 mt-0.5">The challan is cancelled and Programming sees it as CANCELLED with this reason.</p>
+            </div>
+            <label className="block space-y-1">
+              <span className="text-[11px] font-semibold text-neutral-700">Reason <span className="text-danger-600">*</span></span>
+              <textarea
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                rows={3}
+                autoFocus
+                className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+            </label>
+            {cancelError && <p role="alert" className="text-[11px] font-semibold text-danger-700">{cancelError}</p>}
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setCancelTarget(null)}
+                disabled={actionInProgress === cancelTarget.id}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-700 border border-neutral-300 hover:bg-neutral-50"
+              >
+                Keep Challan
+              </button>
+              <button
+                type="button"
+                onClick={handleNotInStock}
+                disabled={actionInProgress === cancelTarget.id}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-danger-600 hover:bg-danger-700 disabled:opacity-60"
+              >
+                {actionInProgress === cancelTarget.id ? 'Cancelling…' : 'Cancel Challan'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       <ProductionSheetPrintModal
         program={selectedSheetModal}

@@ -82,7 +82,7 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => void downloadProductionSheetHtml(activeProgram)}
               className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
-              title="Download all Production Sheets (HTML/PDF)"
+              title="Download"
             >
               <Download className={iconSize} />
             </button>
@@ -90,7 +90,7 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => printProductionSheet(activeProgram)}
               className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
-              title="Print all Production Sheets (A4)"
+              title="Print"
             >
               <Printer className={iconSize} />
             </button>
@@ -113,7 +113,7 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => void downloadChallanHtml(activeChallan)}
               className={`p-1 text-accent-800 hover:text-accent-800 hover:bg-accent-100 border-l border-accent-200/80 transition cursor-pointer`}
-              title="Download Department Transfer Challan Form with Barcode"
+              title="Download"
             >
               <Download className={iconSize} />
             </button>
@@ -121,7 +121,7 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => printChallan(activeChallan)}
               className={`p-1 text-accent-800 hover:text-accent-800 hover:bg-accent-100 border-l border-accent-200/80 transition cursor-pointer`}
-              title="Print Department Transfer Challan Slip"
+              title="Print"
             >
               <Printer className={iconSize} />
             </button>
@@ -144,7 +144,7 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => void downloadWilcomFormHtml(activeProgram)}
               className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
-              title="Download all Wilcom sheets with design artwork"
+              title="Download"
             >
               <Download className={iconSize} />
             </button>
@@ -152,7 +152,7 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => printWilcomForm(activeProgram)}
               className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
-              title="Print all Wilcom sheets (A4)"
+              title="Print"
             >
               <Printer className={iconSize} />
             </button>

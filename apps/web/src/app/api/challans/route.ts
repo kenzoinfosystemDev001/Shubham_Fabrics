@@ -288,6 +288,27 @@ export async function POST(request: Request) {
       );
     }
 
+    // Fabric Store issues a sheet onward only against a challan it received for that sheet. A cancelled
+    // challan does not count: Programming must issue a new challan to the Store first.
+    if (fromDept === 'STORE' && toDept !== 'STORE') {
+      for (const sheetId of new Set(sheetIdOf.values())) {
+        const activeIncoming = await prisma.challan.count({
+          where: {
+            toDepartment: 'STORE',
+            status: { not: 'CANCELLED' },
+            OR: [{ programId: sheetId }, { items: { some: { programId: sheetId } } }],
+          } as any,
+        });
+        if (activeIncoming === 0) {
+          const sheet = await prisma.program.findUnique({ where: { id: sheetId }, select: { programSerialNo: true, programNumber: true } });
+          return NextResponse.json(
+            { error: `Production sheet ${sheet?.programSerialNo || sheet?.programNumber || sheetId} has no active challan received in the Fabric Store (its challan was cancelled or none was issued). Programming must issue a new challan to the Store first.` },
+            { status: 409 }
+          );
+        }
+      }
+    }
+
     await prisma.department.upsert({
       where: { code: fromDept },
       update: {},

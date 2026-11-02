@@ -24,7 +24,7 @@ export async function GET(request: Request) {
       prisma.fabricStoreRoll.count(),
       prisma.fabricStoreRoll.count({ where: { status: 'IN_STOCK' } }),
       prisma.fabricStoreRoll.count({ where: { status: 'ISSUED' } }),
-      prisma.challan.count({ where: { toDepartment: 'STORE' } }),
+      prisma.challan.count({ where: { toDepartment: 'STORE', status: { not: 'CANCELLED' } } }),
       prisma.challan.findMany({
         take: 8,
         where: { toDepartment: 'STORE' },
