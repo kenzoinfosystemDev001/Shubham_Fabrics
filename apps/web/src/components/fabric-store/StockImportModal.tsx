@@ -87,7 +87,7 @@ export default function StockImportModal({ open, onClose, onImported, onManualEn
   return (
     <div className="fixed inset-0 z-50 flex items-stretch sm:items-center justify-center bg-neutral-900/60 backdrop-blur-xs sm:p-4">
       <div role="dialog" aria-modal="true" aria-labelledby="stock-import-title" className="bg-white sm:rounded-2xl shadow-2xl border border-neutral-200 w-full max-w-xl flex flex-col max-h-[100dvh] sm:max-h-[94vh] overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-neutral-200 bg-gradient-to-r from-brand-50 via-white to-accent-50 flex items-center justify-between gap-3">
+        <div className="px-5 py-3.5 border-b border-neutral-200 bg-brand-50 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <span className="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center shadow-sm shrink-0">
               <FileSpreadsheet className="w-5 h-5" />

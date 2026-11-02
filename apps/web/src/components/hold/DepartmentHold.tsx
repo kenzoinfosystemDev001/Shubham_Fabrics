@@ -82,6 +82,8 @@ export function DepartmentHold({ departmentCode }: { departmentCode: string }) {
   const [department, setDepartment] = useState(departmentCode);
   const [view, setView] = useState<View>('open');
   const [search, setSearch] = useState('');
+  // Server-side filters besides the search (design, serial, challan, fabric, colour).
+  const [filters, setFilters] = useState({ reason: '', unit: '', from: '', to: '' });
   const [rows, setRows] = useState<any[]>([]);
   const [receivedLabel, setReceivedLabel] = useState('Total Received');
   const [loading, setLoading] = useState(true);
@@ -99,6 +101,7 @@ export function DepartmentHold({ departmentCode }: { departmentCode: string }) {
     try {
       const q = new URLSearchParams({ department, view });
       if (search.trim()) q.set('search', search.trim());
+      for (const [k, v] of Object.entries(filters)) if (v) q.set(k, v);
       const body = await fetchJson(`/api/holds?${q}`);
       setRows(body.data || []);
       setReceivedLabel(body.departments?.length === 1 ? body.departments[0].receivedLabel : 'Total Received');
@@ -113,7 +116,7 @@ export function DepartmentHold({ departmentCode }: { departmentCode: string }) {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [department, view]);
+  }, [department, view, filters]);
 
   const open = rows.filter((r) => r.active);
   const onHold = useMemo(() => {
@@ -122,7 +125,7 @@ export function DepartmentHold({ departmentCode }: { departmentCode: string }) {
     return totals;
   }, [open]);
   const allDepartments = department === 'ALL';
-  const columns = 21;
+  const columns = 25;
 
   const done = (text: string) => {
     setPlacing(false);
@@ -200,6 +203,17 @@ export function DepartmentHold({ departmentCode }: { departmentCode: string }) {
                   aria-label="Search HOLD records"
                 />
               </form>
+              <select value={filters.reason} onChange={(e) => setFilters({ ...filters, reason: e.target.value })} className={`${FIELD} w-auto`} aria-label="Hold reason">
+                <option value="">All reasons</option>
+                {HOLD_REASONS.map((r) => <option key={r.code} value={r.code}>{r.label}</option>)}
+              </select>
+              <select value={filters.unit} onChange={(e) => setFilters({ ...filters, unit: e.target.value })} className={`${FIELD} w-auto`} aria-label="Unit">
+                <option value="">MTR & PCS</option>
+                <option value="MTR">MTR</option>
+                <option value="PCS">PCS</option>
+              </select>
+              <input type="date" value={filters.from} onChange={(e) => setFilters({ ...filters, from: e.target.value })} className={`${FIELD} w-auto`} aria-label="Held from" title="Held from" />
+              <input type="date" value={filters.to} onChange={(e) => setFilters({ ...filters, to: e.target.value })} className={`${FIELD} w-auto`} aria-label="Held to" title="Held to" />
             </>
           }
         >
@@ -212,10 +226,14 @@ export function DepartmentHold({ departmentCode }: { departmentCode: string }) {
                   <th className="py-2.5 px-3">Serial No.</th>
                   <th className="py-2.5 px-3">Production Sheet</th>
                   <th className="py-2.5 px-3">Challan No.</th>
+                  <th className="py-2.5 px-3">Challan Date</th>
+                  <th className="py-2.5 px-3">From</th>
                   <th className="py-2.5 px-3">Fabric</th>
                   <th className="py-2.5 px-3">Colour</th>
+                  <th className="py-2.5 px-3">Production Type</th>
                   <th className="py-2.5 px-3">Size / Measurement</th>
                   <th className="py-2.5 px-3 text-right">{receivedLabel}</th>
+                  <th className="py-2.5 px-3 text-right">Already Processed</th>
                   <th className="py-2.5 px-3 text-right">Already Forwarded</th>
                   <th className="py-2.5 px-3 text-right">Remaining HOLD</th>
                   <th className="py-2.5 px-3">Unit</th>
@@ -241,10 +259,14 @@ export function DepartmentHold({ departmentCode }: { departmentCode: string }) {
                       <Link href={`/programs/${h.programId}`} className="text-brand-700 hover:underline">{h.productionSheetNumber}</Link>
                     </td>
                     <td className="py-2.5 px-3 font-mono">{h.challanNumber || '—'}</td>
+                    <td className="py-2.5 px-3 whitespace-nowrap">{h.challanDate ? fmtDate(h.challanDate) : '—'}</td>
+                    <td className="py-2.5 px-3 whitespace-nowrap">{h.sendingDepartmentName || '—'}</td>
                     <td className="py-2.5 px-3 text-neutral-900">{h.fabricName}</td>
-                    <td className="py-2.5 px-3">{h.colour || '—'}</td>
+                    <td className="py-2.5 px-3">{h.colour || '—'}{h.requiredColour ? <span className="block text-[10px] text-neutral-500">Required: {h.requiredColour}</span> : null}</td>
+                    <td className="py-2.5 px-3">{h.productionType || '—'}</td>
                     <td className="py-2.5 px-3">{h.size || '—'}</td>
                     <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{fmtQty(h.receivedQuantity, h.unit)}</td>
+                    <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{h.processedQuantity != null ? fmtQty(h.processedQuantity, h.unit) : '—'}</td>
                     <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{fmtQty(h.forwardedQuantity, h.unit)}</td>
                     <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap font-bold text-neutral-900">{fmtQty(h.remainingQuantity, h.unit)}</td>
                     <td className="py-2.5 px-3 font-semibold">{h.unit}</td>
@@ -283,7 +305,7 @@ export function DepartmentHold({ departmentCode }: { departmentCode: string }) {
           </div>
         </Panel>
         <p className="text-xs text-neutral-500">
-          Forwarding held quantity on the department&apos;s normal challan screen lowers the HOLD automatically; the HOLD closes once nothing of it is left.
+          Quantity on HOLD is blocked: it cannot be processed, inspected or forwarded until it is released here. Released quantity stays in this department and moves on only through the department&apos;s normal challan screen.
         </p>
       </main>
 
@@ -352,7 +374,7 @@ function PlaceHoldDialog({ department, onClose, onDone }: { department: string; 
         <div className="p-5 space-y-4">
           {error && <Notice kind="error">{error}</Notice>}
           <div className="flex items-center justify-between gap-3">
-            <span className="text-xs font-semibold text-neutral-600">1. Select the line (only quantity not yet forwarded can be held)</span>
+            <span className="text-xs font-semibold text-neutral-600">1. Select the line (only quantity not yet forwarded and not already on HOLD can be held)</span>
             <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter…" className={`${FIELD} w-48`} aria-label="Filter lines" />
           </div>
           <div className="overflow-auto max-h-72 border border-neutral-200 rounded-xl">
@@ -400,8 +422,14 @@ function PlaceHoldDialog({ department, onClose, onDone }: { department: string; 
               <Info label="Serial No.">{line.serialNumber}</Info>
               <Info label="Production Sheet">{line.productionSheetNumber}</Info>
               <Info label="Challan No.">{line.challanNumber}</Info>
+              <Info label="Challan Date">{line.challanDate ? fmtDate(line.challanDate) : null}</Info>
+              <Info label="From">{line.sendingDepartmentName}</Info>
               <Info label="Fabric">{line.fabricName}</Info>
               <Info label="Colour">{line.colour}</Info>
+              <Info label="Required Colour">{line.requiredColour}</Info>
+              <Info label="Production Type">{line.productionType}</Info>
+              <Info label="Already Processed">{fmtQty(line.processed, line.unit)}</Info>
+              <Info label="Already on HOLD">{line.onHold > 0 ? fmtQty(line.onHold, line.unit) : null}</Info>
               <Info label="Size / Measurement">{line.size}</Info>
               <Info label="Unit">{line.unit}</Info>
             </div>
@@ -553,11 +581,17 @@ function HoldDetailDialog({ id, onClose }: { id: string; onClose: () => void }) 
               <Info label="Serial No.">{hold.serialNumber}</Info>
               <Info label="Production Sheet">{hold.productionSheetNumber}</Info>
               <Info label="Challan No.">{hold.challanNumber}</Info>
+              <Info label="Challan Date">{hold.challanDate ? fmtDate(hold.challanDate) : null}</Info>
+              <Info label="Sending Department">{hold.sendingDepartmentName}</Info>
+              <Info label="Held In">{hold.departmentName}</Info>
               <Info label="Fabric">{hold.fabricName}</Info>
               <Info label="Colour">{hold.colour}</Info>
+              <Info label="Required Colour">{hold.requiredColour}</Info>
+              <Info label="Production Type">{hold.productionType}</Info>
               <Info label="Size / Measurement">{hold.size}</Info>
               <Info label="Unit">{hold.unit}</Info>
               <Info label="Total Received">{fmtQty(hold.receivedQuantity, hold.unit)}</Info>
+              <Info label="Processed at HOLD">{hold.processedAtHold != null ? fmtQty(hold.processedAtHold, hold.unit) : null}</Info>
               <Info label="Already Forwarded">{fmtQty(hold.forwardedQuantity, hold.unit)}</Info>
               <Info label="Forwarded at HOLD">{fmtQty(hold.forwardedAtHold, hold.unit)}</Info>
               <Info label="Placed on HOLD">{fmtQty(hold.holdQuantity, hold.unit)}</Info>

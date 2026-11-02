@@ -165,7 +165,7 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
         sentBefore.set(p.order.id, sentAfter);
         // Applies only if nothing changed since validation; otherwise another transfer won the race.
         const moved = await tx.dyeingOrder.updateMany({
-          where: { id: p.order.id, sentToQc1Quantity: was, dyedQuantity: p.order.dyedQuantity },
+          where: { id: p.order.id, sentToQc1Quantity: was, dyedQuantity: p.order.dyedQuantity, heldQuantity: p.order.heldQuantity },
           data: {
             sentToQc1Quantity: sentAfter,
             readyForQc1Quantity: Math.max(0, round(p.order.dyedQuantity - sentAfter)),

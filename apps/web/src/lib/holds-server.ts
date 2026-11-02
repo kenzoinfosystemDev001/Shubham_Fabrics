@@ -21,7 +21,10 @@ import { departmentName } from '@/lib/workflow-views';
 
 // HOLD in the production departments, Dyeing to Inventory (Packing); Programming and Fabric Store have none.
 // Each department holds back part of a line it already tracks; the line's received / forwarded figures come
-// from the existing records, never from the HOLD:
+// from the existing records, never from the HOLD. Held quantity is blocked: the line's heldQuantity (work items,
+// dyeing orders; syncHeld) is kept in step with its open HOLDs in the same transaction, and every quantity check
+// (lib/work-items.mjs, recutting.mjs, inventory.mjs, dyeing-workflow.mjs, the Dyeing QC inspection) takes it off
+// what may be processed or sent on. Only an explicit release frees it. Lines:
 // - Dyeing: a dyeing order (one Store -> Dyeing challan line), less what was sent to Dyeing QC.
 // - Dyeing QC: an incoming challan's lines of one unit, less its PASS / rework challans and shrinkage.
 // - Embroidery to Inventory: a work item (DepartmentWorkItem), less its transfers (Recutting: allocations;
@@ -56,6 +59,12 @@ export interface HoldLine {
   fabricName: string;
   colour: string | null;
   size: string | null;
+  productionType: string | null;
+  requiredColour: string | null;
+  challanDate: Date | null;
+  sendingDepartment: string | null;
+  /** Already processed (QC: inspected; Dyeing: dyed; Recutting: allocated; Inventory: packed). */
+  processed: number;
   received: number;
   forwarded: number;
   writtenOff: number;
@@ -141,7 +150,7 @@ async function workItemLines(code: string, ids?: string[]): Promise<HoldLine[]> 
     where: { departmentCode: code, ...(ids ? { id: { in: ids } } : { status: { notIn: ['AWAITING_RECEIPT', 'TRANSFERRED'] } }) },
     include: {
       program: { select: PROGRAM_FIELDS },
-      inboundChallan: { select: { id: true, challanNumber: true } },
+      inboundChallan: { select: { id: true, challanNumber: true, issuedDate: true, createdAt: true } },
       transfers: {
         orderBy: { createdAt: 'asc' },
         select: { quantity: true, uom: true, kind: true, createdAt: true, challan: { select: { challanNumber: true } }, createdBy: { select: { fullName: true, username: true } } },
@@ -195,10 +204,20 @@ async function workItemLines(code: string, ids?: string[]): Promise<HoldLine[]> 
       fabricName: item.fabricName,
       colour: joined([item.colour, item.styleRef]),
       size: sizeText(lineItems.get(item.inboundChallanItemId)),
+      productionType: item.garmentCategory || null,
+      requiredColour: null,
+      challanDate: item.inboundChallan?.issuedDate || item.inboundChallan?.createdAt || null,
+      sendingDepartment: item.sourceDepartment || null,
+      processed: round(item.processedQuantity || 0),
       received: receivedBasis(item),
       forwarded,
-      // Defective quantity (production departments) never leaves as good work.
-      writtenOff: cfg?.production ? round(item.defectQuantity || 0) : 0,
+      // Defective quantity (production departments) never leaves as good work; QC REJECT and REWORK not yet sent
+      // are already decided, so they cannot also be held.
+      writtenOff: cfg?.production
+        ? round(item.defectQuantity || 0)
+        : cfg?.qc
+          ? round(Math.max(0, (item.rejectedQuantity || 0) - (item.rejectSentQuantity || 0)) + Math.max(0, (item.reworkQuantity || 0) - (item.reworkSentQuantity || 0)))
+          : 0,
       forwardLog,
       forwardPath: HOLD_DEPARTMENTS[code].forward,
     };
@@ -210,7 +229,7 @@ async function dyeingLines(ids?: string[]): Promise<HoldLine[]> {
     where: ids ? { id: { in: ids } } : { status: { notIn: ['AWAITING_RECEIPT', 'SENT_TO_QC1'] } },
     include: {
       program: { select: PROGRAM_FIELDS },
-      inboundChallan: { select: { id: true, challanNumber: true } },
+      inboundChallan: { select: { id: true, challanNumber: true, issuedDate: true, createdAt: true, fromDepartment: true } },
       qcTransfers: {
         orderBy: { createdAt: 'asc' },
         select: { quantity: true, uom: true, createdAt: true, challan: { select: { challanNumber: true } }, createdBy: { select: { fullName: true, username: true } } },
@@ -235,6 +254,11 @@ async function dyeingLines(ids?: string[]): Promise<HoldLine[]> {
       fabricName: o.fabricName,
       colour: o.dyedColor || o.targetColor || null,
       size: sizeText(o.inboundChallanItemId ? lineItems.get(o.inboundChallanItemId) : null),
+      productionType: null,
+      requiredColour: o.targetColor || null,
+      challanDate: o.inboundChallan?.issuedDate || o.inboundChallan?.createdAt || null,
+      sendingDepartment: o.inboundChallan?.fromDepartment || 'STORE',
+      processed: round(o.dyedQuantity || 0),
       received: round(o.receivedQuantity ?? (o.status === 'AWAITING_RECEIPT' ? 0 : o.requiredQuantity)),
       forwarded: round(o.sentToQc1Quantity),
       writtenOff: 0,
@@ -257,7 +281,7 @@ async function qc1Lines(ids?: string[]): Promise<HoldLine[]> {
         orderBy: { createdAt: 'asc' },
         select: { challanNumber: true, challanType: true, createdAt: true, fabricUnit: true, items: { select: { quantity: true, uom: true } }, issuedBy: { select: { fullName: true, username: true } } },
       },
-      productionLogs: { where: { departmentCode: { in: qc1 } }, select: { wasteQuantity: true, unitOfMeasure: true } },
+      productionLogs: { where: { departmentCode: { in: qc1 } }, select: { wasteQuantity: true, inputQuantity: true, operationName: true, unitOfMeasure: true } },
     },
     orderBy: { createdAt: 'desc' },
     take: ids ? undefined : LIST_LIMIT,
@@ -294,6 +318,16 @@ async function qc1Lines(ids?: string[]): Promise<HoldLine[]> {
         fabricName: joined(unitItems.map((i) => i.fabricCode || i.itemDescription)) || c.program.fabricName || 'Fabric',
         colour: joined(unitItems.map((i) => i.colour || i.shade)),
         size: joined(unitItems.map((i) => sizeText(i))),
+        productionType: joined(unitItems.map((i) => i.garmentCategory)),
+        requiredColour: joined(unitItems.map((i) => i.requiredColour)),
+        challanDate: c.issuedDate || c.createdAt,
+        sendingDepartment: c.fromDepartment,
+        // Inspected in Dyeing QC so far (each inspection records its inspected quantity).
+        processed: round(
+          c.productionLogs
+            .filter((l) => l.operationName === 'QC1_FABRIC_INSPECTION' && (unitOf(l.unitOfMeasure) || units[0]) === unit)
+            .reduce((s, l) => s + (Number(l.inputQuantity) || 0), 0),
+        ),
         received: NOT_YET_RECEIVED.includes(c.status) ? 0 : round(received[unit]),
         forwarded: round(forwardLog.reduce((s, e) => s + e.quantity, 0)),
         writtenOff: round(shrinkage),
@@ -323,7 +357,8 @@ export async function loadLines(code: string, sourceIds?: string[]): Promise<Hol
 
 type HoldRow = Awaited<ReturnType<typeof prisma.departmentHold.findFirstOrThrow>>;
 
-const lineFields = (line: HoldLine) => ({
+/** A line as screens show it; `outstanding` is what is still free to hold (what is already on HOLD is not). */
+const lineFields = (line: HoldLine, onHold = 0) => ({
   key: line.key,
   departmentCode: line.departmentCode,
   departmentName: departmentName(line.departmentCode),
@@ -336,21 +371,30 @@ const lineFields = (line: HoldLine) => ({
   fabricName: line.fabricName,
   colour: line.colour,
   size: line.size,
+  productionType: line.productionType,
+  requiredColour: line.requiredColour,
+  challanDate: line.challanDate,
+  sendingDepartment: line.sendingDepartment,
+  sendingDepartmentName: line.sendingDepartment ? departmentName(departmentKeyFor(line.sendingDepartment) || line.sendingDepartment) : null,
+  processed: line.processed,
   unit: line.unit,
   received: line.received,
   forwarded: line.forwarded,
   writtenOff: line.writtenOff,
-  outstanding: outstandingOf(line),
+  onHold: round(onHold),
+  outstanding: round(Math.max(0, outstandingOf(line) - onHold)),
 });
 
-/** Lines of a department with quantity still to hold and no open HOLD. */
+/** Lines of a department with quantity still free to hold (a line with an open HOLD may have more added to it). */
 export async function holdCandidates(code: string) {
   const [lines, open] = await Promise.all([
     loadLines(code),
-    prisma.departmentHold.findMany({ where: { departmentCode: code, status: { in: ACTIVE_HOLD_STATUSES } }, select: { sourceKey: true } }),
+    prisma.departmentHold.findMany({ where: { departmentCode: code, status: { in: ACTIVE_HOLD_STATUSES } }, select: { sourceKey: true, remainingQuantity: true } }),
   ]);
-  const held = new Set(open.map((h) => h.sourceKey));
-  return lines.filter((l) => !held.has(l.key) && outstandingOf(l) > 0 && l.unit && (l.unit === 'MTR' || l.unit === 'PCS')).map(lineFields);
+  const held = new Map(open.map((h) => [h.sourceKey, h.remainingQuantity]));
+  return lines
+    .map((l) => lineFields(l, held.get(l.key) || 0))
+    .filter((l) => l.outstanding > 0 && l.unit && (l.unit === 'MTR' || l.unit === 'PCS'));
 }
 
 /** The lines of one source (a dyeing order or work item) with their open HOLD, for the Hold section of a processing form. */
@@ -362,7 +406,7 @@ export async function holdsOfSource(code: string, sourceId: string) {
   const rows = await withLines(open);
   return lines.map((line) => {
     const found = rows.find((r) => r.hold.sourceKey === line.key && ACTIVE_HOLD_STATUSES.includes(r.hold.status));
-    return { line: lineFields(line), hold: found ? shapeHold(found.hold, found.line) : null };
+    return { line: lineFields(line, found ? found.hold.remainingQuantity : 0), hold: found ? shapeHold(found.hold, found.line) : null };
   });
 }
 
@@ -383,6 +427,14 @@ function shapeHold(hold: HoldRow, line: HoldLine | null) {
     fabricName: hold.fabricName,
     colour: hold.colour,
     size: hold.size,
+    productionType: hold.productionType,
+    requiredColour: hold.requiredColour,
+    challanDate: hold.challanDate,
+    sendingDepartment: hold.sendingDepartment,
+    sendingDepartmentName: hold.sendingDepartment ? departmentName(departmentKeyFor(hold.sendingDepartment) || hold.sendingDepartment) : null,
+    processedAtHold: hold.processedAtHold,
+    // Live while the HOLD is open; as it was at the HOLD otherwise.
+    processedQuantity: line && active ? line.processed : hold.processedAtHold,
     unit: hold.unit,
     receivedQuantity: line && active ? line.received : hold.receivedQuantity,
     forwardedQuantity: line && active ? line.forwarded : hold.forwardedQuantity,
@@ -432,6 +484,7 @@ async function refreshHold(hold: HoldRow, line: HoldLine | undefined): Promise<H
   };
   return prisma.$transaction(async (tx) => {
     const res = await tx.departmentHold.updateMany({ where: { id: hold.id, updatedAt: hold.updatedAt, status: { in: ACTIVE_HOLD_STATUSES } }, data });
+    if (res.count === 1) await syncHeld(tx, hold.sourceType, hold.sourceId);
     if (res.count === 1 && closing) {
       const since = forwardedSinceHold(hold, line);
       await tx.departmentHoldEvent.create({
@@ -485,15 +538,30 @@ export function holdDepartmentsFor(user: AuthenticatedUser, raw: string | null):
   return [code];
 }
 
+export interface HoldFilters {
+  reason?: string | null;
+  unit?: string | null;
+  from?: string | null;
+  to?: string | null;
+}
+
+const dayStart = (v: string | null | undefined) => (v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(`${v}T00:00:00`) : null);
+
 /** HOLDs of these departments: open ones (refreshed against their lines), closed ones, or both. */
-export async function listHolds(departments: string[], rawView: string | null, search: string) {
+export async function listHolds(departments: string[], rawView: string | null, search: string, filters: HoldFilters = {}) {
   const view = rawView === 'closed' || rawView === 'all' ? rawView : 'open';
   const status = view === 'closed' ? { notIn: ACTIVE_HOLD_STATUSES } : view === 'all' ? undefined : { in: ACTIVE_HOLD_STATUSES };
   const q = search.trim();
+  const from = dayStart(filters.from);
+  const toStart = dayStart(filters.to);
+  const heldAt = from || toStart ? { ...(from ? { gte: from } : {}), ...(toStart ? { lt: new Date(toStart.getTime() + 86400000) } : {}) } : null;
   const holds = await prisma.departmentHold.findMany({
     where: {
       departmentCode: { in: departments },
       ...(status ? { status } : {}),
+      ...(filters.reason ? { reason: filters.reason.toUpperCase() } : {}),
+      ...(filters.unit ? { unit: filters.unit.toUpperCase() } : {}),
+      ...(heldAt ? { heldAt } : {}),
       ...(q
         ? {
             OR: ['holdNumber', 'designNumber', 'serialNumber', 'productionSheetNumber', 'challanNumber', 'fabricName', 'colour'].map((field) => ({
@@ -537,69 +605,176 @@ export async function holdDetail(id: string, user: AuthenticatedUser) {
 
 const actorNameOf = (user: AuthenticatedUser) => user.fullName || user.username;
 
-/** Places a HOLD on one line of the department. Only one open HOLD per line. */
+/**
+ * Sets the line's heldQuantity to what its open HOLDs still keep back. Call inside the transaction that changed a
+ * HOLD, so the line and its HOLDs never disagree. Dyeing QC challans keep no column (their inspection reads the HOLDs).
+ */
+export async function syncHeld(tx: any, sourceType: string, sourceId: string) {
+  if (sourceType !== 'WORK_ITEM' && sourceType !== 'DYEING_ORDER') return;
+  const sum = await tx.departmentHold.aggregate({
+    where: { sourceType, sourceId, status: { in: ACTIVE_HOLD_STATUSES } },
+    _sum: { remainingQuantity: true },
+  });
+  const heldQuantity = round(sum._sum.remainingQuantity || 0);
+  if (sourceType === 'WORK_ITEM') await tx.departmentWorkItem.update({ where: { id: sourceId }, data: { heldQuantity } });
+  else await tx.dyeingOrder.update({ where: { id: sourceId }, data: { heldQuantity } });
+}
+
+/**
+ * Locks the line's row for the rest of the transaction (and changes its updatedAt), so a challan, inspection or
+ * allocation being saved at the same moment either finishes first or fails its guard and is retried.
+ */
+export async function lockSource(tx: any, sourceType: string, sourceId: string) {
+  const now = new Date();
+  if (sourceType === 'WORK_ITEM') await tx.departmentWorkItem.update({ where: { id: sourceId }, data: { updatedAt: now } });
+  else if (sourceType === 'DYEING_ORDER') await tx.dyeingOrder.update({ where: { id: sourceId }, data: { updatedAt: now } });
+  else await tx.challan.update({ where: { id: sourceId }, data: { updatedAt: now } });
+}
+
+/**
+ * Places a HOLD on one line of the department, or adds to the line's open HOLD (one open HOLD per line; each
+ * addition is its own entry in the HOLD's history). Never more than the line still has free.
+ */
 export async function placeHold(code: string, body: any, user: AuthenticatedUser) {
   const key = String(body?.lineKey || '');
   const [sourceType, sourceId] = key.split(':');
   if (!sourceType || !sourceId) throw new WorkRequestError('Select the line to place on HOLD.');
-  const line = (await loadLines(code, [sourceId])).find((l) => l.key === key) || null;
-  const check = validateHold(line, body);
-  if (!check.ok) throw new WorkRequestError(check.error);
-  const l = line as HoldLine;
-  const activeKey = `${code}|${l.key}`;
-  const year = new Date().getFullYear();
   for (let attempt = 0; attempt < 3; attempt++) {
-    const existing = await prisma.departmentHold.findUnique({ where: { activeKey }, select: { holdNumber: true } });
-    if (existing) throw new WorkRequestError(`This line is already on HOLD (${existing.holdNumber}). Release or update that HOLD instead.`, 409);
-    const latest = await prisma.departmentHold.findFirst({ where: { holdNumber: { startsWith: `HLD-${year}-` } }, orderBy: { holdNumber: 'desc' }, select: { holdNumber: true } });
-    const seq = (parseInt(latest?.holdNumber.split('-').pop() || '0', 10) || 0) + 1;
     try {
       return await prisma.$transaction(async (tx) => {
-        const hold = await tx.departmentHold.create({
-          data: {
-            holdNumber: `HLD-${year}-${String(seq).padStart(4, '0')}`,
-            departmentCode: code,
-            sourceType: l.sourceType,
-            sourceId: l.sourceId,
-            sourceKey: l.key,
-            activeKey,
-            programId: l.programId,
-            challanId: l.challanId,
-            challanNumber: l.challanNumber,
-            designNumber: l.designNumber,
-            serialNumber: l.serialNumber,
-            productionSheetNumber: l.productionSheetNumber,
-            fabricName: l.fabricName,
-            colour: l.colour,
-            size: l.size,
-            unit: l.unit,
-            receivedQuantity: l.received,
-            forwardedQuantity: l.forwarded,
-            forwardedAtHold: l.forwarded,
-            holdQuantity: check.quantity,
-            remainingQuantity: check.quantity,
-            reason: check.reason,
-            reasonOther: check.reasonOther,
-            remarks: check.remarks,
-            status: 'ON_HOLD',
-            heldById: user.id,
-            heldByName: actorNameOf(user),
-          },
-        });
-        await tx.departmentHoldEvent.create({
-          data: { holdId: hold.id, action: 'HOLD', quantity: check.quantity, remainingAfter: check.quantity, unit: l.unit, remarks: [holdReasonText(hold), check.remarks].filter(Boolean).join(' · '), actorId: user.id, actorName: actorNameOf(user) },
-        });
-        await tx.auditLog.create({
-          data: { actorId: user.id, action: 'HOLD', entity: 'DepartmentHold', entityId: hold.id, afterState: JSON.stringify({ departmentCode: code, line: l.key, quantity: check.quantity, unit: l.unit, reason: check.reason }) },
-        });
-        return shapeHold(hold, l);
+        await lockSource(tx, sourceType, sourceId);
+        // Read after the lock: anything saved before it is counted.
+        const line = (await loadLines(code, [sourceId])).find((l) => l.key === key) || null;
+        const check = validateHold(line, body);
+        if (!check.ok) throw new WorkRequestError(check.error);
+        return addToHold(tx, code, line as HoldLine, check, user);
       }, TX);
     } catch (error) {
-      // P2002: the HOLD number was taken at the same moment (try the next), or the line was just held (reported above).
+      // P2002: the HOLD number was taken at the same moment; try the next.
       if ((error as { code?: string } | null)?.code !== 'P2002') throw error;
     }
   }
-  throw new WorkRequestError('Could not number the HOLD record. Try again.', 409);
+  throw new WorkRequestError('Could not save the HOLD record. Try again.', 409);
+}
+
+/**
+ * Holds `check.quantity` more of the line, inside the caller's transaction (the line is already locked and its
+ * figures read after the lock): opens a HOLD, or adds to the line's open HOLD. The quantity must be free on the
+ * line (what is already held is not free). Updates the line's heldQuantity and records the history.
+ */
+export async function addToHold(
+  tx: any,
+  code: string,
+  l: HoldLine,
+  check: { quantity: number; reason: string; reasonOther: string | null; remarks: string | null },
+  user: AuthenticatedUser,
+  note?: string,
+) {
+  const activeKey = `${code}|${l.key}`;
+  const existing = await tx.departmentHold.findUnique({ where: { activeKey } });
+  const alreadyHeld = existing ? round(existing.remainingQuantity) : 0;
+  const free = round(outstandingOf(l) - alreadyHeld);
+  if (round(check.quantity) > free) {
+    throw new WorkRequestError(
+      `Only ${Math.max(0, free)} ${l.unit} of this line is free to hold${alreadyHeld > 0 ? ` (${alreadyHeld} ${l.unit} is already on HOLD)` : ''}.`,
+    );
+  }
+  let hold;
+  if (existing) {
+    hold = await tx.departmentHold.update({
+      where: { id: existing.id },
+      data: {
+        holdQuantity: round(existing.holdQuantity + check.quantity),
+        remainingQuantity: round(existing.remainingQuantity + check.quantity),
+        receivedQuantity: l.received,
+        forwardedQuantity: l.forwarded,
+        status: existing.releasedQuantity > 0 ? 'PARTIALLY_RELEASED' : 'ON_HOLD',
+      },
+    });
+  } else {
+    const year = new Date().getFullYear();
+    const latest = await tx.departmentHold.findFirst({ where: { holdNumber: { startsWith: `HLD-${year}-` } }, orderBy: { holdNumber: 'desc' }, select: { holdNumber: true } });
+    const seq = (parseInt(latest?.holdNumber.split('-').pop() || '0', 10) || 0) + 1;
+    hold = await tx.departmentHold.create({
+      data: {
+        holdNumber: `HLD-${year}-${String(seq).padStart(4, '0')}`,
+        departmentCode: code,
+        sourceType: l.sourceType,
+        sourceId: l.sourceId,
+        sourceKey: l.key,
+        activeKey,
+        programId: l.programId,
+        challanId: l.challanId,
+        challanNumber: l.challanNumber,
+        designNumber: l.designNumber,
+        serialNumber: l.serialNumber,
+        productionSheetNumber: l.productionSheetNumber,
+        fabricName: l.fabricName,
+        colour: l.colour,
+        size: l.size,
+        productionType: l.productionType,
+        requiredColour: l.requiredColour,
+        challanDate: l.challanDate,
+        sendingDepartment: l.sendingDepartment,
+        processedAtHold: l.processed,
+        unit: l.unit,
+        receivedQuantity: l.received,
+        forwardedQuantity: l.forwarded,
+        forwardedAtHold: l.forwarded,
+        holdQuantity: check.quantity,
+        remainingQuantity: check.quantity,
+        reason: check.reason,
+        reasonOther: check.reasonOther,
+        remarks: check.remarks,
+        status: 'ON_HOLD',
+        heldById: user.id,
+        heldByName: actorNameOf(user),
+      },
+    });
+  }
+  await syncHeld(tx, l.sourceType, l.sourceId);
+  await tx.departmentHoldEvent.create({
+    data: {
+      holdId: hold.id,
+      action: 'HOLD',
+      quantity: check.quantity,
+      remainingAfter: hold.remainingQuantity,
+      unit: l.unit,
+      remarks: [holdReasonText({ reason: check.reason, reasonOther: check.reasonOther }), existing ? 'Added to the open HOLD' : null, note || null, check.remarks].filter(Boolean).join(' · '),
+      actorId: user.id,
+      actorName: actorNameOf(user),
+    },
+  });
+  await tx.auditLog.create({
+    data: { actorId: user.id, action: 'HOLD', entity: 'DepartmentHold', entityId: hold.id, afterState: JSON.stringify({ departmentCode: code, line: l.key, quantity: check.quantity, unit: l.unit, reason: check.reason, heldNow: hold.remainingQuantity, note: note || null }) },
+  });
+  return shapeHold(hold, l);
+}
+
+/**
+ * Takes `quantity` off the line's open HOLD inside the caller's transaction, because that quantity got a QC
+ * decision instead (REJECT / REWORK). Recorded in the HOLD's history; the HOLD closes when nothing is left.
+ */
+export async function takeFromHold(tx: any, code: string, sourceKey: string, quantity: number, user: AuthenticatedUser, note: string) {
+  const hold = await tx.departmentHold.findUnique({ where: { activeKey: `${code}|${sourceKey}` } });
+  if (!hold || round(hold.remainingQuantity) < round(quantity)) {
+    throw new WorkRequestError(`Only ${hold ? round(hold.remainingQuantity) : 0} ${hold?.unit || ''} of this line is on HOLD.`.trim());
+  }
+  const after = round(hold.remainingQuantity - quantity);
+  const res = await tx.departmentHold.updateMany({
+    where: { id: hold.id, updatedAt: hold.updatedAt, status: { in: ACTIVE_HOLD_STATUSES } },
+    data: {
+      holdQuantity: round(hold.holdQuantity - quantity),
+      remainingQuantity: after,
+      ...(after <= 0 ? { status: 'CLEARED', activeKey: null, closedAt: new Date() } : {}),
+    },
+  });
+  if (res.count !== 1) throw new WorkRequestError('This HOLD was changed by someone else. Refresh and try again.', 409);
+  await syncHeld(tx, hold.sourceType, hold.sourceId);
+  await tx.departmentHoldEvent.create({
+    data: { holdId: hold.id, action: 'DECISION', quantity, remainingAfter: after, unit: hold.unit, remarks: note, actorId: user.id, actorName: actorNameOf(user) },
+  });
+  return hold;
 }
 
 /** Releases part or all of what is still on HOLD; the HOLD closes as RELEASED when nothing is left. */
@@ -625,6 +800,8 @@ export async function releaseHold(id: string, body: any, user: AuthenticatedUser
       },
     });
     if (res.count !== 1) throw new WorkRequestError('This HOLD was changed by someone else. Refresh and try again.', 409);
+    // The released quantity is available again on the line straight away.
+    await syncHeld(tx, hold.sourceType, hold.sourceId);
     await tx.departmentHoldEvent.create({
       data: { holdId: hold.id, action: 'RELEASE', quantity: check.quantity, remainingAfter: after, unit: hold.unit, remarks: check.remarks, actorId: user.id, actorName: actorNameOf(user) },
     });

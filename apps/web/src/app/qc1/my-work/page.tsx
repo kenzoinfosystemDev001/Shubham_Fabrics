@@ -1,5 +1,7 @@
 'use client';
 
+import { HoldSection } from '@/components/hold/HoldSection';
+import { Qc1DecisionModal } from '@/components/qc1/Qc1DecisionModal';
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -168,6 +170,9 @@ export default function QC1MyWorkPage() {
   const [selectedSheetForModal, setSelectedSheetForModal] = useState<any | null>(null);
   const [selectedChallanForView, setSelectedChallanForView] = useState<QC1Challan | null>(null);
   const [selectedChallanForInspect, setSelectedChallanForInspect] = useState<QC1Challan | null>(null);
+  // Change Decision (REWORK <-> HOLD) of an inspected challan, and the message after it was saved.
+  const [decisionChallanId, setDecisionChallanId] = useState<string | null>(null);
+  const [decisionMessage, setDecisionMessage] = useState<string | null>(null);
 
   // Inspection Form State
   const [inspectionForm, setInspectionForm] = useState({
@@ -901,7 +906,8 @@ export default function QC1MyWorkPage() {
                             )}
 
                             {/* START / RECORD INSPECTION (If status === 'RECEIVED' or 'UNDER_INSPECTION') */}
-                            {(isReceived || isUnderInspection) && (
+                            {/* A challan with quantity on HOLD is inspected again once the HOLD is released. */}
+                            {(isReceived || isUnderInspection || isHold) && (
                               <button
                                 onClick={() => openInspectionModal(challan)}
                                 className="flex items-center gap-1 px-2.5 py-1 bg-accent-500 hover:bg-accent-600 text-neutral-900 rounded text-xs font-semibold shadow-xs transition cursor-pointer"
@@ -918,6 +924,14 @@ export default function QC1MyWorkPage() {
                                 className="px-2 py-1 text-neutral-600 hover:bg-neutral-100 rounded text-[11px] font-semibold border border-neutral-200 transition"
                               >
                                 Verified
+                              </button>
+                            )}
+                            {(isRework || isHold) && (
+                              <button
+                                onClick={() => setDecisionChallanId(challan.id)}
+                                className="px-2 py-1 text-brand-700 hover:bg-brand-50 rounded text-[11px] font-semibold border border-brand-200 transition"
+                              >
+                                Change decision
                               </button>
                             )}
                           </div>
@@ -1516,6 +1530,23 @@ export default function QC1MyWorkPage() {
         {/* ========================================================================= */}
         {/* MODAL 3: QC1 QUALITY INSPECTION FORM                                      */}
         {/* ========================================================================= */}
+        {decisionChallanId && (
+          <Qc1DecisionModal
+            challanId={decisionChallanId}
+            onClose={() => setDecisionChallanId(null)}
+            onSaved={(message) => {
+              setDecisionChallanId(null);
+              setDecisionMessage(message);
+              loadChallans();
+            }}
+          />
+        )}
+        {decisionMessage && (
+          <div role="status" className="fixed bottom-4 right-4 z-50 px-4 py-2.5 rounded-lg bg-neutral-900 text-white text-xs font-semibold shadow-lg flex items-center gap-3">
+            {decisionMessage}
+            <button type="button" onClick={() => setDecisionMessage(null)} className="underline">Close</button>
+          </div>
+        )}
         {selectedChallanForInspect && (
           <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
             <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-neutral-200">
@@ -1982,6 +2013,9 @@ export default function QC1MyWorkPage() {
                           ))}
                         </div>
                       )}
+
+                      {/* HOLD: kept back from this inspection; neither passed nor reworked until released on the HOLD page. */}
+                      <HoldSection department="QC1" sourceId={selectedChallanForInspect.id} holdPage="/qc1/hold" />
 
                       {/* REMARKS INPUT FOR CHOSEN OUTCOME */}
                       <div className="space-y-1.5 pt-1">

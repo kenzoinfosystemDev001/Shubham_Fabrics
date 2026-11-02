@@ -1539,6 +1539,8 @@ model DyeingOrder {
   undyedQuantity      Float  @default(0)
   readyForQc1Quantity Float  @default(0)
   sentToQc1Quantity   Float  @default(0)
+  // Still on HOLD (open DepartmentHold records of this order), kept in step by lib/holds-server.ts; never sent to QC.
+  heldQuantity        Float  @default(0)
   uom                 String @default("MTR")
 
   // Receipt: what physically arrived (null until received; legacy orders received before this existed).
@@ -1654,6 +1656,9 @@ model DepartmentWorkItem {
   reworkQuantity          Float                @default(0)
   rejectSentQuantity      Float                @default(0)
   reworkSentQuantity      Float                @default(0)
+  // Still on HOLD (open DepartmentHold records of this line), kept in step by lib/holds-server.ts. Held quantity
+  // is never processed, inspected, allocated, packed or transferred until it is released.
+  heldQuantity            Float                @default(0)
 
   receivedAt             DateTime?
   receivedById           String?
@@ -2077,6 +2082,11 @@ model DepartmentHold {
   fabricName            String
   colour                String?
   size                  String?
+  productionType        String? // TOP | BOTTOM | DUPATTA | OTHERS, once the fabric is cut into garments
+  requiredColour        String? // colour Dyeing must achieve (Dyeing lines)
+  challanDate           DateTime? // issue date of the incoming challan
+  sendingDepartment     String? // department that sent the line
+  processedAtHold       Float? // already processed (QC: inspected; Dyeing: dyed) when the HOLD was placed
   unit                  String // MTR | PCS, the line's own unit; never converted
   receivedQuantity      Float
   forwardedQuantity     Float // forwarded from the line, as last computed

@@ -150,6 +150,7 @@ export async function POST(request: Request) {
             receivingDate: parsedReceivingDate,
             billQty: line.billQty,
             unit: line.unit,
+            width: line.width,
             pricePerUnit: line.pricePerUnit,
             boxThanQty: line.boxThanQty,
             hsnCode: line.hsnCode,

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { FloorBoardTabs } from '@/components/workflow/IssuedChallansTab';
 import {
   RefreshCw,
   Search,
@@ -165,9 +166,11 @@ export default function QC1FloorBoard() {
         </div>
       )}
 
+      <div className="px-4 sm:px-8 pt-4 flex-1 flex flex-col">
+      <FloorBoardTabs department="QC1">
       {/* STAGE SUMMARY (also filters the board) */}
       {totalItems > 0 && (
-        <div className="px-4 sm:px-8 pt-5 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setStageFilter('ALL')}
             className={`px-3.5 py-2 rounded-xl border text-xs font-semibold transition ${
@@ -209,7 +212,7 @@ export default function QC1FloorBoard() {
 
       {/* BOARD */}
       {totalItems > 0 && (
-        <main className="px-4 sm:px-8 pt-4 flex-1">
+        <main className="pt-4 flex-1">
           <div
             className={`grid gap-4 items-start ${
               shownStages.length === 1 ? 'grid-cols-1 max-w-md' : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5'
@@ -242,6 +245,8 @@ export default function QC1FloorBoard() {
           </div>
         </main>
       )}
+      </FloorBoardTabs>
+      </div>
     </div>
   );
 }

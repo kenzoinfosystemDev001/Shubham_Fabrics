@@ -6,10 +6,11 @@
 // Values live as RGB channels in src/app/globals.css (:root) so opacity
 // modifiers like `bg-brand-500/10` keep working.
 //
-//   brand   Lavender  #B57EDC  primary actions, active nav/tabs, focus, links
-//   accent  Chartreuse #DFFF00 progress, small accent borders, highlights (dark text only)
-//   danger  Tomato    #FF6347  destructive actions, rejections, critical errors
-//   neutral           #F8F7FA canvas, #E5E1E8 line, #6B6872 muted, #25232A ink
+// Theme: white, blue and black.
+//   brand   Blue      #2563EB (600)  primary actions, active nav/tabs, focus, links; #EFF6FF (50) light blue
+//   accent  Sky blue  #38BDF8 (400)  progress, light highlights, positive states (dark text only)
+//   danger  Red       #DC2626 (600)  errors, destructive actions, rejections only
+//   neutral Cool grey #FFFFFF white, #F9FAFB canvas, #F3F4F6 inputs, #E5E7EB line, #6B7280 muted, #111827 ink
 //
 // White text only sits on brand-600+ / danger-600+ (WCAG AA).
 const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
@@ -54,15 +55,15 @@ module.exports = {
       // Elevation scale: light from above, soft ink-tinted shadows (each step = a tight contact
       // shadow + a wider ambient one). `2xs`/`xs` are also the names already used in the markup.
       boxShadow: {
-        '2xs': '0 1px 2px 0 rgb(37 35 42 / 0.05)',
-        xs: '0 1px 2px 0 rgb(37 35 42 / 0.06), 0 2px 6px -2px rgb(37 35 42 / 0.08)',
-        sm: '0 1px 2px 0 rgb(37 35 42 / 0.06), 0 4px 10px -3px rgb(37 35 42 / 0.10)',
-        DEFAULT: '0 1px 3px 0 rgb(37 35 42 / 0.07), 0 6px 14px -4px rgb(37 35 42 / 0.12)',
-        md: '0 2px 4px -1px rgb(37 35 42 / 0.07), 0 10px 20px -6px rgb(37 35 42 / 0.14)',
-        lg: '0 4px 8px -2px rgb(37 35 42 / 0.08), 0 16px 32px -10px rgb(37 35 42 / 0.18)',
-        xl: '0 6px 12px -4px rgb(37 35 42 / 0.10), 0 24px 44px -14px rgb(37 35 42 / 0.22)',
-        '2xl': '0 10px 20px -8px rgb(37 35 42 / 0.12), 0 36px 64px -18px rgb(37 35 42 / 0.28)',
-        inner: 'inset 0 1px 2px 0 rgb(37 35 42 / 0.06)',
+        '2xs': '0 1px 2px 0 rgb(17 24 39 / 0.05)',
+        xs: '0 1px 2px 0 rgb(17 24 39 / 0.06), 0 2px 6px -2px rgb(17 24 39 / 0.08)',
+        sm: '0 1px 2px 0 rgb(17 24 39 / 0.06), 0 4px 10px -3px rgb(17 24 39 / 0.10)',
+        DEFAULT: '0 1px 3px 0 rgb(17 24 39 / 0.07), 0 6px 14px -4px rgb(17 24 39 / 0.12)',
+        md: '0 2px 4px -1px rgb(17 24 39 / 0.07), 0 10px 20px -6px rgb(17 24 39 / 0.14)',
+        lg: '0 4px 8px -2px rgb(17 24 39 / 0.08), 0 16px 32px -10px rgb(17 24 39 / 0.18)',
+        xl: '0 6px 12px -4px rgb(17 24 39 / 0.10), 0 24px 44px -14px rgb(17 24 39 / 0.22)',
+        '2xl': '0 10px 20px -8px rgb(17 24 39 / 0.12), 0 36px 64px -18px rgb(17 24 39 / 0.28)',
+        inner: 'inset 0 1px 2px 0 rgb(17 24 39 / 0.06)',
       },
       dropShadow: {
         xs: '0 1px 1px rgb(255 255 255 / 0.6)',

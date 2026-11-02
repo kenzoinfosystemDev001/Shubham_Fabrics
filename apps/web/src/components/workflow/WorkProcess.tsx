@@ -24,7 +24,7 @@ import {
   challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
-import { availableToProcess, awaitingTakeIn, inProduction, readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
+import { availableToProcess, awaitingTakeIn, freeQuantity, heldOf, inProduction, readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
 import { isAdminUser } from '@/lib/rbac';
 import { departmentName, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
@@ -335,7 +335,13 @@ function ProcessEditor({
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
             <div><dt className="text-xs text-neutral-500">Colour</dt><dd className="font-semibold">{item.colour || '—'}</dd></div>
             <div><dt className="text-xs text-neutral-500">Received from</dt><dd className="font-semibold">{departmentName(item.sourceDepartment)}</dd></div>
-            <div><dt className="text-xs text-neutral-500">Received</dt><dd className="font-semibold tabular-nums">{fmtQty(received, item.uom)}</dd></div>
+            <div><dt className="text-xs text-neutral-500">Total received</dt><dd className="font-semibold tabular-nums">{fmtQty(received, item.uom)}</dd></div>
+            {/* HOLD stays visible but is never available for processing or transfer until released. */}
+            <div>
+              <dt className="text-xs text-neutral-500">On HOLD</dt>
+              <dd className={`font-semibold tabular-nums ${heldOf(item) > 0 ? 'text-danger-700' : ''}`}>{fmtQty(heldOf(item), item.uom)}</dd>
+            </div>
+            {!flow.production && <div><dt className="text-xs text-neutral-500">Rejected / defective</dt><dd className="font-semibold tabular-nums">{fmtQty(item.defectQuantity || 0, item.uom)}</dd></div>}
             {flow.production ? (
               <>
                 <div><dt className="text-xs text-neutral-500">Not yet taken in</dt><dd className="font-semibold tabular-nums">{fmtQty(awaitingTakeIn(item), item.uom)}</dd></div>
@@ -352,8 +358,9 @@ function ProcessEditor({
                 )}
               </>
             ) : (
-              <div><dt className="text-xs text-neutral-500">Still to process</dt><dd className="font-semibold tabular-nums">{fmtQty(availableToProcess(item), item.uom)}</dd></div>
+              <div><dt className="text-xs text-neutral-500">Still available for processing</dt><dd className="font-semibold tabular-nums">{fmtQty(availableToProcess(item), item.uom)}</dd></div>
             )}
+            <div><dt className="text-xs text-neutral-500">Available (not on HOLD)</dt><dd className="font-semibold tabular-nums">{fmtQty(freeQuantity(item), item.uom)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Transferred to {flow.next}</dt><dd className="font-semibold tabular-nums">{fmtQty(item.transferredQuantity, item.uom)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Ready for {flow.next}</dt><dd className="font-semibold tabular-nums">{fmtQty(readyToTransfer(item), item.uom)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Started</dt><dd>{fmtDate(item.startedAt, true)}</dd></div>
@@ -448,7 +455,15 @@ function ProcessEditor({
                   <input type="date" value={expected} onChange={(e) => setExpected(e.target.value)} className={`${FIELD} mt-1`} />
                 </label>
               </div>
-              <HoldSection department={flow.code} sourceId={item.id} holdPage={`${flow.base}/hold`} />
+              <HoldSection
+                department={flow.code}
+                sourceId={item.id}
+                holdPage={`${flow.base}/hold`}
+                onChanged={async (message) => {
+                  const body = await fetchJson(`${flow.api}/items/${item.id}`).catch(() => null);
+                  if (body?.data) onSaved(body.data, message);
+                }}
+              />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Remarks / observations</span>
                 <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} maxLength={500} rows={2} className={`${FIELD} h-auto py-2 mt-1`} />

@@ -165,7 +165,7 @@ export function ProductionSheetPrintModal({
                 Production Sheet Specification Form
               </div>
               <h2 className="text-base font-bold text-neutral-900">
-                Traveler #{serialNo} &middot; {designNo}
+                Design No: {designNo || '—'} &middot; Serial No: {serialNo || '—'}
               </h2>
             </div>
           </div>

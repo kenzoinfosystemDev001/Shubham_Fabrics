@@ -3,7 +3,7 @@
 // or framework imports. Quantity flow per line: received -> allocated (line unit) -> cut (cut unit,
 // never converted automatically) -> transferred to Stitching.
 
-import { receivedBasis } from './work-items.mjs';
+import { heldOf, holdNote, receivedBasis } from './work-items.mjs';
 import { headerUnitOf, unitOf } from './challan-units.mjs';
 import { checkSourceSelection, distinct } from './challan-sheets.mjs';
 
@@ -36,9 +36,9 @@ export function allocatedTotal(allocations) {
   return round((allocations || []).filter(isActiveAllocation).reduce((s, a) => s + (Number(a.allocatedQuantity) || 0), 0));
 }
 
-/** Received but not yet allocated. */
+/** Received but not yet allocated, less what is on HOLD (held fabric is never allocated). */
 export function unallocated(item, allocations) {
-  return round(Math.max(0, receivedBasis(item) - allocatedTotal(allocations)));
+  return round(Math.max(0, receivedBasis(item) - allocatedTotal(allocations) - heldOf(item)));
 }
 
 /** Cut but not yet sent to Stitching, in the allocation's cut unit. */
@@ -101,7 +101,14 @@ export function validateAllocationRows(item, existing, rows) {
   }
   const total = round(out.reduce((s, r) => s + r.allocatedQuantity, 0));
   const open = unallocated(item, existing);
-  if (total > open) return { ok: false, error: `These rows allocate ${total} ${item.uom}, but only ${open} ${item.uom} is unallocated.` };
+  if (total > open) {
+    return {
+      ok: false,
+      error: heldOf(item) > 0
+        ? `Insufficient Available Quantity. ${holdNote(item)}These rows allocate ${total} ${item.uom}; at most ${open} ${item.uom} can be allocated.`
+        : `These rows allocate ${total} ${item.uom}, but only ${open} ${item.uom} is unallocated.`,
+    };
+  }
   return { ok: true, rows: out, total };
 }
 

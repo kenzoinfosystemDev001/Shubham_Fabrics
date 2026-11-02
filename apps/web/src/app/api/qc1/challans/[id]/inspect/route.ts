@@ -6,10 +6,11 @@ import {
   challanNumberErrorResponse,
   requireChallanNumberSet,
 } from '@/lib/challan-number-server';
-import { MIXED_UNIT, formatTotals, headerUnitOf, totalsByUnit } from '@/lib/challan-units.mjs';
+import { MIXED_UNIT, formatTotals, headerUnitOf, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 import { lineSheetId } from '@/lib/challan-sheets.mjs';
 import { lineLabel, qc1LineQuantities, qc1UnitTotals } from '@/lib/qc1-inspection.mjs';
 import { canWriteColumns } from '@/lib/challan-item-average';
+import { ACTIVE_HOLD_STATUSES } from '@/lib/holds.mjs';
 import { SHRINKAGE_NOT_SET_UP, ShrinkageError, saveShrinkageForLine, shrinkageTableExists } from '@/lib/shrinkage-server';
 
 export const dynamic = 'force-dynamic';
@@ -87,6 +88,26 @@ export async function POST(
     // (lib/qc1-inspection). Shrinkage is fabric lost in dyeing, recorded as the line's shrinkage.
     const receivedByUnit = totalsByUnit(challan.items, challan.fabricUnit);
     const challanUnits = Object.keys(receivedByUnit);
+    // Quantity on HOLD in Dyeing QC is never inspected or forwarded until released; what earlier inspections of
+    // this challan covered (a challan with a HOLD is inspected again after the release) is not inspected twice.
+    const [openHolds, earlier] = await Promise.all([
+      prisma.departmentHold.findMany({
+        where: { sourceType: 'QC1_CHALLAN', sourceId: id, status: { in: ACTIVE_HOLD_STATUSES } },
+        select: { unit: true, remainingQuantity: true },
+      }),
+      prisma.productionTransaction.findMany({
+        where: { challanId: id, departmentCode: 'QC1', operationName: 'QC1_FABRIC_INSPECTION' },
+        select: { inputQuantity: true, unitOfMeasure: true },
+      }),
+    ]);
+    const heldByUnit: Record<string, number> = {};
+    for (const h of openHolds) heldByUnit[unitOf(h.unit) || h.unit] = (heldByUnit[unitOf(h.unit) || h.unit] || 0) + h.remainingQuantity;
+    const inspectedByUnit: Record<string, number> = {};
+    for (const t of earlier) {
+      const u = unitOf(t.unitOfMeasure) || challanUnits[0];
+      inspectedByUnit[u] = (inspectedByUnit[u] || 0) + t.inputQuantity;
+    }
+    const openOf = (unit: string) => Math.max(0, Math.round(((receivedByUnit[unit] || 0) - (inspectedByUnit[unit] || 0) - (heldByUnit[unit] || 0)) * 1000) / 1000);
     if (challanUnits.length === 0) {
       return NextResponse.json({ error: 'This challan has no quantity to inspect.' }, { status: 400 });
     }
@@ -97,6 +118,20 @@ export async function POST(
     const inspectedLines = lineCheck.lines;
     // Per-unit sums of the inspected lines, for header quantities, records and messages.
     const byUnit = qc1UnitTotals(inspectedLines);
+    // Quantity on HOLD (and what earlier inspections covered) cannot be inspected again.
+    for (const r of byUnit) {
+      if (r.inspected > openOf(r.unit) + 0.001) {
+        const held = heldByUnit[r.unit] || 0;
+        return NextResponse.json(
+          {
+            error: held > 0
+              ? `Insufficient Available Quantity. ${held} ${r.unit} is currently on HOLD. Maximum quantity that can be inspected is ${openOf(r.unit)} ${r.unit}.`
+              : `Only ${openOf(r.unit)} ${r.unit} of this challan is still uninspected.`,
+          },
+          { status: 400 }
+        );
+      }
+    }
     const lineSummary = inspectedLines.map((r) => ({
       challanItemId: r.item.id,
       line: lineLabel(r.item),
@@ -426,11 +461,13 @@ export async function POST(
           }
         }
 
-        // F. Compute final status for the Dyeing -> QC1 Challan
+        // F. Compute final status for the Dyeing -> QC1 Challan. Quantity still on HOLD keeps the challan open
+        // (ON_HOLD) so it can be inspected once the HOLD is released.
         let newChallanStatus = 'QC_APPROVED';
         if (normalizedResult === 'REWORK') {
           newChallanStatus = 'REWORK_REQUESTED';
         }
+        if (openHolds.length > 0) newChallanStatus = 'ON_HOLD';
 
         const updatedChallan = await tx.challan.update({
           where: { id },

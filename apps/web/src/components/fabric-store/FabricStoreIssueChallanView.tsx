@@ -592,13 +592,13 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 <strong className="font-mono text-neutral-900 text-sm">{issuedChallan.challanNumber}</strong>
               </div>
               <div>
-                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Serial Number</span>
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Production Serial Number</span>
                 <strong className="font-mono text-brand-800 text-sm">
                   {issuedChallan.program?.programSerialNo || issuedChallan.program?.programNumber || '—'}
                 </strong>
               </div>
               <div>
-                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Design Number</span>
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Production Design Number</span>
                 <strong className="text-neutral-900">{designNumber || '—'}</strong>
               </div>
               <div>
@@ -695,7 +695,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 </button>
               ) : (
                 <span className="text-xs text-neutral-500 italic">
-                  Select Serial Number to preview Production Sheet
+                  Select Production Serial Number to preview Production Sheet
                 </span>
               )}
             </div>
@@ -927,7 +927,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               {/* 7. DESIGN NUMBER */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
                 <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
-                  Design Number
+                  Production Design Number
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
                   <input
@@ -942,7 +942,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               {/* 8. SERIAL NUMBER (Production Sheet Selector) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
                 <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4 sm:self-start sm:pt-2">
-                  Serial Number <span className="text-danger-600">*</span>
+                  Production Serial Number <span className="text-danger-600">*</span>
                 </label>
                 <div className="sm:col-span-2 max-w-lg space-y-2">
                   {sheetIds.length > 0 && (

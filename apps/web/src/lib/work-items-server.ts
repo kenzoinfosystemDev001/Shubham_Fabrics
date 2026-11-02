@@ -1127,7 +1127,8 @@ export function workflowHandlers(cfg: WorkflowConfig) {
             const updated = { ...was, [counter]: after };
             current.set(p.item.id, updated);
             const moved = await tx.departmentWorkItem.updateMany({
-              where: { id: p.item.id, [counter]: was[counter], processedQuantity: p.item.processedQuantity },
+              // A HOLD placed or released meanwhile changes heldQuantity, so held quantity can never leave here.
+              where: { id: p.item.id, [counter]: was[counter], processedQuantity: p.item.processedQuantity, heldQuantity: p.item.heldQuantity },
               data: {
                 [counter]: after,
                 status: cfg.qc ? qcStatusOf(updated) : statusAfterTransfer(was, after),
@@ -1507,6 +1508,11 @@ export function workflowHandlers(cfg: WorkflowConfig) {
       };
       const received = receivedBasis(item);
       if (after.processedQuantity > received) throw new WorkRequestError(`Only ${received} ${item.uom} was received; the line cannot be inspected beyond that.`);
+      // Held quantity is never inspected: a correction may not inspect more than is free of the HOLD.
+      const held = round(item.heldQuantity || 0);
+      if (after.processedQuantity > round(item.processedQuantity) && after.processedQuantity > round(received - held)) {
+        throw new WorkRequestError(`Insufficient Available Quantity. ${held} ${item.uom} is currently on HOLD. At most ${round(received - held)} ${item.uom} of this line can be inspected.`);
+      }
       if (after.passedQuantity < round(item.transferredQuantity)) {
         throw new WorkRequestError(`${round(item.transferredQuantity)} ${item.uom} passed has already been sent on; PASS cannot go below that.`);
       }

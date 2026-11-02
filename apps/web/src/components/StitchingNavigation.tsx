@@ -230,6 +230,13 @@ export function StitchingNavigation() {
 
           {/* HOLD: fabric kept back from forwarding */}
           <Link
+            href="/stitching/defective-shelf"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/stitching/defective-shelf', true)}
+          >
+            <span>Defective Shelf</span>
+          </Link>
+          <Link
             href="/stitching/hold"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/stitching/hold', true)}

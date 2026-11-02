@@ -5,7 +5,8 @@
 //   received  = receivedQuantity
 //   sent      = takenQuantity       pieces sent for packing, net of pieces returned unpacked
 //   packed    = processedQuantity
-//   available = received - sent     ready to send for packing
+//   held      = heldQuantity        on HOLD (never sent for packing until released)
+//   available = received - sent - held   ready to send for packing
 //   inPacking = sent - packed       sent and not yet packed
 //   remaining = received - packed   still to be packed
 // A PackingAllocation is one "Send for Packing": quantity, packedQuantity, returnedQuantity.
@@ -61,11 +62,13 @@ export function stockOf(item) {
   const received = item?.status === 'AWAITING_RECEIPT' ? 0 : n(item?.receivedQuantity ?? item?.expectedQuantity);
   const sent = n(item?.takenQuantity);
   const packed = n(item?.processedQuantity);
+  const held = n(item?.heldQuantity);
   return {
     received,
     sent,
     packed,
-    available: Math.max(0, received - sent),
+    held,
+    available: Math.max(0, received - sent - held),
     inPacking: Math.max(0, sent - packed),
     remaining: Math.max(0, received - packed),
   };
@@ -132,7 +135,15 @@ export function validateSendForPacking(item, input) {
   const q = wholePieces(input?.quantity, 'quantity to send for packing');
   if (!q.ok) return q;
   const { available } = stockOf(item);
-  if (q.value > available) return { ok: false, error: `Only ${available} PCS of ${garmentLabel(item)} is available for packing.` };
+  if (q.value > available) {
+    const held = stockOf(item).held;
+    return {
+      ok: false,
+      error: held > 0
+        ? `Insufficient Available Quantity. ${held} PCS of ${garmentLabel(item)} is currently on HOLD. At most ${available} PCS can be sent for packing.`
+        : `Only ${available} PCS of ${garmentLabel(item)} is available for packing.`,
+    };
+  }
   const priority = input?.priority ? String(input.priority).toUpperCase() : 'NORMAL';
   if (!PRIORITIES.includes(priority)) return { ok: false, error: 'Choose a valid priority.' };
   if (!input?.packingDate) return { ok: false, error: 'Enter the packing date.' };

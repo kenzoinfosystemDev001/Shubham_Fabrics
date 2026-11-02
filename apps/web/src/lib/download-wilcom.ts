@@ -363,28 +363,28 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
   <style>
     @page { size: A4 portrait; margin: 12mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    body { background: #f1eff4; color: #1c1a20; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; padding: 16px; }
+    body { background: #f3f4f6; color: #111827; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; padding: 16px; }
     .toolbar { max-width: 186mm; margin: 0 auto 12px; display: flex; justify-content: flex-end; gap: 8px; }
-    .btn { cursor: pointer; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; border: 1px solid #d3ced8; background: #fff; color: #1c1a20; }
-    .btn-primary { background: #7442a6; border-color: #7442a6; color: #fff; }
+    .btn { cursor: pointer; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; border: 1px solid #d1d5db; background: #fff; color: #111827; }
+    .btn-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
     .sheet { max-width: 186mm; margin: 0 auto; background: #fff; padding: 24px; border-radius: 8px; }
-    .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding-bottom: 14px; border-bottom: 2px solid #1c1a20; }
-    .company { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #57545e; }
+    .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding-bottom: 14px; border-bottom: 2px solid #111827; }
+    .company { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #4b5563; }
     .title { font-size: 24px; font-weight: 800; margin-top: 2px; }
     .ids { display: flex; gap: 24px; text-align: right; }
-    .id-label { font-size: 10px; color: #6b6872; }
+    .id-label { font-size: 10px; color: #6b7280; }
     .id-value { font-size: 15px; font-weight: 800; }
     .designs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
-    .design { border: 1px solid #d3ced8; border-radius: 8px; padding: 10px; page-break-inside: avoid; }
-    .photo { height: 240px; display: flex; align-items: center; justify-content: center; background: #faf9fb; border-radius: 6px; overflow: hidden; }
+    .design { border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; page-break-inside: avoid; }
+    .photo { height: 240px; display: flex; align-items: center; justify-content: center; background: #f9fafb; border-radius: 6px; overflow: hidden; }
     .photo img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
-    .no-photo { color: #8f8a96; font-weight: 700; }
+    .no-photo { color: #9ca3af; font-weight: 700; }
     .design-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: 8px; }
     .style-name { font-size: 14px; font-weight: 800; }
-    .wilcom-no { font-size: 11px; color: #57545e; font-family: monospace; text-align: right; overflow-wrap: anywhere; }
-    .empty { margin-top: 18px; padding: 32px; text-align: center; border: 1.5px dashed #b3adb9; border-radius: 8px; color: #6b6872; font-weight: 700; }
+    .wilcom-no { font-size: 11px; color: #4b5563; font-family: monospace; text-align: right; overflow-wrap: anywhere; }
+    .empty { margin-top: 18px; padding: 32px; text-align: center; border: 1.5px dashed #9ca3af; border-radius: 8px; color: #6b7280; font-weight: 700; }
     .signs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px; }
-    .sign { border-top: 1px solid #1c1a20; padding-top: 6px; text-align: center; font-size: 11px; font-weight: 700; }
+    .sign { border-top: 1px solid #111827; padding-top: 6px; text-align: center; font-size: 11px; font-weight: 700; }
     @media print {
       body { background: #fff; padding: 0; }
       .toolbar { display: none !important; }

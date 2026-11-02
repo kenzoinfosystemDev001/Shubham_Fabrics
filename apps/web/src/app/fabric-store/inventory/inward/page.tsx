@@ -33,6 +33,7 @@ interface InwardItem {
   billQty: number;
   unit: 'MTR' | 'PCS' | string;
   colour?: string | null;
+  width?: string | null;
   supplierName?: string | null;
   billerStateCity?: string | null;
   pricePerUnit?: number | null;
@@ -50,6 +51,7 @@ interface InwardLine {
   billQty: string;
   /** '' until the user picks MTR or PCS; new lines never default to a unit. */
   unit: 'MTR' | 'PCS' | '';
+  width: string;
   pricePerUnit: string;
   boxThanQty: string;
   hsnCode: string;
@@ -62,6 +64,7 @@ const createInwardLine = (seed: Partial<InwardLine> = {}): InwardLine => ({
   colour: '',
   billQty: '',
   unit: '',
+  width: '',
   pricePerUnit: '',
   boxThanQty: '',
   hsnCode: '',
@@ -210,7 +213,7 @@ export default function InwardStockPage() {
         throw new Error('Bill No. is required.');
       }
       const lines = formData.lines.filter((line) =>
-        line.itemName.trim() || line.colour.trim() || line.billQty || line.pricePerUnit || line.boxThanQty || line.hsnCode.trim() || line.taxPercent
+        line.itemName.trim() || line.colour.trim() || line.width.trim() || line.billQty || line.pricePerUnit || line.boxThanQty || line.hsnCode.trim() || line.taxPercent
       );
       if (lines.length === 0) {
         throw new Error('Add at least one fabric line.');
@@ -225,11 +228,12 @@ export default function InwardStockPage() {
       }
 
       const { lines: _lines, ...header } = formData;
-      const payloadLines = lines.map(({ itemName, colour, billQty, unit, pricePerUnit, boxThanQty, hsnCode, taxPercent }) => ({
+      const payloadLines = lines.map(({ itemName, colour, billQty, unit, width, pricePerUnit, boxThanQty, hsnCode, taxPercent }) => ({
         itemName: itemName.trim(),
         colour: colour.trim() || null,
         billQty: Number(billQty),
         unit,
+        width: width.trim() || null,
         pricePerUnit: pricePerUnit === '' ? null : Number(pricePerUnit),
         boxThanQty: boxThanQty === '' ? null : Number(boxThanQty),
         hsnCode: hsnCode.trim() || null,
@@ -284,6 +288,7 @@ export default function InwardStockPage() {
           billQty: String(item.billQty),
           // Show the saved unit as it is; anything unrecognised must be picked again, never guessed.
           unit: item.unit === 'PCS' || item.unit === 'MTR' ? item.unit : '',
+          width: item.width || '',
           pricePerUnit: item.pricePerUnit != null ? String(item.pricePerUnit) : '',
           boxThanQty: item.boxThanQty != null ? String(item.boxThanQty) : '',
           hsnCode: item.hsnCode || '',
@@ -322,6 +327,7 @@ export default function InwardStockPage() {
         Type: item.entryType === 'DYED' ? 'Dyed' : 'Undyed',
         Fabric: item.itemName,
         Colour: item.colour || '',
+        Width: item.width || '',
         'Bill No.': item.billNo,
         'Bill Date': formatDate(item.billDate),
         Received: formatDate(item.receivingDate),
@@ -517,6 +523,7 @@ export default function InwardStockPage() {
                   <th className={th}>Type</th>
                   <th className={th}>Fabric</th>
                   <th className={th}>Colour</th>
+                  <th className={th}>Width</th>
                   <th className={th}>Bill No.</th>
                   <th className={th}>Bill Date</th>
                   <th className={th}>Received</th>
@@ -535,7 +542,7 @@ export default function InwardStockPage() {
               <tbody className="divide-y divide-neutral-100">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={15} className="px-4 py-14 text-center">
+                    <td colSpan={16} className="px-4 py-14 text-center">
                       <ArrowDownToLine className="w-8 h-8 mx-auto text-neutral-300" />
                       <p className="text-sm font-medium text-neutral-500 mt-3">{loading ? 'Loading…' : 'No inward entries yet'}</p>
                     </td>
@@ -557,6 +564,7 @@ export default function InwardStockPage() {
                         </td>
                         <td className="py-3 px-4 font-semibold text-neutral-900">{item.itemName}</td>
                         <td className="py-3 px-4 text-neutral-700">{item.colour || <span className="text-neutral-400">—</span>}</td>
+                        <td className="py-3 px-4 text-neutral-700 whitespace-nowrap">{item.width || <span className="text-neutral-400">—</span>}</td>
                         <td className="py-3 px-4 font-mono text-xs font-semibold text-neutral-900">{item.billNo}</td>
                         <td className="py-3 px-4 text-xs text-neutral-500 whitespace-nowrap">{formatDate(item.billDate)}</td>
                         <td className="py-3 px-4 text-xs text-neutral-700 whitespace-nowrap">{formatDate(item.receivingDate)}</td>
@@ -846,10 +854,11 @@ export default function InwardStockPage() {
                   )}
                 </div>
                 <div className="border border-neutral-200 rounded-lg overflow-x-auto">
-                  <div className="min-w-[50rem]">
-                  <div className="grid grid-cols-[minmax(10rem,1fr)_6.5rem_5.5rem_4.75rem_5.5rem_5rem_5.5rem_4.5rem_2rem] gap-2 px-2 py-1.5 bg-neutral-50 text-[10px] font-black uppercase text-neutral-500">
+                  <div className="min-w-[55rem]">
+                  <div className="grid grid-cols-[minmax(10rem,1fr)_6.5rem_4.5rem_5.5rem_4.75rem_5.5rem_5rem_5.5rem_4.5rem_2rem] gap-2 px-2 py-1.5 bg-neutral-50 text-[10px] font-black uppercase text-neutral-500">
                     <span>Item name (fabric)</span>
                     <span>Colour</span>
+                    <span>Width</span>
                     <span className="text-right">Qty</span>
                     <span>Unit</span>
                     <span className="text-right">Price / unit</span>
@@ -859,7 +868,7 @@ export default function InwardStockPage() {
                     <span />
                   </div>
                   {formData.lines.map((line, idx) => (
-                    <div key={line.key} className="grid grid-cols-[minmax(10rem,1fr)_6.5rem_5.5rem_4.75rem_5.5rem_5rem_5.5rem_4.5rem_2rem] gap-2 px-2 py-1.5 border-t border-neutral-200 items-center">
+                    <div key={line.key} className="grid grid-cols-[minmax(10rem,1fr)_6.5rem_4.5rem_5.5rem_4.75rem_5.5rem_5rem_5.5rem_4.5rem_2rem] gap-2 px-2 py-1.5 border-t border-neutral-200 items-center">
                       <input
                         type="text"
                         value={line.itemName}
@@ -874,6 +883,15 @@ export default function InwardStockPage() {
                         onChange={(e) => updateLine(line.key, { colour: e.target.value })}
                         placeholder="e.g. Off White"
                         aria-label={`Line ${idx + 1} colour`}
+                        className="h-8 px-2 border border-neutral-300 rounded-md text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                      />
+                      <input
+                        type="text"
+                        value={line.width}
+                        onChange={(e) => updateLine(line.key, { width: e.target.value })}
+                        placeholder='e.g. 58"'
+                        maxLength={30}
+                        aria-label={`Line ${idx + 1} width`}
                         className="h-8 px-2 border border-neutral-300 rounded-md text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
                       />
                       <input

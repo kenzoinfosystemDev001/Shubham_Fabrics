@@ -530,7 +530,7 @@ const CATEGORY_CHIPS = [
 
 const STANDARD_LABEL: Record<string, string> = { TOP: 'Top', BOTTOM: 'Bottom', DUPATTA: 'Dupatta', OTHER: 'Other' };
 
-// Readable tones (the old Top badge was dark text on dark lavender).
+// Readable tones (the old Top badge was dark text on a dark tint).
 const CATEGORY_TONE: Record<string, string> = {
   TOP: 'bg-brand-100 text-brand-800',
   BOTTOM: 'bg-accent-100 text-neutral-900',

@@ -7,8 +7,8 @@ interface StatusBadgeProps {
   type?: 'challan' | 'program' | 'priority' | 'quality';
 }
 
-// Theme mapping: done = lavender, in progress = chartreuse, needs attention = solid
-// chartreuse, failed/rejected = tomato, everything else (pending, on hold) = neutral.
+// Theme mapping: done = blue, in progress = sky blue, needs attention = solid
+// sky blue, failed/rejected = red, everything else (pending, on hold) = neutral.
 export function StatusBadge({ status, type = 'challan' }: StatusBadgeProps) {
   let colorClass = 'bg-white text-neutral-700 border-neutral-300';
 

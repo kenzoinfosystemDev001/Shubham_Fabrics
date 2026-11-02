@@ -229,6 +229,13 @@ export function QC2Navigation() {
 
           {/* HOLD: fabric kept back from forwarding */}
           <Link
+            href="/qc2/defective-shelf"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/qc2/defective-shelf', true)}
+          >
+            <span>Defective Shelf</span>
+          </Link>
+          <Link
             href="/qc2/hold"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/qc2/hold', true)}

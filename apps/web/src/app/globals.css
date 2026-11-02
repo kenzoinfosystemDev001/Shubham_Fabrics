@@ -4,49 +4,52 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Shubham Fabrics MES theme tokens (RGB channels). See tailwind.config.js for usage rules. */
+/* Shubham Fabrics MES theme tokens (RGB channels): white, blue and black. See tailwind.config.js for usage rules.
+   brand = blue (primary actions, active navigation, links, selected tabs); accent = sky blue (light highlights,
+   progress, positive states; dark text only); danger = red (errors and destructive actions only);
+   neutral = cool grey, white #FFFFFF to ink #111827 (text, borders, inputs, page canvas). */
 :root {
-  --brand-50: 247 241 252; /* #F7F1FC */
-  --brand-100: 239 226 248; /* #EFE2F8 */
-  --brand-200: 223 198 241; /* #DFC6F1 */
-  --brand-300: 204 165 232; /* #CCA5E8 */
-  --brand-400: 196 154 228; /* #C49AE4 */
-  --brand-500: 181 126 220; /* #B57EDC */
-  --brand-600: 142 85 196; /* #8E55C4 */
-  --brand-700: 116 66 166; /* #7442A6 */
-  --brand-800: 91 52 131; /* #5B3483 */
-  --brand-900: 67 38 96; /* #432660 */
-  --accent-50: 251 255 230; /* #FBFFE6 */
-  --accent-100: 245 255 194; /* #F5FFC2 */
-  --accent-200: 238 255 138; /* #EEFF8A */
-  --accent-300: 231 255 77; /* #E7FF4D */
-  --accent-400: 223 255 0; /* #DFFF00 */
-  --accent-500: 201 230 0; /* #C9E600 */
-  --accent-600: 157 179 0; /* #9DB300 */
-  --accent-700: 101 117 0; /* #657500 */
-  --accent-800: 74 86 0; /* #4A5600 */
-  --accent-900: 52 61 0; /* #343D00 */
-  --danger-50: 255 244 242; /* #FFF4F2 */
-  --danger-100: 255 229 224; /* #FFE5E0 */
-  --danger-200: 255 202 191; /* #FFCABF */
-  --danger-300: 255 165 147; /* #FFA593 */
-  --danger-400: 255 129 105; /* #FF8169 */
-  --danger-500: 255 99 71; /* #FF6347 */
-  --danger-600: 201 58 34; /* #C93A22 */
-  --danger-700: 165 46 26; /* #A52E1A */
-  --danger-800: 129 36 18; /* #812412 */
-  --danger-900: 92 26 12; /* #5C1A0C */
+  --brand-50: 239 246 255; /* #EFF6FF */
+  --brand-100: 219 234 254; /* #DBEAFE */
+  --brand-200: 191 219 254; /* #BFDBFE */
+  --brand-300: 147 197 253; /* #93C5FD */
+  --brand-400: 96 165 250; /* #60A5FA */
+  --brand-500: 59 130 246; /* #3B82F6 */
+  --brand-600: 37 99 235; /* #2563EB */
+  --brand-700: 29 78 216; /* #1D4ED8 */
+  --brand-800: 30 64 175; /* #1E40AF */
+  --brand-900: 30 58 138; /* #1E3A8A */
+  --accent-50: 240 249 255; /* #F0F9FF */
+  --accent-100: 224 242 254; /* #E0F2FE */
+  --accent-200: 186 230 253; /* #BAE6FD */
+  --accent-300: 125 211 252; /* #7DD3FC */
+  --accent-400: 56 189 248; /* #38BDF8 */
+  --accent-500: 14 165 233; /* #0EA5E9 */
+  --accent-600: 2 132 199; /* #0284C7 */
+  --accent-700: 3 105 161; /* #0369A1 */
+  --accent-800: 7 89 133; /* #075985 */
+  --accent-900: 12 74 110; /* #0C4A6E */
+  --danger-50: 254 242 242; /* #FEF2F2 */
+  --danger-100: 254 226 226; /* #FEE2E2 */
+  --danger-200: 254 202 202; /* #FECACA */
+  --danger-300: 252 165 165; /* #FCA5A5 */
+  --danger-400: 248 113 113; /* #F87171 */
+  --danger-500: 239 68 68; /* #EF4444 */
+  --danger-600: 220 38 38; /* #DC2626 */
+  --danger-700: 185 28 28; /* #B91C1C */
+  --danger-800: 153 27 27; /* #991B1B */
+  --danger-900: 127 29 29; /* #7F1D1D */
   --neutral-0: 255 255 255; /* #FFFFFF */
-  --neutral-50: 248 247 250; /* #F8F7FA */
-  --neutral-100: 241 239 244; /* #F1EFF4 */
-  --neutral-200: 229 225 232; /* #E5E1E8 */
-  --neutral-300: 211 206 216; /* #D3CED8 */
-  --neutral-400: 143 138 150; /* #8F8A96 */
-  --neutral-500: 107 104 114; /* #6B6872 */
-  --neutral-600: 87 84 94; /* #57545E */
-  --neutral-700: 67 64 74; /* #43404A */
-  --neutral-800: 52 49 58; /* #34313A */
-  --neutral-900: 37 35 42; /* #25232A */
+  --neutral-50: 249 250 251; /* #F9FAFB */
+  --neutral-100: 243 244 246; /* #F3F4F6 */
+  --neutral-200: 229 231 235; /* #E5E7EB */
+  --neutral-300: 209 213 219; /* #D1D5DB */
+  --neutral-400: 156 163 175; /* #9CA3AF */
+  --neutral-500: 107 114 128; /* #6B7280 */
+  --neutral-600: 75 85 99; /* #4B5563 */
+  --neutral-700: 55 65 81; /* #374151 */
+  --neutral-800: 31 41 55; /* #1F2937 */
+  --neutral-900: 17 24 39; /* #111827 */
 
   --background: rgb(var(--neutral-50));
   --foreground: rgb(var(--neutral-900));
@@ -94,7 +97,7 @@ body {
   background: rgb(var(--neutral-400));
 }
 
-/* Keyboard focus: one lavender ring everywhere */
+/* Keyboard focus: one blue ring everywhere */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 2px solid rgb(var(--brand-500));
   outline-offset: 2px;
@@ -147,51 +150,44 @@ html[data-app-background] main .min-h-screen:is(.bg-canvas, .bg-neutral-50, .bg-
    Shadows are composed with Tailwind's ring variables so ring utilities keep working.
    --------------------------------------------------------------------------------------------- */
 :root {
-  --ink-shadow: 37 35 42;
+  --ink-shadow: 17 24 39;
   --ring-stack: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000);
-  --raise-sheen: linear-gradient(180deg, rgb(255 255 255 / 0) 55%, rgb(var(--neutral-100) / 0.45));
-  --button-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.22) 0, rgb(255 255 255 / 0.22) 1px,
-      rgb(255 255 255 / 0.08) 1px, rgb(255 255 255 / 0) 60%, rgb(0 0 0 / 0.06));
-  --button-sheen-pressed: linear-gradient(180deg, rgb(0 0 0 / 0.08), rgb(0 0 0 / 0) 70%);
+  /* Surfaces are flat white: no sheens or gradients, only borders and soft shadows. */
+  --raise-sheen: none;
+  --button-sheen: none;
+  --button-sheen-pressed: none;
   --ease-lift: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 @media screen {
-  /* Canvas: a soft pool of light at the top of the page. */
-  body {
-    background-image: radial-gradient(1200px 520px at 50% -140px, rgb(var(--neutral-0)) 0%, rgb(var(--neutral-0) / 0) 70%);
-    background-repeat: no-repeat;
-  }
-
   /* Raised surfaces: white rounded cards, panels, table containers and dialogs. */
   :where(.bg-white.border:is(.rounded-xl, .rounded-2xl)):where(:not(input, select, textarea, button)) {
     background-image: var(--raise-sheen);
     box-shadow: var(--ring-stack), 0 1px 2px 0 rgb(var(--ink-shadow) / 0.05), 0 2px 6px -2px rgb(var(--ink-shadow) / 0.07);
   }
 
-  /* Sticky page headers float a little above the content scrolling beneath them. */
+  /* Sticky page headers sit just above the content scrolling beneath them. */
   :where(header.sticky) {
-    box-shadow: 0 1px 0 rgb(255 255 255 / 0.7) inset, 0 8px 18px -14px rgb(var(--ink-shadow) / 0.35);
+    box-shadow: 0 1px 0 rgb(var(--neutral-200)), 0 6px 14px -12px rgb(var(--ink-shadow) / 0.25);
   }
 
-  /* Sidebar: a slab sitting above the content, with a lit inner edge. */
+  /* Sidebar: separated from the content by a hairline and a soft shadow. */
   :where(aside.fixed) {
-    box-shadow: inset -1px 0 0 rgb(255 255 255 / 0.6), 8px 0 28px -18px rgb(var(--ink-shadow) / 0.28);
+    box-shadow: inset -1px 0 0 rgb(var(--neutral-200)), 6px 0 20px -16px rgb(var(--ink-shadow) / 0.2);
   }
-  /* Active nav item: slightly raised (every sidebar marks it with a left border). */
+  /* Active nav item (every sidebar marks it with a left border): light blue with a blue edge. */
   :where(aside nav a[class~='border-l-2'], aside nav a[aria-current='page']) {
-    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 70%);
-    box-shadow: 0 1px 2px 0 rgb(var(--ink-shadow) / 0.06), 0 3px 8px -3px rgb(var(--brand-700) / 0.22),
-      inset 0 0 0 1px rgb(var(--brand-300) / 0.35);
+    background-color: rgb(var(--brand-50));
+    box-shadow: inset 0 0 0 1px rgb(var(--brand-200) / 0.6);
   }
 
-  /* Solid buttons (lavender, tomato, ink, chartreuse): lit top edge, tinted drop shadow. */
+  /* Solid buttons (blue, red, ink, sky): a soft tinted drop shadow. */
   :is(button, a, [role='button'], input[type='submit'], input[type='button']):is(
       [class~='bg-brand-500'], [class~='bg-brand-600'], [class~='bg-brand-700'], [class~='bg-brand-800'],
       [class~='bg-danger-500'], [class~='bg-danger-600'], [class~='bg-danger-700'],
       [class~='bg-neutral-800'], [class~='bg-neutral-900'], [class~='bg-accent-400'], [class~='bg-accent-300']
     ) {
-    --button-glow: rgb(var(--brand-700) / 0.28);
+    --button-glow: rgb(var(--brand-700) / 0.25);
     background-image: var(--button-sheen);
     box-shadow: var(--ring-stack), 0 1px 1px 0 rgb(var(--ink-shadow) / 0.12), 0 3px 8px -3px var(--button-glow);
   }
@@ -202,10 +198,9 @@ html[data-app-background] main .min-h-screen:is(.bg-canvas, .bg-neutral-50, .bg-
     --button-glow: rgb(var(--ink-shadow) / 0.25);
   }
 
-  /* Outlined white buttons: a faint convex face. Translucent so hover tints still show. */
+  /* Outlined white buttons: flat, with a hairline shadow. */
   :where(button, a[role='button'])[class~='bg-white'][class~='border'] {
-    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.6), rgb(var(--neutral-100) / 0.55));
-    box-shadow: var(--ring-stack), 0 1px 2px 0 rgb(var(--ink-shadow) / 0.06);
+    box-shadow: var(--ring-stack), 0 1px 2px 0 rgb(var(--ink-shadow) / 0.05);
   }
 
   /* Text fields, selects and textareas sit slightly recessed. */
@@ -213,19 +208,13 @@ html[data-app-background] main .min-h-screen:is(.bg-canvas, .bg-neutral-50, .bg-
     box-shadow: var(--ring-stack), inset 0 1px 2px 0 rgb(var(--ink-shadow) / 0.07);
   }
 
-  /* Table headers: a lit band over the existing header colour; rows ease their hover tint. */
-  :where(thead) {
-    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0));
-  }
-  :where(thead th) {
-    text-shadow: 0 1px 0 rgb(255 255 255 / 0.8);
-  }
+  /* Table rows ease their hover tint. */
   :where(tbody tr) {
     transition: background-color 0.15s ease;
   }
 }
 
-/* Checkboxes and radios follow the lavender brand instead of the browser default blue. */
+/* Checkboxes and radios follow the brand blue. */
 :where(input[type='checkbox'], input[type='radio']) {
   accent-color: rgb(var(--brand-600));
 }
@@ -244,17 +233,15 @@ html[data-app-background] main .min-h-screen:is(.bg-canvas, .bg-neutral-50, .bg-
     transition-timing-function: var(--ease-lift);
   }
 
-  /* Buttons lift a pixel on hover and press back down when clicked. */
+  /* Buttons deepen their shadow on hover and settle when clicked (no movement). */
   :is(button, a, [role='button'], input[type='submit'], input[type='button']):is(
       [class~='bg-brand-500'], [class~='bg-brand-600'], [class~='bg-brand-700'], [class~='bg-brand-800'],
       [class~='bg-danger-500'], [class~='bg-danger-600'], [class~='bg-danger-700'],
       [class~='bg-neutral-800'], [class~='bg-neutral-900'], [class~='bg-accent-400'], [class~='bg-accent-300']
     ):not(:disabled, [aria-disabled='true']):hover {
-    transform: translateY(-1px);
     box-shadow: var(--ring-stack), 0 2px 3px -1px rgb(var(--ink-shadow) / 0.14), 0 8px 16px -6px var(--button-glow);
   }
   :where(button, a[role='button'])[class~='bg-white'][class~='border']:not(:disabled, [aria-disabled='true']):hover {
-    transform: translateY(-1px);
     box-shadow: var(--ring-stack), 0 2px 3px -1px rgb(var(--ink-shadow) / 0.08), 0 6px 12px -6px rgb(var(--ink-shadow) / 0.16);
   }
   :is(button, a, [role='button'], input[type='submit'], input[type='button']):is(
@@ -263,27 +250,17 @@ html[data-app-background] main .min-h-screen:is(.bg-canvas, .bg-neutral-50, .bg-
       [class~='bg-neutral-800'], [class~='bg-neutral-900'], [class~='bg-accent-400'], [class~='bg-accent-300'],
       [class~='bg-white'][class~='border']
     ):not(:disabled, [aria-disabled='true']):active {
-    transform: translateY(0.5px);
     background-image: var(--button-sheen-pressed);
     box-shadow: var(--ring-stack), inset 0 1px 2px 0 rgb(var(--ink-shadow) / 0.18);
     transition-duration: 0.06s;
   }
 
-  /* Cards that already grow their shadow on hover also rise slightly. */
+  /* Cards that grow their shadow on hover ease it in. */
   :where(a, button):where(.rounded-xl, .rounded-2xl)[class*='hover:shadow'] {
     transition-property: color, background-color, border-color, box-shadow, transform;
     transition-duration: 0.2s;
     transition-timing-function: var(--ease-lift);
   }
-  :where(a, button):where(.rounded-xl, .rounded-2xl)[class*='hover:shadow']:hover {
-    transform: translateY(-2px);
-  }
-
-  /* Sidebar items nudge toward the content on hover. */
-  :where(aside nav a):hover {
-    transform: translateX(2px);
-  }
-
   /* Dialogs and drawers: the scrim fades in and the panel rises into place (once, on open). */
   :where(.fixed.inset-0)[class*='bg-neutral-900/'] {
     animation: sf-scrim-in 0.16s ease-out;

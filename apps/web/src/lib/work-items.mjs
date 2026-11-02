@@ -116,15 +116,53 @@ export function receivedBasis(item) {
   return item.status === 'AWAITING_RECEIPT' ? 0 : round(item.expectedQuantity);
 }
 
-/** Received but not yet processed. */
-export function availableToProcess(item) {
-  return round(Math.max(0, receivedBasis(item) - (Number(item.processedQuantity) || 0)));
+/** Still on HOLD on the line (kept in step with its open HOLD records); blocked until released. */
+export function heldOf(item) {
+  return round(Math.max(0, Number(item?.heldQuantity) || 0));
 }
 
-/** Processed (QC: passed) but not yet transferred: the most a new outgoing challan line may carry. */
+/**
+ * Quantity of the line that may still move: received - forwarded - written off - HOLD. Forwarded is every
+ * challan out (QC: PASS, REJECT and REWORK); written off is defective (production departments); for QC lines,
+ * REJECT and REWORK decided but not yet sent are already spoken for. HOLD is taken off last, so held quantity is
+ * never processed, inspected or transferred, and nothing is subtracted twice.
+ */
+export function freeQuantity(item) {
+  const received = receivedBasis(item);
+  const spoken = isQcItem(item)
+    ? (Number(item.transferredQuantity) || 0) + (Number(item.rejectedQuantity) || 0) + (Number(item.reworkQuantity) || 0)
+    : (Number(item.transferredQuantity) || 0) + (Number(item.defectQuantity) || 0);
+  return round(Math.max(0, received - spoken - heldOf(item)));
+}
+
+/** "1 MTR is currently on HOLD. " when the line has HOLD, for messages about what is available. */
+export function holdNote(item) {
+  const held = heldOf(item);
+  return held > 0 ? `${held} ${item.uom} is currently on HOLD. ` : '';
+}
+
+/**
+ * Where the HOLD sits: first on quantity not yet processed (QC: inspected), and only what is held beyond that on
+ * quantity processed (QC: passed) but not yet sent. Returns [held from unprocessed, held from processed].
+ */
+function heldSplit(item) {
+  const unprocessed = Math.max(0, receivedBasis(item) - (Number(item.processedQuantity) || 0) - (isQcItem(item) ? 0 : Number(item.defectQuantity) || 0));
+  const held = heldOf(item);
+  const early = Math.min(held, unprocessed);
+  return [round(early), round(held - early)];
+}
+
+/** Received but not yet processed (QC: inspected), less what is on HOLD. */
+export function availableToProcess(item) {
+  const open = Math.max(0, receivedBasis(item) - (Number(item.processedQuantity) || 0));
+  return round(Math.max(0, open - heldSplit(item)[0]));
+}
+
+/** Processed (QC: passed) but not yet transferred, less what is on HOLD: the most a new outgoing challan line may carry. */
 export function readyToTransfer(item) {
   const basis = isQcItem(item) ? item.passedQuantity : item.processedQuantity;
-  return round(Math.max(0, (Number(basis) || 0) - (Number(item.transferredQuantity) || 0)));
+  const open = Math.max(0, (Number(basis) || 0) - (Number(item.transferredQuantity) || 0));
+  return round(Math.min(Math.max(0, open - heldSplit(item)[1]), freeQuantity(item)));
 }
 
 /** QC: rejected but not yet sent to the defective shelf. */
@@ -166,6 +204,7 @@ export function qcStages(next, reworkTo) {
     { key: 'PASSED', label: `Passed, awaiting ${next}` },
     { key: 'REJECTED', label: 'Rejected, awaiting Defective Shelf' },
     { key: 'REWORK', label: `Rework, awaiting return to ${reworkTo}` },
+    { key: 'ON_HOLD', label: 'On HOLD' },
     { key: 'COMPLETED', label: 'Completed' },
   ];
 }
@@ -180,6 +219,7 @@ export function qcStageEntries(item) {
   if (readyToTransfer(item) > 0) entries.push({ key: 'PASSED', quantity: readyToTransfer(item) });
   if (pendingReject(item) > 0) entries.push({ key: 'REJECTED', quantity: pendingReject(item) });
   if (pendingRework(item) > 0) entries.push({ key: 'REWORK', quantity: pendingRework(item) });
+  if (heldOf(item) > 0) entries.push({ key: 'ON_HOLD', quantity: heldOf(item) });
   return entries;
 }
 
@@ -200,7 +240,14 @@ export function validateInspection(item, input) {
     if (!Number.isFinite(v) || v < 0) return { ok: false, error: `${label} quantity must be zero or more.` };
   }
   const open = availableToProcess(item);
-  if (round(inspected) > open) return { ok: false, error: `Only ${open} ${item.uom} is still uninspected.` };
+  if (round(inspected) > open) {
+    return {
+      ok: false,
+      error: heldOf(item) > 0
+        ? `Insufficient Available Quantity. ${holdNote(item)}Maximum quantity that can be inspected is ${open} ${item.uom}.`
+        : `Only ${open} ${item.uom} is still uninspected.`,
+    };
+  }
   const sum = round(pass + reject + rework);
   if (sum !== round(inspected)) {
     return { ok: false, error: `PASS + REJECT + REWORK (${sum}) must equal the inspected quantity (${round(inspected)} ${item.uom}).` };
@@ -278,6 +325,11 @@ export function validateWorkUpdate(item, input) {
     processed = round(parsed);
   }
   if (processed > received) return { ok: false, error: `Processed quantity cannot exceed the received ${received} ${item.uom}.` };
+  // Held quantity is never processed: more processed than before may not reach into the HOLD.
+  const processLimit = round(received - (Number(item.defectQuantity) || 0) - heldOf(item));
+  if (processed > round(item.processedQuantity) && processed > processLimit) {
+    return { ok: false, error: `Insufficient Available Quantity. ${holdNote(item)}Processed quantity can be at most ${Math.max(0, processLimit)} ${item.uom}.` };
+  }
   if (processed < transferred) {
     return { ok: false, error: `${transferred} ${item.uom} has already been transferred; processed quantity cannot be lower.` };
   }
@@ -325,6 +377,10 @@ export function validateProductionUpdate(item, input) {
   if (!Number.isFinite(defect) || defect < 0) return { ok: false, error: 'Defective quantity must be zero or more.' };
   const received = receivedBasis(item);
   if (round(taken) > received) return { ok: false, error: `Quantity taken into production cannot exceed the received ${received} ${item.uom}.` };
+  const takeLimit = round(received - heldOf(item));
+  if (round(taken) > round(item.takenQuantity) && round(taken) > takeLimit) {
+    return { ok: false, error: `Insufficient Available Quantity. ${holdNote(item)}At most ${Math.max(0, takeLimit)} ${item.uom} can be taken into production.` };
+  }
   if (round(defect) < round(item.defectQuantity)) {
     return { ok: false, error: `${round(item.defectQuantity)} ${item.uom} was already recorded as defective; it cannot be reduced here.` };
   }
@@ -368,6 +424,9 @@ export function validateTransferLines(lines, itemsById, departmentCode, kind = '
     const total = round((sent.get(line.workItemId) || 0) + quantity);
     sent.set(line.workItemId, total);
     if (total > available) {
+      if (kind === 'PASS' && heldOf(item) > 0) {
+        return { ok: false, error: `Line ${n}: Insufficient Available Quantity. ${holdNote(item)}Maximum transferable quantity of ${item.fabricName} is ${available} ${item.uom}.` };
+      }
       const what = kind === 'REJECT' ? 'rejected and not yet sent' : kind === 'REWORK' ? 'marked for rework and not yet returned' : qc ? 'passed and not yet transferred' : 'ready to transfer';
       return { ok: false, error: `Line ${n}: only ${available} ${item.uom} of ${item.fabricName} is ${what}.` };
     }

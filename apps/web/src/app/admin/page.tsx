@@ -25,15 +25,22 @@ import {
   UserPlus,
   Pencil,
   Image as ImageIcon,
-  Palette
+  Palette,
+  ShieldAlert,
+  RotateCcw,
+  PauseCircle
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { getCurrentUser, isAdminUser } from '@/lib/rbac';
 import { ShubhamLogo } from '@/components/ShubhamLogo';
 import { AppearancePanel, SidebarImagePanel } from '@/components/admin/LoginAppearancePanel';
 import { AdminDepartmentMenu } from '@/components/admin/AdminDepartmentMenu';
+import { QualityMonitorPanel, type MonitorKind } from '@/components/admin/QualityMonitorPanel';
 import { departmentName } from '@/lib/workflow-views';
 import { printProductionSheet } from '@/lib/download-production-sheet';
+
+const QUALITY_TAB_KIND = { rejected: 'REJECT', rework: 'REWORK', hold: 'HOLD' } as const;
+const QUALITY_KIND_TAB = { REJECT: 'rejected', REWORK: 'rework', HOLD: 'hold' } as const;
 
 // Every department a user can belong to, with the role a new user there normally gets.
 const DEPARTMENT_OPTIONS = [
@@ -107,7 +114,7 @@ interface EditableUser {
 export default function AdminConsolePage() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabrics' | 'stocks' | 'sidebar-image' | 'login-appearance'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabrics' | 'stocks' | 'rejected' | 'rework' | 'hold' | 'sidebar-image' | 'login-appearance'>('users');
   const [loading, setLoading] = useState(true);
 
   // Data states
@@ -117,6 +124,8 @@ export default function AdminConsolePage() {
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [fabrics, setFabrics] = useState<any[]>([]);
   const [stocksData, setStocksData] = useState<any>(null);
+  // Live counts of REJECT / REWORK / HOLD records for the monitoring tabs.
+  const [qualityCounts, setQualityCounts] = useState<Record<MonitorKind, number> | null>(null);
 
   // Search filter
   const [searchTerm, setSearchTerm] = useState('');
@@ -162,13 +171,14 @@ export default function AdminConsolePage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [usersRes, programsRes, challansRes, suppliersRes, fabricsRes, stocksRes] = await Promise.all([
+      const [usersRes, programsRes, challansRes, suppliersRes, fabricsRes, stocksRes, qualityRes] = await Promise.all([
         fetch('/api/admin/users').then((r) => r.json()).catch(() => []),
         fetch('/api/programs').then((r) => r.json()).catch(() => []),
         fetch('/api/challans').then((r) => r.json()).catch(() => []),
         fetch('/api/admin/suppliers').then((r) => r.json()).catch(() => []),
         fetch('/api/admin/fabrics').then((r) => r.json()).catch(() => []),
         fetch('/api/admin/stocks').then((r) => r.json()).catch(() => null),
+        fetch('/api/admin/quality-monitor?countsOnly=1').then((r) => (r.ok ? r.json() : null)).catch(() => null),
       ]);
 
       // Retired duplicate station accounts ("<name>-old", switched off) exist only so old records keep
@@ -183,6 +193,7 @@ export default function AdminConsolePage() {
       setSuppliers(Array.isArray(suppliersRes) ? suppliersRes : []);
       setFabrics(Array.isArray(fabricsRes) ? fabricsRes : []);
       setStocksData(stocksRes);
+      if (qualityRes?.counts) setQualityCounts(qualityRes.counts);
     } catch (err: any) {
       console.error('Failed to load admin data:', err);
     } finally {
@@ -529,6 +540,9 @@ export default function AdminConsolePage() {
             { id: 'suppliers', label: 'Suppliers', icon: Building, count: suppliers.length },
             { id: 'fabrics', label: 'Fabrics Master', icon: Layers, count: fabrics.length },
             { id: 'stocks', label: 'Stocks & Inventory', icon: Boxes, count: stocksData?.summary?.totalRolls },
+            { id: 'rejected', label: 'Rejected Fabric', icon: ShieldAlert, count: qualityCounts?.REJECT },
+            { id: 'rework', label: 'Rework Fabric', icon: RotateCcw, count: qualityCounts?.REWORK },
+            { id: 'hold', label: 'Hold Fabric', icon: PauseCircle, count: qualityCounts?.HOLD },
             { id: 'sidebar-image', label: 'Sidebar Image', icon: ImageIcon, count: undefined },
             { id: 'login-appearance', label: 'Appearance', icon: Palette, count: undefined },
           ].map((tab) => {
@@ -575,6 +589,15 @@ export default function AdminConsolePage() {
             {/* DEPARTMENT SIDEBAR IMAGES */}
             {activeTab === 'sidebar-image' && <SidebarImagePanel onNotify={showNotification} />}
             {activeTab === 'login-appearance' && <AppearancePanel onNotify={showNotification} />}
+
+            {/* REJECTED / REWORK / HOLD FABRIC MONITORING */}
+            {(activeTab === 'rejected' || activeTab === 'rework' || activeTab === 'hold') && (
+              <QualityMonitorPanel
+                kind={QUALITY_TAB_KIND[activeTab]}
+                onKindChange={(kind) => setActiveTab(QUALITY_KIND_TAB[kind])}
+                onCounts={setQualityCounts}
+              />
+            )}
 
             {/* TAB 1: USERS & RBAC */}
             {activeTab === 'users' && (() => {
