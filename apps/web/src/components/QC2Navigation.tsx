@@ -21,8 +21,8 @@ export function QC2Navigation() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>({
-    fullName: 'Threadcut QC Inspector',
-    username: 'qc2',
+    fullName: 'Threadcut QC Incharge',
+    username: 'threadcutqc',
     role: 'QC2_INSPECTOR',
     departmentCode: 'QC2',
   });

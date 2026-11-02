@@ -21,8 +21,8 @@ export function QCWashingNavigation() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>({
-    fullName: 'Washing QC Inspector',
-    username: 'qc3',
+    fullName: 'Washing QC Incharge',
+    username: 'washingqc',
     role: 'QC3_INSPECTOR',
     departmentCode: 'QC3',
   });

@@ -152,9 +152,10 @@ export function isQc1User(user: MESUser | null): boolean {
   const roles = (user.roles || []).map((r) => r.toUpperCase());
 
   if (dept === 'QC2' || dept === 'QC3' || dept === 'QCWASHING' || dept === 'QC_WASHING') return false;
-  if (username === 'qc2' || username === 'qc2_insp' || username === 'qc3' || username === 'qcwashing' || username === 'qc_washing') return false;
+  if (username === 'qc2' || username === 'qc2_insp' || username === 'threadcutqc' || username === 'qc3' || username === 'qcwashing' || username === 'qc_washing' || username === 'washingqc') return false;
 
   return (
+    username === 'dyeingqc' ||
     username === 'qc1' ||
     username === 'qc_insp' ||
     dept === 'QC1' ||
@@ -175,9 +176,10 @@ export function isQc2User(user: MESUser | null): boolean {
   const roles = (user.roles || []).map((r) => r.toUpperCase());
 
   if (dept === 'QC1' || dept === 'QC3' || dept === 'QCWASHING' || dept === 'QC_WASHING') return false;
-  if (username === 'qc1' || username === 'qc_insp' || username === 'qc3' || username === 'qcwashing' || username === 'qc_washing') return false;
+  if (username === 'qc1' || username === 'qc_insp' || username === 'dyeingqc' || username === 'qc3' || username === 'qcwashing' || username === 'qc_washing' || username === 'washingqc') return false;
 
   return (
+    username === 'threadcutqc' ||
     username === 'qc2' ||
     username === 'qc2_insp' ||
     dept === 'QC2' ||
@@ -216,6 +218,7 @@ export function isThreadCuttingUser(user: MESUser | null): boolean {
   const roles = (user.roles || []).map((r) => r.toUpperCase());
 
   return (
+    username === 'threadcut' ||
     username === 'cutting' ||
     username === 'thread_cutting' ||
     dept === 'THREAD_CUTTING' ||
@@ -257,9 +260,10 @@ export function isQcWashingUser(user: MESUser | null): boolean {
   const roles = (user.roles || []).map((r) => r.toUpperCase());
 
   if (dept === 'QC1' || dept === 'QC2') return false;
-  if (username === 'qc1' || username === 'qc_insp' || username === 'qc2' || username === 'qc2_insp') return false;
+  if (username === 'qc1' || username === 'qc_insp' || username === 'dyeingqc' || username === 'qc2' || username === 'qc2_insp' || username === 'threadcutqc') return false;
 
   return (
+    username === 'washingqc' ||
     username === 'qcwashing' ||
     username === 'qc_washing' ||
     username === 'qc3' ||

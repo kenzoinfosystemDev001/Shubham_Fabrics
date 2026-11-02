@@ -36,8 +36,8 @@ export function FinalCheckNavigation() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>({
-    fullName: 'Final QC Inspector',
-    username: 'finalcheck',
+    fullName: 'Final QC Incharge',
+    username: 'finalqc',
     role: 'FINAL_CHECK_INSPECTOR',
     departmentCode: 'FINAL_CHECK',
   });

@@ -98,8 +98,8 @@ export async function POST(request: Request) {
 
         const coreUsers = [
           { username: 'admin', fullName: 'System Administrator', email: 'admin@subhamfabrics.com', role: 'ADMIN', dept: 'ADMIN' },
-          { username: 'program', fullName: 'Programming Department', email: 'programming@subhamfabrics.com', role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING' },
-          { username: 'store', fullName: 'Fabric Store Department', email: 'store@subhamfabrics.com', role: 'FABRIC_STORE', dept: 'STORE' },
+          { username: 'program', fullName: 'Programming Incharge', email: 'programming@subhamfabrics.com', role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING' },
+          { username: 'store', fullName: 'Fabric Store Incharge', email: 'store@subhamfabrics.com', role: 'FABRIC_STORE', dept: 'STORE' },
           { username: 'dyeing', fullName: 'Dyeing Incharge', email: 'dyeing@subhamfabrics.com', role: 'DYEING_INCHARGE', dept: 'DYEING' },
         ];
 
