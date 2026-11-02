@@ -14,10 +14,15 @@ test('receiver can receive an issued challan, but not twice', () => {
   assert.equal(checkGenericStatusChange('ISSUED', 'RECEIVED', sender).ok, false);
 });
 
-test('sender can cancel only before receipt, and never an engine-tracked challan', () => {
+test('sender withdraws or receiver declines only before receipt, and never an engine-tracked challan', () => {
   assert.equal(checkGenericStatusChange('ISSUED', 'CANCELLED', sender).ok, true);
   assert.equal(checkGenericStatusChange('RECEIVED', 'CANCELLED', sender).ok, false);
-  assert.equal(checkGenericStatusChange('ISSUED', 'CANCELLED', receiver).ok, false);
+  // Fabric Store "Not in Stock" declines a Programming -> Store request before receiving it.
+  assert.equal(checkGenericStatusChange('ISSUED', 'CANCELLED', receiver).ok, true);
+  assert.equal(checkGenericStatusChange('RECEIVED', 'CANCELLED', receiver).ok, false);
+  assert.equal(checkGenericStatusChange('ISSUED', 'CANCELLED', { ...receiver, engineManaged: true }).ok, false);
+  const outsider = { engineManaged: false, isSender: false, isReceiver: false, isAdmin: false };
+  assert.equal(checkGenericStatusChange('ISSUED', 'CANCELLED', outsider).ok, false);
   assert.equal(checkGenericStatusChange('ISSUED', 'CANCELLED', { ...sender, engineManaged: true }).ok, false);
   assert.equal(checkGenericStatusChange('ISSUED', 'CANCELLED', { ...admin, engineManaged: true }).ok, false);
 });
@@ -49,4 +54,9 @@ test('generic issue: only Programming -> Store and Store -> Dyeing / Embroidery'
   assert.equal(checkGenericIssueRoute('STITCHING', 'FINAL_CHECK').ok, false);
   assert.equal(checkGenericIssueRoute('PROGRAMMING', 'DYEING').ok, false);
   assert.equal(checkGenericIssueRoute('FINISHING', null).ok, false);
+});
+
+test('a SUBMITTED request counts as not yet received (Store can receive or decline it)', () => {
+  assert.equal(checkGenericStatusChange('SUBMITTED', 'RECEIVED', receiver).ok, true);
+  assert.equal(checkGenericStatusChange('SUBMITTED', 'CANCELLED', receiver).ok, true);
 });

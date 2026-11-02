@@ -28,7 +28,7 @@ export function checkGenericIssueRoute(fromKey, toKey) {
 }
 
 /** Statuses before anything was received: the challan can still be cancelled or received. */
-export const NOT_YET_RECEIVED = ['DRAFT', 'ISSUED', 'IN_TRANSIT'];
+export const NOT_YET_RECEIVED = ['DRAFT', 'SUBMITTED', 'ISSUED', 'IN_TRANSIT'];
 
 /** Final clean-up an administrator may record for challans no department screen tracks (older records). */
 const ADMIN_CLOSE_FROM = ['RECEIVED', 'IN_PROCESS', 'UNDER_INSPECTION', 'ON_HOLD', 'COMPLETED'];
@@ -55,7 +55,10 @@ export function checkGenericStatusChange(from, to, ctx) {
   }
 
   if (next === 'CANCELLED') {
-    if (!ctx.isSender && !ctx.isAdmin) return { ok: false, status: 403, error: 'Only the sending department can cancel this challan.' };
+    // The sender withdraws it, or the receiver declines it (e.g. Fabric Store: "Not in Stock"), before receipt.
+    if (!ctx.isSender && !ctx.isReceiver && !ctx.isAdmin) {
+      return { ok: false, status: 403, error: 'Only the sending or receiving department can cancel this challan.' };
+    }
     if (!NOT_YET_RECEIVED.includes(current)) {
       return { ok: false, status: 409, error: `This challan is ${current}; a challan can only be cancelled before it is received.` };
     }

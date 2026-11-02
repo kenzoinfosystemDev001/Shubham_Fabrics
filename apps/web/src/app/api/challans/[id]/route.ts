@@ -122,7 +122,7 @@ export async function DELETE(
       challan._count.workTransfers > 0 ||
       challan._count.productionLogs > 0 ||
       challan._count.inspections > 0 ||
-      !['DRAFT', 'ISSUED', 'IN_TRANSIT', 'CANCELLED'].includes(challan.status);
+      !['DRAFT', 'SUBMITTED', 'ISSUED', 'IN_TRANSIT', 'CANCELLED'].includes(challan.status);
     if (hasActivity) {
       const disabled = destructiveAdminActionsDisabled();
       if (disabled) {
