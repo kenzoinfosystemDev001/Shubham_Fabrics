@@ -711,24 +711,6 @@ export default function ProgramDetailPage() {
             />
           </div>
 
-          {/* PRODUCTION DATES */}
-          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-3 md:col-span-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-900 bg-neutral-100 px-2 py-0.5 rounded">
-              Production Dates
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-1">
-              <div>
-                <span className="text-neutral-500 block text-[11px]">Production Design Date</span>
-                <span className="text-neutral-900">{program.productionDesignDate ? new Date(program.productionDesignDate).toLocaleDateString() : '—'}</span>
-              </div>
-              <div>
-                <span className="text-neutral-500 block text-[11px]">Projected End Date</span>
-                <span className="text-neutral-900">{program.productionEndDate ? new Date(program.productionEndDate).toLocaleDateString() : '—'}</span>
-              </div>
-            </div>
-          </div>
-
-
         </div>
 
       </main>
