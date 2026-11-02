@@ -23,17 +23,6 @@ export async function GET(request: Request) {
         isActive: true,
         createdAt: true,
         updatedAt: true,
-        userRoles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                code: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -46,8 +35,6 @@ export async function GET(request: Request) {
       departmentCode: u.departmentCode || 'STORE',
       isActive: u.isActive,
       createdAt: u.createdAt,
-      role: u.userRoles?.[0]?.role?.code || 'USER',
-      roleName: u.userRoles?.[0]?.role?.name || 'Standard User',
     }));
 
     return NextResponse.json(formatted);
@@ -69,7 +56,6 @@ export async function POST(request: Request) {
     const fullName = (body.fullName || '').trim();
     const pin = String(body.pin || body.password || '').trim();
     const departmentCode = (body.departmentCode || 'PROGRAMMING').trim().toUpperCase();
-    const roleCode = (body.roleCode || (departmentCode === 'ADMIN' ? 'ADMIN' : departmentCode === 'STORE' ? 'FABRIC_STORE' : 'PROGRAMMING_INCHARGE')).trim();
     const email = (body.email || `${username}@subhamfabrics.com`).trim().toLowerCase();
 
     if (!username || !fullName) {
@@ -104,19 +90,6 @@ export async function POST(request: Request) {
 
     const passwordHash = await bcrypt.hash(pin, 10);
 
-    // Ensure role exists
-    let role = await prisma.role.findFirst({ where: { code: roleCode } });
-    if (!role) {
-      role = await prisma.role.create({
-        data: {
-          code: roleCode,
-          name: roleCode.replace(/_/g, ' '),
-          description: `Custom ${roleCode} role`,
-          isSystem: false,
-        },
-      });
-    }
-
     // Ensure department exists
     await prisma.department.upsert({
       where: { code: departmentCode },
@@ -128,7 +101,7 @@ export async function POST(request: Request) {
       },
     });
 
-    // Create user
+    // Create user. Access comes from the department; users have no roles.
     const newUser = await prisma.user.create({
       data: {
         username,
@@ -137,16 +110,6 @@ export async function POST(request: Request) {
         passwordHash,
         departmentCode,
         isActive: true,
-        userRoles: {
-          create: {
-            roleId: role.id,
-          },
-        },
-      },
-      include: {
-        userRoles: {
-          include: { role: true },
-        },
       },
     });
 
@@ -158,7 +121,6 @@ export async function POST(request: Request) {
         fullName: newUser.fullName,
         email: newUser.email,
         departmentCode: newUser.departmentCode,
-        role: newUser.userRoles?.[0]?.role?.code,
         isActive: newUser.isActive,
       },
     });

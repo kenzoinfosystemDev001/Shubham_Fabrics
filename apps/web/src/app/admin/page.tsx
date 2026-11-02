@@ -42,71 +42,39 @@ import { printProductionSheet } from '@/lib/download-production-sheet';
 const QUALITY_TAB_KIND = { rejected: 'REJECT', rework: 'REWORK', hold: 'HOLD' } as const;
 const QUALITY_KIND_TAB = { REJECT: 'rejected', REWORK: 'rework', HOLD: 'hold' } as const;
 
-// Every department a user can belong to, with the role a new user there normally gets.
+// Every department a user can belong to. A user's access comes from their department.
 const DEPARTMENT_OPTIONS = [
-  { code: 'ADMIN', label: 'Administration', defaultRole: 'ADMIN' },
-  { code: 'PROGRAMMING', label: 'Programming', defaultRole: 'PROGRAMMING_INCHARGE' },
-  { code: 'STORE', label: 'Fabric Store', defaultRole: 'FABRIC_STORE' },
-  { code: 'DYEING', label: 'Dyeing', defaultRole: 'DYEING_INCHARGE' },
-  { code: 'QC1', label: 'Dyeing QC', defaultRole: 'QC1_INSPECTOR' },
-  { code: 'EMBROIDERY', label: 'Embroidery', defaultRole: 'EMBROIDERY_INCHARGE' },
-  { code: 'THREAD_CUTTING', label: 'Thread Cutting', defaultRole: 'THREAD_CUTTING_INCHARGE' },
-  { code: 'QC2', label: 'Threadcut QC', defaultRole: 'QC2_INSPECTOR' },
-  { code: 'WASHING', label: 'Washing', defaultRole: 'WASHING_INCHARGE' },
-  { code: 'QC3', label: 'Washing QC', defaultRole: 'QC3_INSPECTOR' },
-  { code: 'RECUTTING', label: 'Recutting', defaultRole: 'RECUTTING_SUPERVISOR' },
-  { code: 'STITCHING', label: 'Stitching', defaultRole: 'STITCHING_SUPERVISOR' },
-  { code: 'FINISHING', label: 'Finishing', defaultRole: 'FINISHING_SUPERVISOR' },
-  { code: 'STEAM_PRESS', label: 'Steam Press', defaultRole: 'STEAM_PRESS_SUPERVISOR' },
-  { code: 'FINAL_CHECK', label: 'Final QC', defaultRole: 'FINAL_CHECK_INSPECTOR' },
-  { code: 'INVENTORY', label: 'Inventory', defaultRole: 'INVENTORY_SUPERVISOR' },
+  { code: 'ADMIN', label: 'Administration' },
+  { code: 'PROGRAMMING', label: 'Programming' },
+  { code: 'STORE', label: 'Fabric Store' },
+  { code: 'DYEING', label: 'Dyeing' },
+  { code: 'QC1', label: 'Dyeing QC' },
+  { code: 'EMBROIDERY', label: 'Embroidery' },
+  { code: 'THREAD_CUTTING', label: 'Thread Cutting' },
+  { code: 'QC2', label: 'Threadcut QC' },
+  { code: 'WASHING', label: 'Washing' },
+  { code: 'QC3', label: 'Washing QC' },
+  { code: 'RECUTTING', label: 'Recutting' },
+  { code: 'STITCHING', label: 'Stitching' },
+  { code: 'FINISHING', label: 'Finishing' },
+  { code: 'STEAM_PRESS', label: 'Steam Press' },
+  { code: 'FINAL_CHECK', label: 'Final QC' },
+  { code: 'INVENTORY', label: 'Inventory' },
 ];
 
-const ROLE_OPTIONS = Array.from(
-  new Set([
-    ...DEPARTMENT_OPTIONS.map((d) => d.defaultRole),
-    'SUPER_ADMIN',
-    'DYEING_OPERATOR',
-    'EMBROIDERY_OPERATOR',
-    'WASHING_OPERATOR',
-    'RECUTTING_OPERATOR',
-    'STITCHING_OPERATOR',
-    'FINISHING_OPERATOR',
-    'STEAM_PRESS_OPERATOR',
-    'PACKING_OPERATOR',
-  ])
-);
-
-// Display names for the QC department and role codes (the codes themselves stay as stored).
+// Display names for the QC department codes (the codes themselves stay as stored).
 const QC_DEPARTMENT_LABELS: Record<string, string> = {
   QC1: 'Dyeing QC',
   QC2: 'Threadcut QC',
   QC3: 'Washing QC',
 };
-const QC_ROLE_LABELS: Record<string, string> = {
-  QC1_INSPECTOR: 'Dyeing QC Inspector',
-  QC2_INSPECTOR: 'Threadcut QC Inspector',
-  QC3_INSPECTOR: 'Washing QC Inspector',
-};
 const departmentDisplay = (code: string) => QC_DEPARTMENT_LABELS[code] || code;
-/** The generic QC_INSPECTOR role is named after the user's QC department when there is one. */
-const roleDisplay = (code: string, departmentCode?: string | null) => {
-  if (code === 'ADMIN') return 'ADMIN (Full Access)';
-  if (code === 'QC_INSPECTOR' && departmentCode && QC_DEPARTMENT_LABELS[departmentCode]) {
-    return `${QC_DEPARTMENT_LABELS[departmentCode]} Inspector`;
-  }
-  return QC_ROLE_LABELS[code] || code;
-};
-
-const defaultRoleFor = (departmentCode: string) =>
-  DEPARTMENT_OPTIONS.find((d) => d.code === departmentCode)?.defaultRole || 'USER';
 
 interface EditableUser {
   id: string;
   username: string;
   fullName: string;
   departmentCode: string;
-  roleCode: string;
   isActive: boolean;
   pin: string;
 }
@@ -138,7 +106,6 @@ export default function AdminConsolePage() {
     fullName: '',
     pin: '',
     departmentCode: 'PROGRAMMING',
-    roleCode: 'PROGRAMMING_INCHARGE',
     email: '',
   });
   const [editingUser, setEditingUser] = useState<EditableUser | null>(null);
@@ -240,7 +207,6 @@ export default function AdminConsolePage() {
         fullName: '',
         pin: '',
         departmentCode: 'PROGRAMMING',
-        roleCode: 'PROGRAMMING_INCHARGE',
         email: '',
       });
       loadData();
@@ -251,7 +217,7 @@ export default function AdminConsolePage() {
     }
   };
 
-  // Edit User handler (name, department, role, status and optional new PIN)
+  // Edit User handler (name, department, status and optional new PIN)
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
@@ -278,7 +244,7 @@ export default function AdminConsolePage() {
 
   // Delete User handler
   const handleDeleteUser = async (id: string, username: string) => {
-    if (!confirm(`Permanently delete user "${username}" and their role from the database? Earlier challans and records they made are kept and will show "Deleted User".`)) return;
+    if (!confirm(`Permanently delete user "${username}" from the database? Earlier challans and records they made are kept and will show "Deleted User".`)) return;
     try {
       const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
       const data = await res.json();
@@ -534,7 +500,7 @@ export default function AdminConsolePage() {
         {/* TABS */}
         <div className="flex items-center gap-6 mt-5 overflow-x-auto -mb-px">
           {[
-            { id: 'users', label: 'Users & RBAC', icon: Users, count: users.length },
+            { id: 'users', label: 'Users', icon: Users, count: users.length },
             { id: 'programs', label: 'Program Sheets', icon: FileText, count: programs.length },
             { id: 'challans', label: 'Challans', icon: Truck, count: challans.length },
             { id: 'suppliers', label: 'Suppliers', icon: Building, count: suppliers.length },
@@ -599,7 +565,7 @@ export default function AdminConsolePage() {
               />
             )}
 
-            {/* TAB 1: USERS & RBAC */}
+            {/* TAB 1: USERS */}
             {activeTab === 'users' && (() => {
               const q = userSearch.trim().toLowerCase();
               const shownUsers = q
@@ -645,7 +611,6 @@ export default function AdminConsolePage() {
                       <tr>
                         <th className="py-3 pl-6 pr-4 font-medium">User</th>
                         <th className="py-3 px-4 font-medium">Department</th>
-                        <th className="py-3 px-4 font-medium">Role</th>
                         <th className="py-3 px-4 font-medium">Status</th>
                         <th className="py-3 pl-4 pr-6 font-medium text-right">
                           <span className="sr-only">Actions</span>
@@ -654,7 +619,7 @@ export default function AdminConsolePage() {
                     </thead>
                     <tbody className="divide-y divide-neutral-100">
                       {shownUsers.map((u) => {
-                        const isAdminRow = u.role.includes('ADMIN');
+                        const isAdminRow = u.departmentCode === 'ADMIN' || u.username === 'admin';
                         const initials = String(u.fullName || u.username || '?')
                           .split(/\s+/)
                           .filter(Boolean)
@@ -684,19 +649,6 @@ export default function AdminConsolePage() {
                             {u.departmentCode ? departmentName(u.departmentCode) : '—'}
                           </td>
                           <td className="py-3.5 px-4">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium whitespace-nowrap ${
-                                isAdminRow ? 'bg-brand-600 text-white' : 'bg-neutral-100 text-neutral-700'
-                              }`}
-                            >
-                              {isAdminRow
-                                ? 'Administrator'
-                                : u.departmentCode
-                                  ? `${departmentName(u.departmentCode)} Inspector`
-                                  : roleDisplay(u.role, u.departmentCode)}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4">
                             <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${u.isActive ? 'text-accent-800' : 'text-neutral-500'}`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${u.isActive ? 'bg-accent-600' : 'bg-neutral-400'}`} />
                               {u.isActive ? 'Active' : 'Inactive'}
@@ -711,7 +663,6 @@ export default function AdminConsolePage() {
                                     username: u.username,
                                     fullName: u.fullName,
                                     departmentCode: u.departmentCode,
-                                    roleCode: u.role,
                                     isActive: u.isActive,
                                     pin: '',
                                   })
@@ -1186,7 +1137,7 @@ export default function AdminConsolePage() {
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-neutral-200 p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-base font-bold text-neutral-900 mb-4 flex items-center gap-2">
               <UserPlus className="w-5 h-5 text-brand-600" />
-              Add New Factory User (RBAC)
+              Add New Factory User
             </h3>
 
             <form onSubmit={handleCreateUser} className="space-y-3.5">
@@ -1239,7 +1190,7 @@ export default function AdminConsolePage() {
                   <select
                     value={newUser.departmentCode}
                     onChange={(e) =>
-                      setNewUser({ ...newUser, departmentCode: e.target.value, roleCode: defaultRoleFor(e.target.value) })
+                      setNewUser({ ...newUser, departmentCode: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
@@ -1252,7 +1203,6 @@ export default function AdminConsolePage() {
                 </div>
               </div>
 
-              {/* A new user gets the default role of the chosen department (set with the Department above). */}
               <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
                 <button
                   type="button"
@@ -1296,7 +1246,7 @@ export default function AdminConsolePage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div>
                 <div>
                   <label className="block text-xs font-semibold text-neutral-700 mb-1">Department *</label>
                   <select
@@ -1305,7 +1255,6 @@ export default function AdminConsolePage() {
                       setEditingUser({
                         ...editingUser,
                         departmentCode: e.target.value,
-                        roleCode: defaultRoleFor(e.target.value),
                       })
                     }
                     className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
@@ -1316,23 +1265,6 @@ export default function AdminConsolePage() {
                     {DEPARTMENT_OPTIONS.map((d) => (
                       <option key={d.code} value={d.code}>
                         {d.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Security Role *</label>
-                  <select
-                    value={editingUser.roleCode}
-                    onChange={(e) => setEditingUser({ ...editingUser, roleCode: e.target.value })}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                  >
-                    {!ROLE_OPTIONS.includes(editingUser.roleCode) && (
-                      <option value={editingUser.roleCode}>{editingUser.roleCode}</option>
-                    )}
-                    {ROLE_OPTIONS.map((r) => (
-                      <option key={r} value={r}>
-                        {roleDisplay(r)}
                       </option>
                     ))}
                   </select>

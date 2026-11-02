@@ -76,7 +76,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'The Deleted User account cannot be changed.' }, { status: 400 });
     }
 
-    const roleCode = typeof body.roleCode === 'string' ? body.roleCode.trim().toUpperCase() : '';
+    // Access comes from the department (users have no roles), so the department is what makes an administrator.
     const departmentCode =
       typeof body.departmentCode === 'string' ? body.departmentCode.trim().toUpperCase() : undefined;
 
@@ -85,7 +85,7 @@ export async function PATCH(
       if (body.isActive === false) {
         return NextResponse.json({ error: 'You cannot deactivate your own account.' }, { status: 400 });
       }
-      if ((roleCode && !['ADMIN', 'SUPER_ADMIN'].includes(roleCode)) || (departmentCode && departmentCode !== 'ADMIN')) {
+      if (departmentCode && departmentCode !== 'ADMIN') {
         return NextResponse.json({ error: 'You cannot remove administrator access from your own account.' }, { status: 400 });
       }
     }
@@ -115,18 +115,6 @@ export async function PATCH(
       // Never send the password hash back to the browser.
       select: { id: true, username: true, fullName: true, email: true, departmentCode: true, isActive: true },
     });
-
-    if (roleCode) {
-      const role = await prisma.role.upsert({
-        where: { code: roleCode },
-        update: {},
-        create: { code: roleCode, name: roleCode.replace(/_/g, ' '), isSystem: false },
-      });
-      await prisma.$transaction([
-        prisma.userRole.deleteMany({ where: { userId: id } }),
-        prisma.userRole.create({ data: { userId: id, roleId: role.id } }),
-      ]);
-    }
 
     return NextResponse.json({
       success: true,
