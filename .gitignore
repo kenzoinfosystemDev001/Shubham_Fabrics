@@ -33,12 +33,7 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Strict Prohibition on Testing, Example, Dummy, and Scratch Files
-test/
-tests/
-__tests__/
-*.test.*
-*.spec.*
+# No example, dummy or scratch files. Automated tests (apps/web/test/*.test.mjs) are committed.
 example/
 examples/
 *.example.*

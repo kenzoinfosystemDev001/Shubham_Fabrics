@@ -10,6 +10,7 @@ import { MIXED_UNIT, formatTotals, headerUnitOf, totalsByUnit, unitOf } from '@/
 import { lineSheetId } from '@/lib/challan-sheets.mjs';
 import { lineLabel, qc1LineQuantities, qc1UnitTotals } from '@/lib/qc1-inspection.mjs';
 import { canWriteColumns } from '@/lib/challan-item-average';
+import { ConflictError, claimChallan } from '@/lib/record-claim';
 import { ACTIVE_HOLD_STATUSES } from '@/lib/holds.mjs';
 import { SHRINKAGE_NOT_SET_UP, ShrinkageError, saveShrinkageForLine, shrinkageTableExists } from '@/lib/shrinkage-server';
 
@@ -242,6 +243,10 @@ export async function POST(
     // 5. Transactional Execution
     const transactionResult = await prisma.$transaction(
       async (tx) => {
+        // The status checks above ran before the transaction: re-check them atomically here, so a double
+        // submit or a second tablet cannot record the inspection (and its PASS / rework challans) twice.
+        await claimChallan(tx, challan);
+
         // A. Create QualityInspection Record
         const inspection = await tx.qualityInspection.create({
           data: {
@@ -555,6 +560,9 @@ export async function POST(
       data: transactionResult,
     });
   } catch (error: any) {
+    if (error instanceof ConflictError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     if (error instanceof ShrinkageError) {
       return NextResponse.json({ error: error.message }, { status: error.status });
     }

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
-import { requireUser } from '@/lib/auth/require-user';
+import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
 
 import { STOCK_REFERENCE, STORE_STOCK_DEPARTMENT } from '@/lib/fabric-stock-ledger';
 
@@ -16,6 +16,9 @@ const CONFIRM_PHRASE = 'DELETE ALL';
 export async function DELETE(request: Request) {
   const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
   if (!authUser) return authResponse;
+  // Bulk deletes erase production history: only on a server where destructive actions are switched on.
+  const disabledResponse = destructiveAdminActionsDisabled();
+  if (disabledResponse) return disabledResponse;
   const body = await request.json().catch(() => null);
   if (body?.confirm !== CONFIRM_PHRASE) {
     return NextResponse.json({ error: `Type "${CONFIRM_PHRASE}" to confirm deleting every challan.` }, { status: 400 });
@@ -52,10 +55,7 @@ export async function DELETE(request: Request) {
         await tx.challanItem.deleteMany({});
         await tx.challanEvent.deleteMany({});
 
-        // 6. Delete challan audit logs
-        await tx.auditLog.deleteMany({
-          where: { entity: 'Challan' },
-        });
+        // 6. Audit logs are kept; the wipe itself is recorded below.
 
         // Fabric Store ledger postings of the deleted challans; their stock returns to the store.
         await tx.stockLedgerEntry.deleteMany({
@@ -65,7 +65,7 @@ export async function DELETE(request: Request) {
         // 7. Permanently delete ALL Challans from PostgreSQL
         await tx.challan.deleteMany({});
 
-        // Who wiped the challans and when (kept: only 'Challan' entries were cleared above).
+        // Who wiped the challans and when.
         await tx.auditLog.create({
           data: {
             actorId: authUser.id,

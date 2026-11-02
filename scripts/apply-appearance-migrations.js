@@ -2,9 +2,10 @@
 // the app needs, each ONCE: applied files are recorded in the "_manual_migrations" table, so later runs only
 // check that table. A file is applied again only if its contents change (every file is re-runnable).
 //
-// Runs automatically before the web app starts (apps/web "predev" / "prestart", with --soft), so a newly
-// added migration reaches the database without anyone having to remember a command. It can also be run by
-// hand from the Shubham_Fabrics folder:  node scripts/apply-appearance-migrations.js
+// Runs automatically only in a Vercel production build (apps/web "prebuild" with --vercel-production), so a
+// production deploy applies its migrations before the new code goes live. Local "npm run dev" does NOT run it:
+// apply new migrations to a local or shared database by hand, from the Shubham_Fabrics folder:
+//   node scripts/apply-appearance-migrations.js
 //
 // Flags:  --soft   never fail the caller (prints the problem and exits 0, so the app still starts)
 //         --force  apply every file again
@@ -57,6 +58,8 @@ const MIGRATIONS = [
   '20261031_challan_item_width.sql',
   '20261102_remove_retired_users.sql',
   '20261102_station_account_names.sql',
+  '20261102_fabric_stock_import_rerunnable.sql',
+  '20261102_hot_path_indexes.sql',
   // Keep last: it deletes every role, including any an earlier file adds when re-applied.
   '20261102_remove_roles.sql',
 ];

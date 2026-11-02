@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { ConflictError } from '@/lib/record-claim';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,8 +60,10 @@ export async function POST(request: Request) {
       const returnedRolls = [];
       for (const roll of rolls) {
         // Return roll → RETURNED status, qcStatus back to PENDING for return QC
-        const updated = await tx.fabricStoreRoll.update({
-          where: { id: roll.id },
+        // Only a roll still ISSUED can be returned: re-checked atomically, so a double submit cannot
+        // write two RETURN ledger entries for one roll.
+        const claimed = await tx.fabricStoreRoll.updateMany({
+          where: { id: roll.id, status: 'ISSUED' },
           data: {
             status: 'RETURNED',
             qcStatus: 'PENDING',
@@ -71,6 +74,10 @@ export async function POST(request: Request) {
             qcRemarks: null,
           },
         });
+        if (claimed.count !== 1) {
+          throw new ConflictError(`Roll ${roll.rollNumber} was returned or changed by someone else. Refresh and try again.`);
+        }
+        const updated = await tx.fabricStoreRoll.findUniqueOrThrow({ where: { id: roll.id } });
 
         // Ledger entry
         const entryNumber = `${slePrefix}${String(sleSeq).padStart(4, '0')}`;
@@ -115,6 +122,9 @@ export async function POST(request: Request) {
       message: `${result.length} roll(s) returned — queued for return QC`,
     });
   } catch (error: any) {
+    if (error instanceof ConflictError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Material return error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -3,8 +3,12 @@ import { prisma } from '@shubham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
 import { workflowReceiving } from '@/lib/work-items-server';
+import { checkChallanStatusChange } from '@/lib/challan-status-server';
+import { ConflictError, claimChallan } from '@/lib/record-claim';
 import { MIXED_UNIT, unitOf } from '@/lib/challan-units.mjs';
 import { ITEMS_WITH_SOURCE } from '@/lib/challan-sheets.mjs';
+import { writeAuditLog } from '@/lib/audit-log';
+import { destructiveAdminActionsDisabled } from '@/lib/auth/require-user';
 import { challanEditOptions } from '@/lib/challan-edit-server';
 
 import {
@@ -99,11 +103,41 @@ export async function DELETE(
 
     const challan = await prisma.challan.findUnique({
       where: { id },
-      select: { id: true, challanNumber: true },
+      select: {
+        id: true,
+        challanNumber: true,
+        status: true,
+        fromDepartment: true,
+        toDepartment: true,
+        programId: true,
+        _count: { select: { workTransfers: true, productionLogs: true, inspections: true } },
+      },
     });
 
     if (!challan) {
       return NextResponse.json({ error: 'Challan not found' }, { status: 404 });
+    }
+
+    // A challan nothing has happened on yet (no line received, processed, inspected or issued from it) can be
+    // removed to correct a mistake. Once work exists, deleting it would erase production history and leave the
+    // sending department's counts wrong, so it needs the server's destructive-actions switch as well.
+    const receivedLines = await prisma.departmentWorkItem.count({ where: { inboundChallanId: id, status: { not: 'AWAITING_RECEIPT' } } });
+    const hasActivity =
+      receivedLines > 0 ||
+      challan._count.workTransfers > 0 ||
+      challan._count.productionLogs > 0 ||
+      challan._count.inspections > 0 ||
+      !['DRAFT', 'SUBMITTED', 'ISSUED', 'IN_TRANSIT', 'CANCELLED'].includes(challan.status);
+    if (hasActivity) {
+      const disabled = destructiveAdminActionsDisabled();
+      if (disabled) {
+        return NextResponse.json(
+          {
+            error: `Challan ${challan.challanNumber} already has recorded work (${challan.status}). Deleting it would erase production history, so it is disabled on this server. Correct it from the department's screen instead.`,
+          },
+          { status: 403 },
+        );
+      }
     }
 
     // Cascade delete all dependencies safely in transaction
@@ -180,13 +214,19 @@ export async function DELETE(
           where: { challanId: id },
         });
 
-        // 8. Delete audit logs associated with this challan
-        await tx.auditLog.deleteMany({
-          where: {
-            OR: [
-              { entityId: id },
-              { entity: 'Challan', entityId: id },
-            ],
+        // 8. Audit logs are kept: record the deletion itself, with what was removed.
+        await writeAuditLog(tx, {
+          actorId: authUser.id,
+          action: 'CHALLAN_DELETED',
+          entity: 'Challan',
+          entityId: id,
+          before: {
+            challanNumber: challan.challanNumber,
+            status: challan.status,
+            fromDepartment: challan.fromDepartment,
+            toDepartment: challan.toDepartment,
+            programId: challan.programId,
+            hadRecordedWork: hasActivity,
           },
         });
 
@@ -236,10 +276,26 @@ export async function PATCH(
 
     const current = await prisma.challan.findUnique({
       where: { id },
-      select: { fromDepartment: true, toDepartment: true, challanType: true, fabricUnit: true, defectiveUnit: true },
+      select: {
+        id: true,
+        challanNumber: true,
+        status: true,
+        updatedAt: true,
+        fromDepartment: true,
+        toDepartment: true,
+        challanType: true,
+        fabricUnit: true,
+        defectiveUnit: true,
+        defectivePieces: true,
+      },
     });
     if (!current) {
       return NextResponse.json({ error: 'Challan not found' }, { status: 404 });
+    }
+    // Only the changes the generic route may make (receive, cancel before receipt, admin clean-up).
+    const transition = await checkChallanStatusChange(current, status, authUser);
+    if (!transition.ok) {
+      return NextResponse.json({ error: transition.error }, { status: transition.status });
     }
     const receivingFlow = status === 'RECEIVED' ? workflowReceiving(current) : null;
     if (receivingFlow) {
@@ -266,6 +322,7 @@ export async function PATCH(
       updateData.status = status;
       if (status === 'RECEIVED') {
         updateData.receivedDate = new Date();
+        updateData.receivedById = authUser.id;
       } else if (status === 'COMPLETED') {
         updateData.completedDate = new Date();
       }
@@ -316,6 +373,8 @@ export async function PATCH(
     }
 
     const updated = await prisma.$transaction(async (tx) => {
+      // Re-check atomically that nobody changed the challan since it was read (double submit, second tablet).
+      await claimChallan(tx, current);
       const ch = await tx.challan.update({
         where: { id },
         data: updateData,
@@ -327,6 +386,20 @@ export async function PATCH(
         },
       });
 
+      // Every status change is recorded on the challan's history.
+      if (status && status !== current.status) {
+        await tx.challanEvent.create({
+          data: {
+            challanId: id,
+            fromStatus: current.status,
+            toStatus: status,
+            action: status === 'RECEIVED' ? 'RECEIVE' : status === 'CANCELLED' ? 'CANCEL' : 'STATUS_CHANGE',
+            actorId: authUser.id,
+            notes: typeof remarks === 'string' && remarks.trim() ? remarks.trim().slice(0, 500) : `Challan ${ch.challanNumber} status changed to ${status}`,
+          },
+        });
+      }
+
       // Cancelling (or reinstating) a Fabric Store challan returns (or re-issues) its stock;
       // the ledger reconcile posts only the difference, so repeated updates change nothing.
       if (status) {
@@ -334,7 +407,8 @@ export async function PATCH(
       }
 
       // If defective pieces were cut, ensure DefectRecord exists or is logged
-      if (updateData.defectivePieces && updateData.defectivePieces > 0) {
+      // Log only an increase in defective pieces (repeating the same value adds nothing).
+      if (updateData.defectivePieces && updateData.defectivePieces > (Number(current.defectivePieces) || 0)) {
         const actor = { id: authUser.id };
         if (actor) {
           try {
@@ -346,7 +420,7 @@ export async function PATCH(
                 departmentCode: ch.fromDepartment,
                 itemDescription: `Defective pieces cut in ${ch.fromDepartment} — Stored in ${updateData.defectiveShelfLocation || 'DEF-SHELF-01'}`,
                 severity: 'MAJOR',
-                quantity: updateData.defectivePieces,
+                quantity: updateData.defectivePieces - (Number(current.defectivePieces) || 0),
                 uom: updateData.defectiveUnit,
                 reason: updateData.defectReason || 'Quality Defect / Segregation',
                 detectedById: actor.id,
@@ -365,6 +439,9 @@ export async function PATCH(
 
     return NextResponse.json(updated);
   } catch (error: any) {
+    if (error instanceof ConflictError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     if (error instanceof FabricStockError) {
       return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
     }

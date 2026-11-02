@@ -3,6 +3,8 @@ import { prisma } from '@shubham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
 import { workflowReceiving } from '@/lib/work-items-server';
+import { checkChallanStatusChange } from '@/lib/challan-status-server';
+import { ConflictError, claimChallan } from '@/lib/record-claim';
 import { MIXED_UNIT, challanTotalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 import {
@@ -53,6 +55,12 @@ export async function PATCH(
         { error: 'Only the sending or receiving department can update this challan.' },
         { status: 403 }
       );
+    }
+
+    // Only the changes the generic route may make (receive, cancel before receipt, admin clean-up).
+    const transition = await checkChallanStatusChange(existing, status, authUser);
+    if (!transition.ok) {
+      return NextResponse.json({ error: transition.error }, { status: transition.status });
     }
 
     // Work-item departments record what each line actually received (shortages, excess) on their own screen.
@@ -124,6 +132,8 @@ export async function PATCH(
 
     // 2. Perform Transaction to update Challan and operational logs
     const updated = await prisma.$transaction(async (tx) => {
+      // Re-check atomically that nobody changed the challan since it was read (double submit, second tablet).
+      await claimChallan(tx, existing);
       const ch = await tx.challan.update({
         where: { id },
         data,
@@ -170,8 +180,8 @@ export async function PATCH(
       // Dyeing orders are not marked received here: Dyeing records the actual quantity per line
       // through POST /api/dyeing/challans/:id/receive.
 
-      // If defective pieces cut, ensure DefectRecord is logged
-      if (data.defectivePieces && data.defectivePieces > 0) {
+      // If more defective pieces were recorded, log the increase once (repeating the same value adds nothing).
+      if (data.defectivePieces && data.defectivePieces > (Number(existing.defectivePieces) || 0)) {
         const actor = { id: authUser.id };
         if (actor) {
           try {
@@ -183,7 +193,7 @@ export async function PATCH(
                 departmentCode: ch.toDepartment || ch.fromDepartment,
                 itemDescription: `Defective pieces cut in ${ch.toDepartment || ch.fromDepartment} — Stored in ${data.defectiveShelfLocation || 'DEF-SHELF-01'}`,
                 severity: 'MAJOR',
-                quantity: data.defectivePieces,
+                quantity: data.defectivePieces - (Number(existing.defectivePieces) || 0),
                 uom: data.defectiveUnit,
                 reason: data.defectReason || 'Quality Defect / Segregation',
                 detectedById: actor.id,
@@ -202,6 +212,9 @@ export async function PATCH(
 
     return NextResponse.json(updated);
   } catch (error: any) {
+    if (error instanceof ConflictError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     if (error instanceof FabricStockError) {
       return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
     }

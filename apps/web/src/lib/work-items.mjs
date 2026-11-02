@@ -110,6 +110,23 @@ export function workStages(process, next) {
 
 const round = (n) => Math.round((Number(n) || 0) * 1000) / 1000;
 
+/**
+ * A received quantity as entered on a receipt line. Blank is an error (never read as 0, which would close
+ * the line and lose the sender's quantity); more than was dispatched is refused unless `allowExcess`.
+ * Shortages are always accepted: the receipt records them.
+ * @returns {{ ok: true, received: number } | { ok: false, error: string }}
+ */
+export function parseReceivedQuantity(raw, dispatched, { allowExcess = false } = {}) {
+  if (raw === undefined || raw === null || String(raw).trim() === '') return { ok: false, error: 'Enter the received quantity.' };
+  const qty = Number(raw);
+  if (!Number.isFinite(qty) || qty < 0) return { ok: false, error: 'Received quantity must be zero or more.' };
+  const received = round(qty);
+  if (!allowExcess && received > round(dispatched)) {
+    return { ok: false, error: `Received ${received} is more than the ${round(dispatched)} dispatched.` };
+  }
+  return { ok: true, received };
+}
+
 /** Quantity the department holds: what was received (legacy rows past receipt count as expected). */
 export function receivedBasis(item) {
   if (item.receivedQuantity !== null && item.receivedQuantity !== undefined) return round(item.receivedQuantity);
@@ -385,7 +402,13 @@ export function validateProductionUpdate(item, input) {
     return { ok: false, error: `${round(item.defectQuantity)} ${item.uom} was already recorded as defective; it cannot be reduced here.` };
   }
   // Completed quantity and status follow the shared rules, against what is on the floor (taken - defective).
-  const check = validateWorkUpdate({ ...item, receivedQuantity: round(taken - defect) }, input);
+  // Defective is already out of that basis, so it is not subtracted again; HOLD counts only for the part
+  // that sits on quantity already taken in (HOLD rests first on what is still waiting to be taken in).
+  const heldOnTaken = round(Math.max(0, heldOf(item) - (received - round(taken))));
+  const check = validateWorkUpdate(
+    { ...item, receivedQuantity: round(taken - defect), defectQuantity: 0, heldQuantity: heldOnTaken },
+    input
+  );
   if (!check.ok) {
     return { ok: false, error: check.error.replace(/the received/, 'the quantity taken in (less defective),') };
   }

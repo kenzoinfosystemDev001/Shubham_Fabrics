@@ -11,6 +11,7 @@ import {
   availableToProcess,
   fabricStatusForInboundLine,
   pendingReject,
+  parseReceivedQuantity,
   pendingRework,
   qcStageEntries,
   qcStages,
@@ -530,18 +531,16 @@ export function workflowHandlers(cfg: WorkflowConfig) {
       const receipts = pending.map((item, index) => {
         const line = byId.get(item.id);
         if (!line) throw new WorkRequestError(`Enter the received quantity for line ${index + 1} (${nameOf(item)}).`);
-        const qty = Number(line.receivedQuantity);
-        if (!Number.isFinite(qty) || qty < 0) throw new WorkRequestError(`Line ${index + 1}: received quantity must be zero or more.`);
-        const received = round(qty);
-        if (cfg.strictReceipt && received > round(item.expectedQuantity)) {
-          throw new WorkRequestError(`Line ${index + 1} (${nameOf(item)}): received ${received} ${item.uom} is more than the ${round(item.expectedQuantity)} ${item.uom} dispatched.`);
-        }
+        // Every department refuses more than was dispatched unless its config opts out (strictReceipt: false).
+        const parsed = parseReceivedQuantity(line.receivedQuantity, item.expectedQuantity, { allowExcess: cfg.strictReceipt === false });
+        if (!parsed.ok) throw new WorkRequestError(`Line ${index + 1} (${nameOf(item)}): ${parsed.error} (${item.uom})`);
+        const received = parsed.received;
         if (cfg.garmentStock && item.uom !== INVENTORY_UNIT) {
           throw new WorkRequestError(`Line ${index + 1} (${nameOf(item)}) is in ${item.uom}; ${cfg.label} receives finished garments in pieces only.`);
         }
         if (cfg.garmentStock && !Number.isInteger(received)) throw new WorkRequestError(`Line ${index + 1}: received quantity must be a whole number of pieces.`);
         const diff = round(received - item.expectedQuantity);
-        const second = secondReceipt(challan.items.find((l) => l.id === item.inboundChallanItemId), line.receivedUnitQuantity, `Line ${index + 1} (${nameOf(item)})`, Boolean(cfg.strictReceipt));
+        const second = secondReceipt(challan.items.find((l) => l.id === item.inboundChallanItemId), line.receivedUnitQuantity, `Line ${index + 1} (${nameOf(item)})`, cfg.strictReceipt !== false);
         const note = textOf(line.remarks, 300);
         const discrepancy = diff < 0 ? `Short by ${-diff} ${item.uom}` : diff > 0 ? `Excess of ${diff} ${item.uom}` : null;
         return { item, received, diff, second, remarks: [discrepancy, second.discrepancy, note].filter(Boolean).join(' · ') || null };
@@ -1128,7 +1127,17 @@ export function workflowHandlers(cfg: WorkflowConfig) {
             current.set(p.item.id, updated);
             const moved = await tx.departmentWorkItem.updateMany({
               // A HOLD placed or released meanwhile changes heldQuantity, so held quantity can never leave here.
-              where: { id: p.item.id, [counter]: was[counter], processedQuantity: p.item.processedQuantity, heldQuantity: p.item.heldQuantity },
+              // QC: an inspection edit or decision change committed meanwhile changes the passed / rejected /
+              // rework counts this transfer was validated against, so the same pieces cannot leave twice.
+              where: {
+                id: p.item.id,
+                [counter]: was[counter],
+                processedQuantity: p.item.processedQuantity,
+                heldQuantity: p.item.heldQuantity,
+                ...(cfg.qc
+                  ? { passedQuantity: p.item.passedQuantity, rejectedQuantity: p.item.rejectedQuantity, reworkQuantity: p.item.reworkQuantity }
+                  : {}),
+              },
               data: {
                 [counter]: after,
                 status: cfg.qc ? qcStatusOf(updated) : statusAfterTransfer(was, after),
