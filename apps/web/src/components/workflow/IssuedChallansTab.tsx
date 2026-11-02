@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Eye, FileText, Printer, RefreshCw, Search, X } from 'lucide-react';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight, Eye, FileText, Pencil, Printer, RefreshCw, Search, X } from 'lucide-react';
 import { printChallan } from '@/lib/download-challan';
 import { ProductionSheetPrintModal } from '@/components/production-sheet/ProductionSheetPrintModal';
 
@@ -321,6 +322,9 @@ export function IssuedChallansPanel({ department, onCount }: { department: strin
                             <td rowSpan={span} className={cell}>
                               <div className="flex items-center gap-1">
                                 <button type="button" onClick={() => setDetailId(c.id)} title="View details" aria-label={`View ${c.challanNumber}`} className="p-1.5 rounded-md text-brand-700 hover:bg-brand-50"><Eye className="w-3.5 h-3.5" /></button>
+                                {!['CANCELLED', 'REJECTED'].includes(String(c.status || '').toUpperCase()) && (
+                                  <Link href={`/challans/${c.id}?edit=1`} title="Edit challan" aria-label={`Edit ${c.challanNumber}`} className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100"><Pencil className="w-3.5 h-3.5" /></Link>
+                                )}
                                 <button type="button" onClick={() => printIssued(c)} title="Print" aria-label={`Print ${c.challanNumber}`} className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100"><Printer className="w-3.5 h-3.5" /></button>
                                 <button type="button" onClick={() => printIssued(c)} title="Download" aria-label={`Download PDF of ${c.challanNumber}`} className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100"><FileText className="w-3.5 h-3.5" /></button>
                                 {c.program?.id && (
