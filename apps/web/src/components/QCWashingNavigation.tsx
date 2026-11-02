@@ -230,6 +230,13 @@ export function QCWashingNavigation() {
 
           {/* HOLD: fabric kept back from forwarding */}
           <Link
+            href="/qcwashing/defective-shelf"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/qcwashing/defective-shelf', true)}
+          >
+            <span>Defective Shelf</span>
+          </Link>
+          <Link
             href="/qcwashing/hold"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/qcwashing/hold', true)}

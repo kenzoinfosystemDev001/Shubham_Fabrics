@@ -229,6 +229,13 @@ export function FinishingNavigation() {
 
           {/* HOLD: fabric kept back from forwarding */}
           <Link
+            href="/finishing/defective-shelf"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/finishing/defective-shelf', true)}
+          >
+            <span>Defective Shelf</span>
+          </Link>
+          <Link
             href="/finishing/hold"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/finishing/hold', true)}

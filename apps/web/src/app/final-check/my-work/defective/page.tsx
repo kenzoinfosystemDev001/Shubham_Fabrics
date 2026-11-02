@@ -1,6 +1,5 @@
-import { WorkReceived } from '@/components/workflow/WorkReceived';
-import { FINAL_QC_FLOW } from '@/lib/workflow-views';
+import { DefectiveShelf } from '@/components/defective/DefectiveShelf';
 
 export default function Page() {
-  return <WorkReceived flow={FINAL_QC_FLOW} only="defective" />;
+  return <DefectiveShelf department="FINAL_CHECK" />;
 }

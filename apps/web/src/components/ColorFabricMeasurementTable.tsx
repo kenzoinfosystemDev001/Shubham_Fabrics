@@ -14,7 +14,7 @@ import {
   CopyPlus
 } from 'lucide-react';
 
-// Shared input style for the items table; dye-specific fields add a light lavender tint.
+// Shared input style for the items table; dye-specific fields add a light blue tint.
 const FIELD_BASE =
   'w-full h-9 px-3 border rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition';
 const FIELD = `${FIELD_BASE} bg-white border-neutral-200 hover:border-neutral-300`;

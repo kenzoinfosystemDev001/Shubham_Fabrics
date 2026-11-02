@@ -168,42 +168,42 @@ export function generateChallanHtml(challan: any): string {
   <style>
     @page { size: A4 portrait; margin: 12mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    body { background: #f1eff4; color: #1c1a20; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; padding: 16px; }
+    body { background: #f3f4f6; color: #111827; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; padding: 16px; }
     .no-print-bar { max-width: 186mm; margin: 0 auto 12px; display: flex; justify-content: flex-end; gap: 8px; }
-    .btn { cursor: pointer; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; border: 1px solid #d3ced8; background: #fff; color: #1c1a20; }
-    .btn-primary { background: #7442a6; border-color: #7442a6; color: #fff; }
+    .btn { cursor: pointer; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; border: 1px solid #d1d5db; background: #fff; color: #111827; }
+    .btn-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
     .challan-container { max-width: 186mm; margin: 0 auto; background: #fff; padding: 28px; border-radius: 8px; }
     .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
-    .company { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #57545e; }
+    .company { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #4b5563; }
     .title { font-size: 26px; font-weight: 800; margin-top: 2px; }
     .ref { text-align: right; }
     .ref-no { font-size: 17px; font-weight: 800; font-family: monospace; margin-top: 4px; }
-    .ref-date { font-size: 12px; color: #6b6872; }
-    .route { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 22px; padding: 12px 16px; background: #faf9fb; border: 1px solid #e4e0e8; border-radius: 8px; }
-    .label { font-size: 10px; color: #6b6872; }
+    .ref-date { font-size: 12px; color: #6b7280; }
+    .route { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 22px; padding: 12px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; }
+    .label { font-size: 10px; color: #6b7280; }
     .value { font-size: 14px; font-weight: 700; margin-top: 1px; overflow-wrap: anywhere; }
-    .arrow { font-size: 18px; color: #7442a6; }
+    .arrow { font-size: 18px; color: #2563eb; }
     .section { margin-top: 20px; }
     .section-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
-    .fields { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid #e4e0e8; border-radius: 8px; }
-    .fields > div { padding: 10px 14px; border-left: 1px solid #e4e0e8; min-width: 0; }
+    .fields { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid #e5e7eb; border-radius: 8px; }
+    .fields > div { padding: 10px 14px; border-left: 1px solid #e5e7eb; min-width: 0; }
     .fields > div:first-child { border-left: none; }
-    table { width: 100%; border-collapse: collapse; border: 1px solid #e4e0e8; }
-    th { background: #faf9fb; font-size: 10px; font-weight: 700; color: #57545e; text-align: left; padding: 8px 10px; border-bottom: 1px solid #e4e0e8; }
-    td { padding: 9px 10px; border-bottom: 1px solid #efedf1; vertical-align: top; }
+    table { width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-size: 10px; font-weight: 700; color: #4b5563; text-align: left; padding: 8px 10px; border-bottom: 1px solid #e5e7eb; }
+    td { padding: 9px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
     .num { text-align: right; font-variant-numeric: tabular-nums; }
-    .total td { background: #faf9fb; font-weight: 800; border-bottom: none; }
-    .muted { color: #57545e; }
-    .defect { margin-top: 10px; color: #a52e1a; font-weight: 700; }
+    .total td { background: #f9fafb; font-weight: 800; border-bottom: none; }
+    .muted { color: #4b5563; }
+    .defect { margin-top: 10px; color: #b91c1c; font-weight: 700; }
     .garment-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .garment-card { border: 1px solid #e4e0e8; border-radius: 8px; padding: 6px; text-align: center; page-break-inside: avoid; }
+    .garment-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px; text-align: center; page-break-inside: avoid; }
     .garment-card img { width: 100%; height: 110px; object-fit: contain; }
-    .no-image { height: 110px; display: flex; align-items: center; justify-content: center; color: #8f8a96; }
+    .no-image { height: 110px; display: flex; align-items: center; justify-content: center; color: #9ca3af; }
     .garment-name { font-size: 11px; font-weight: 700; margin-top: 4px; }
     .signs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 56px; }
-    .sign { border-top: 1px solid #1c1a20; padding-top: 6px; text-align: center; }
+    .sign { border-top: 1px solid #111827; padding-top: 6px; text-align: center; }
     .sign strong { display: block; font-size: 12px; }
-    .sign span { font-size: 11px; color: #6b6872; }
+    .sign span { font-size: 11px; color: #6b7280; }
     @media print {
       body { background: #fff; padding: 0; }
       .no-print-bar { display: none !important; }
@@ -213,7 +213,7 @@ export function generateChallanHtml(challan: any): string {
   ${attachedSheets ? `<style>${attachedSheets.styles}</style>
   <style>
     /* The challan keeps its own type over the Production Sheet's page styles, and the sheets start on a new page. */
-    .challan-container { font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; font-weight: 400; letter-spacing: normal; line-height: 1.4; color: #1c1a20; margin-bottom: 20px; }
+    .challan-container { font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; font-weight: 400; letter-spacing: normal; line-height: 1.4; color: #111827; margin-bottom: 20px; }
     .challan-page-break { break-after: page; page-break-after: always; }
   </style>` : ''}
 </head>

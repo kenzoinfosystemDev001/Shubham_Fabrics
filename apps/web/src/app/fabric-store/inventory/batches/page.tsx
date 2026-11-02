@@ -253,7 +253,7 @@ export default function FabricBatchesPage() {
                         <div className="flex items-center gap-1.5">
                           <span
                             className="w-3 h-3 rounded-full border border-neutral-300 shadow-2xs shrink-0"
-                            style={{ backgroundColor: batch.colorCode || '#D3CED8' }}
+                            style={{ backgroundColor: batch.colorCode || '#D1D5DB' }}
                           />
                           <span className="font-medium text-neutral-700">{batch.colorName || 'Natural/Raw'}</span>
                         </div>

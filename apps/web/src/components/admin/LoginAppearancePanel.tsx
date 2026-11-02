@@ -43,7 +43,7 @@ function LoginPreview({ src, dimmed }: { src: string; dimmed?: boolean }) {
         className={`absolute inset-0 bg-cover bg-center bg-no-repeat ${dimmed ? 'opacity-30 grayscale' : ''}`}
         style={{ backgroundImage: `url("${src}"), url("${DEFAULT_LOGIN_BACKGROUND}")` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/40 to-brand-100/50" />
+      <div className="absolute inset-0 bg-white/55" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_50%_45%,rgba(255,255,255,0.6),transparent)]" />
       {/* Same layout as the login page: logo, glass station tiles on the background, small sign-in panel. */}
       <div className="absolute left-1/2 top-1/2 flex w-[46%] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-[4%]">
@@ -84,7 +84,7 @@ function DepartmentPreview({ src, dimmed, off }: { src: string; dimmed?: boolean
               className={`absolute inset-0 bg-cover bg-center bg-no-repeat ${dimmed ? 'opacity-30 grayscale' : ''}`}
               style={{ backgroundImage: `url("${src}"), url("${DEFAULT_APP_BACKGROUND}")` }}
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/75 to-brand-50/80" />
+            <div className="absolute inset-0 bg-white/85" />
           </>
         )}
         <div className="relative h-[13%] bg-white/90 border-b border-neutral-200" />

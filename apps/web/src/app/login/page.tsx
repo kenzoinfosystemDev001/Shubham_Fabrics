@@ -133,7 +133,7 @@ export default function LoginPage() {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url("${loginBackgroundSrc()}"), url("${DEFAULT_LOGIN_BACKGROUND}")` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/40 to-brand-100/50" />
+        <div className="absolute inset-0 bg-white/55" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_50%_45%,rgba(255,255,255,0.6),transparent)]" />
       </div>
 

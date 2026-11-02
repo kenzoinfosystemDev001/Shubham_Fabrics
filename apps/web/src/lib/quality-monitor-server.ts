@@ -55,6 +55,8 @@ export interface MonitorRecord {
   location: string;
   references: string[];
   challanId: string | null;
+  /** Number of the challan the line came in on (REJECT records); null when none. */
+  challanNumber?: string | null;
   recordedBy: string | null;
   releasedAt: string | null;
 }
@@ -192,6 +194,7 @@ async function qcInspectionRecords(): Promise<MonitorRecord[]> {
       shade: null,
       unit: unitKey(item.uom),
       challanId: item.inboundChallanId,
+      challanNumber: item.inboundChallan.challanNumber,
     };
     const rejectTransfers = item.transfers.filter((t) => t.kind === 'REJECT');
     const reworkTransfers = item.transfers.filter((t) => t.kind === 'REWORK');
@@ -433,6 +436,7 @@ async function defectRecords(): Promise<MonitorRecord[]> {
       location: open ? shelf : `Resolved: ${r.status.replace(/_/g, ' ')}`,
       references: [r.defectCode, ...(r.challan ? [`Challan ${r.challan.challanNumber}`] : [])],
       challanId: r.challanId,
+      challanNumber: r.challan?.challanNumber || null,
       recordedBy: userName(r.detectedBy),
       releasedAt: iso(r.resolvedAt),
     };
@@ -504,6 +508,16 @@ async function holdRecords(): Promise<MonitorRecord[]> {
       releasedAt: iso(h.closedAt) || iso(releasedOf.get(h.id)),
     };
   });
+}
+
+/**
+ * Every REJECT record (QC inspection batches and department defect records), newest first: the one source the
+ * department Defective Shelves and the Fabric Store central Defective Shelf read. A changed QC decision corrects
+ * the batch itself, so both views follow it and nothing is counted twice.
+ */
+export async function loadRejectRecords(): Promise<MonitorRecord[]> {
+  const parts = await Promise.all([qcInspectionRecords(), defectRecords()]);
+  return parts.flat().filter((r) => r.kind === 'REJECT').sort((a, b) => b.date.localeCompare(a.date));
 }
 
 /** Every REJECT, REWORK and HOLD record, newest first. */

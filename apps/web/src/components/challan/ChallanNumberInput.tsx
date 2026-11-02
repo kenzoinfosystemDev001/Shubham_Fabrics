@@ -20,7 +20,7 @@ interface ChallanNumberInputProps {
   error?: string | null;
   disabled?: boolean;
   className?: string;
-  /** Dark variant for slate-900 modal panels. */
+  /** Dark variant for neutral-900 modal panels. */
   tone?: 'light' | 'dark';
 }
 
@@ -43,8 +43,8 @@ export function ChallanNumberInput({
 
   return (
     <div className={className}>
-      <label htmlFor={id} className={`block text-xs font-bold mb-1 ${dark ? 'text-slate-200' : 'text-slate-700'}`}>
-        {label} <span className="text-rose-500">*</span>
+      <label htmlFor={id} className={`block text-xs font-bold mb-1 ${dark ? 'text-neutral-200' : 'text-neutral-700'}`}>
+        {label} <span className="text-danger-500">*</span>
       </label>
       <input
         id={id}
@@ -60,18 +60,18 @@ export function ChallanNumberInput({
         placeholder=""
         className={`w-full px-3 py-2 rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 transition ${
           dark
-            ? 'bg-slate-950 text-white placeholder:text-slate-500'
-            : 'bg-white text-slate-900 placeholder:text-slate-400 placeholder:font-normal'
+            ? 'bg-neutral-900 text-white placeholder:text-neutral-500'
+            : 'bg-white text-neutral-900 placeholder:text-neutral-400 placeholder:font-normal'
         } ${
           error
-            ? 'border border-rose-500 focus:ring-lavender-500/40'
+            ? 'border border-danger-500 focus:ring-brand-500/40'
             : dark
-              ? 'border border-slate-600 focus:ring-lavender-300/40'
-              : 'border border-slate-300 focus:ring-lavender-500/20'
+              ? 'border border-neutral-600 focus:ring-brand-300/40'
+              : 'border border-neutral-300 focus:ring-brand-500/20'
         }`}
       />
       {error && (
-        <p id={errorId} role="alert" className="mt-1 text-[11px] font-semibold text-rose-600">
+        <p id={errorId} role="alert" className="mt-1 text-[11px] font-semibold text-danger-600">
           {error}
         </p>
       )}

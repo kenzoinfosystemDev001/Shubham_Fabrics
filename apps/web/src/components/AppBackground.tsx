@@ -62,7 +62,7 @@ export function AppBackground() {
         style={{ backgroundImage: `url("${src}"), url("${DEFAULT_APP_BACKGROUND}")` }}
       />
       {/* Light wash keeps operational content easy to read over any image. */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/75 to-brand-50/80" />
+      <div className="absolute inset-0 bg-white/85" />
     </div>
   );
 }

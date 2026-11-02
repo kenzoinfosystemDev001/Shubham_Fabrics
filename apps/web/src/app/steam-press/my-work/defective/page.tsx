@@ -1,6 +1,5 @@
-import { WorkReceived } from '@/components/workflow/WorkReceived';
-import { STEAM_PRESS_FLOW } from '@/lib/workflow-views';
+import { DefectiveShelf } from '@/components/defective/DefectiveShelf';
 
 export default function Page() {
-  return <WorkReceived flow={STEAM_PRESS_FLOW} only="defective" />;
+  return <DefectiveShelf department="STEAM_PRESS" />;
 }

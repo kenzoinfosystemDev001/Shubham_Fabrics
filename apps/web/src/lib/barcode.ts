@@ -189,19 +189,19 @@ export function generateBarcodeStickerSvg(params: BarcodeStickerParams): string 
     <!-- PRIMARY IDENTIFIER: PRODUCTION SHEET DESIGN NUMBER -->
     <g transform="translate(16, 52)">
       <!-- Design Number Callout Box -->
-      <rect x="0" y="4" width="${labelWidth - 32}" height="42" rx="8" fill="#f8f7fa" stroke="#d3ced8" stroke-width="1.2" />
+      <rect x="0" y="4" width="${labelWidth - 32}" height="42" rx="8" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.2" />
       
-      <text x="12" y="20" font-family="'Manrope', sans-serif" font-size="9" font-weight="800" fill="#6b6872" letter-spacing="1">
+      <text x="12" y="20" font-family="'Manrope', sans-serif" font-size="9" font-weight="800" fill="#6b7280" letter-spacing="1">
         PRODUCTION SHEET DESIGN NUMBER
       </text>
       <text x="12" y="38" font-family="'Manrope', monospace" font-size="17" font-weight="900" fill="#000000" letter-spacing="0.5">
         ${escapeXml(designNumber || 'STANDARD DESIGN')}
       </text>
 
-      <text x="${labelWidth - 44}" y="20" text-anchor="end" font-family="'Manrope', sans-serif" font-size="9" font-weight="800" fill="#6b6872" letter-spacing="0.5">
+      <text x="${labelWidth - 44}" y="20" text-anchor="end" font-family="'Manrope', sans-serif" font-size="9" font-weight="800" fill="#6b7280" letter-spacing="0.5">
         MASTER SHEET: ${escapeXml(programSerialNo)}
       </text>
-      <text x="${labelWidth - 44}" y="36" text-anchor="end" font-family="'Manrope', sans-serif" font-size="10" font-weight="700" fill="#43404a">
+      <text x="${labelWidth - 44}" y="36" text-anchor="end" font-family="'Manrope', sans-serif" font-size="10" font-weight="700" fill="#374151">
         Style: ${escapeXml(mainStyle)} · ${escapeXml(clientName)}
       </text>
     </g>
@@ -216,12 +216,12 @@ export function generateBarcodeStickerSvg(params: BarcodeStickerParams): string 
       ${escapeXml(barcodeHuman)}
     </text>
 
-    <line x1="16" y1="190" x2="${labelWidth - 16}" y2="190" stroke="#e5e1e8" stroke-width="1.5" stroke-dasharray="4 3" />
+    <line x1="16" y1="190" x2="${labelWidth - 16}" y2="190" stroke="#e5e7eb" stroke-width="1.5" stroke-dasharray="4 3" />
 
     <!-- BOTTOM ROW: CHALLAN METADATA & DISPATCH QUANTITY -->
     <g transform="translate(16, 198)">
       <!-- Challan Number -->
-      <text x="0" y="14" font-family="'Manrope', sans-serif" font-size="9" font-weight="800" fill="#6b6872" letter-spacing="0.5">
+      <text x="0" y="14" font-family="'Manrope', sans-serif" font-size="9" font-weight="800" fill="#6b7280" letter-spacing="0.5">
         DISPATCH CHALLAN NUMBER
       </text>
       <text x="0" y="32" font-family="'Manrope', monospace" font-size="13" font-weight="900" fill="#000000">
@@ -229,7 +229,7 @@ export function generateBarcodeStickerSvg(params: BarcodeStickerParams): string 
       </text>
 
       <!-- Date -->
-      <text x="0" y="48" font-family="'Manrope', sans-serif" font-size="10" font-weight="600" fill="#6b6872">
+      <text x="0" y="48" font-family="'Manrope', sans-serif" font-size="10" font-weight="600" fill="#6b7280">
         Date: ${escapeXml(date)}
       </text>
 
@@ -244,8 +244,8 @@ export function generateBarcodeStickerSvg(params: BarcodeStickerParams): string 
     </g>
 
     <!-- Scan Directives Small Footer -->
-    <rect x="3" y="${labelHeight - 22}" width="${labelWidth - 6}" height="19" rx="8" fill="#f1eff4" />
-    <text x="${labelWidth / 2}" y="${labelHeight - 9}" text-anchor="middle" font-family="'Manrope', sans-serif" font-size="8.5" font-weight="700" fill="#57545e" letter-spacing="0.5">
+    <rect x="3" y="${labelHeight - 22}" width="${labelWidth - 6}" height="19" rx="8" fill="#f3f4f6" />
+    <text x="${labelWidth / 2}" y="${labelHeight - 9}" text-anchor="middle" font-family="'Manrope', sans-serif" font-size="8.5" font-weight="700" fill="#4b5563" letter-spacing="0.5">
       MANDATORY LOT IDENTIFICATION STICKER · SCAN AT NEXT DEPARTMENT GATE
     </text>
   </svg>`;

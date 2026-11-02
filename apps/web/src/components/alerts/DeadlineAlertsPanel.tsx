@@ -36,7 +36,7 @@ interface AlertsPayload {
   missingDeadline: MissingDeadlineRow[];
 }
 
-/** Severity chip. Tomato for overdue / due today, Lavender for near, Chartreuse (dark text) for upcoming. */
+/** Severity chip. Red for overdue / due today, blue for near, sky blue (dark text) for upcoming. */
 function SeverityChip({ alert }: { alert: AlertRow }) {
   const base = 'inline-block whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide border';
   if (alert.daysRemaining < 0) return <span className={`${base} bg-danger-600 text-white border-danger-600`}>Overdue</span>;

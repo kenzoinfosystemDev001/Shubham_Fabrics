@@ -2688,7 +2688,7 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
                                     <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-[2px] bg-neutral-100 shadow-2xs pointer-events-none" />
                                     <input
                                       type="color"
-                                      value={swatch.color.startsWith('#') ? swatch.color : '#D3CED8'}
+                                      value={swatch.color.startsWith('#') ? swatch.color : '#D1D5DB'}
                                       onChange={(e) => handleUpdateSwatchColor(cat, swatch.name, e.target.value)}
                                       className="sr-only"
                                     />
