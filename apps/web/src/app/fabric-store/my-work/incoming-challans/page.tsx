@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { 
   RefreshCw, 
   ArrowDownToLine, 
@@ -28,7 +27,6 @@ import { ReceiveChallanConfirm } from '@/components/challan/ReceiptLines';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 export default function IncomingChallansPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [challans, setChallans] = useState<any[]>([]);
   const [availabilityMap, setAvailabilityMap] = useState<Record<string, any>>({});
@@ -70,47 +68,28 @@ export default function IncomingChallansPage() {
     }
   };
 
-  // The next challan for a sheet: Store to Dyeing when the fabric needs dyeing, otherwise Store to Embroidery.
-  const issueHref = (ch: any) => {
-    const progId = ch.programId || ch.program?.id || '';
-    const dest = ch.program?.fabricDyeingRequired ? 'challan-to-dyeing' : 'challan-to-embroidery';
-    return `/fabric-store/my-work/${dest}?programId=${progId}`;
-  };
-
-  // Fabric is in the store: confirm the stock (once per sheet), receive the challan, then open the next challan.
-  const [issueAfterReceive, setIssueAfterReceive] = useState<string | null>(null);
-  const handleFabricAvailable = async (ch: any, stockConfirmed: boolean) => {
-    const progId = ch.programId || ch.program?.id;
-    if (!progId) return;
+  // Confirm Stock: the fabric is in the store. It only marks the stock confirmed; the next challan is sent with
+  // the Store to Dyeing / Store to Embroidery buttons.
+  const handleConfirmStock = async (programId: string) => {
     setActionError(null);
-    if (!stockConfirmed) {
-      try {
-        setActionInProgress(progId);
-        const res = await fetch('/api/fabric-store/check-availability', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ programId: progId, isAvailable: true }),
-        });
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          setActionError(body.error || 'Could not confirm the stock.');
-          return;
-        }
-      } catch {
-        setActionError('Could not confirm the stock.');
+    try {
+      setActionInProgress(programId);
+      const res = await fetch('/api/fabric-store/check-availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ programId, isAvailable: true }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setActionError(body.error || 'Could not confirm the stock.');
         return;
-      } finally {
-        setActionInProgress(null);
       }
+      await loadChallans();
+    } catch {
+      setActionError('Could not confirm the stock.');
+    } finally {
+      setActionInProgress(null);
     }
-    if (ch.status === 'RECEIVED') {
-      router.push(issueHref(ch));
-      return;
-    }
-    if (!stockConfirmed) await loadChallans();
-    setReceiveError(null);
-    setIssueAfterReceive(issueHref(ch));
-    setConfirmReceive(ch);
   };
 
   // Not in Stock: the challan is cancelled with a reason (Programming sees it as CANCELLED).
@@ -171,10 +150,6 @@ export default function IncomingChallansPage() {
       });
       if (res.ok) {
         setConfirmReceive(null);
-        if (issueAfterReceive) {
-          router.push(issueAfterReceive);
-          return;
-        }
         await loadChallans();
       } else {
         const body = await res.json().catch(() => ({}));
@@ -321,16 +296,23 @@ export default function IncomingChallansPage() {
                             <span className="text-[10px] text-neutral-500">—</span>
                           ) : (
                             <div className="flex flex-col items-start gap-1">
-                              <button
-                                type="button"
-                                disabled={!progId || actionInProgress === progId}
-                                onClick={() => handleFabricAvailable(ch, stockConfirmed)}
-                                className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 bg-accent-100/90 hover:bg-accent-200 border border-accent-300 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60"
-                                title="Fabric is in the store: receive this challan and issue the next one"
-                              >
-                                <Check className="w-3 h-3 text-accent-700" />
-                                <span>{actionInProgress === progId ? '…' : stockConfirmed ? 'Stock Confirmed' : 'Confirm Stock'}</span>
-                              </button>
+                              {stockConfirmed ? (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 bg-accent-50 border border-accent-200 px-2 py-0.5 rounded-full">
+                                  <Check className="w-3 h-3 text-accent-700" />
+                                  <span>Stock Confirmed</span>
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  disabled={!progId || actionInProgress === progId}
+                                  onClick={() => handleConfirmStock(progId)}
+                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 bg-accent-100/90 hover:bg-accent-200 border border-accent-300 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60"
+                                  title="Fabric is in the store"
+                                >
+                                  <Check className="w-3 h-3 text-accent-700" />
+                                  <span>{actionInProgress === progId ? '…' : 'Confirm Stock'}</span>
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 disabled={actionInProgress === ch.id}
@@ -361,7 +343,6 @@ export default function IncomingChallansPage() {
                                 disabled={actionInProgress === ch.id}
                                 onClick={() => {
                                   setReceiveError(null);
-                                  setIssueAfterReceive(null);
                                   setConfirmReceive(ch);
                                 }}
                                 className="inline-flex items-center gap-1 text-[11px] font-bold text-accent-800 hover:text-accent-800 bg-accent-50 hover:bg-accent-100 border border-accent-200 px-2 py-1 rounded transition cursor-pointer"
