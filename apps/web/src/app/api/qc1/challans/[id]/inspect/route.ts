@@ -6,7 +6,7 @@ import {
   challanNumberErrorResponse,
   requireChallanNumberSet,
 } from '@/lib/challan-number-server';
-import { MIXED_UNIT, formatTotals, headerUnitOf, totalsByUnit } from '@/lib/challan-units.mjs';
+import { MIXED_UNIT, formatTotals, headerUnitOf, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 import { lineSheetId } from '@/lib/challan-sheets.mjs';
 import { lineLabel, qc1LineQuantities, qc1UnitTotals } from '@/lib/qc1-inspection.mjs';
 import { canWriteColumns } from '@/lib/challan-item-average';
@@ -111,74 +111,6 @@ export async function POST(
     if (challanUnits.length === 0) {
       return NextResponse.json({ error: 'This challan has no quantity to inspect.' }, { status: 400 });
     }
-    const rawByUnit: Record<string, any> | null =
-      body.byUnit && typeof body.byUnit === 'object'
-        ? body.byUnit
-        : challanUnits.length === 1
-          ? { [challanUnits[0]]: { quantityInspected, quantityPassed, quantityShrinkage, quantityRework, quantityHold } }
-          : null;
-    if (!rawByUnit) {
-      return NextResponse.json(
-        { error: 'This challan has lines in MTR and PCS. Enter the inspection quantities for each unit.' },
-        { status: 400 }
-      );
-    }
-    const num = (v: unknown) => (v === undefined || v === null || v === '' ? 0 : Number(v));
-    // Shrinkage: fabric lost in dyeing. It is recorded as the line's shrinkage (Shrinkage screen), not sent anywhere.
-    const byUnit: Array<{ unit: string; inspected: number; passed: number; shrinkage: number; rework: number; hold: number }> = [];
-    for (const [rawUnit, q] of Object.entries(rawByUnit)) {
-      const unit = unitOf(rawUnit);
-      if (!unit || !(unit in receivedByUnit)) {
-        return NextResponse.json({ error: `Challan ${challan.challanNumber} has no ${rawUnit} line to inspect.` }, { status: 400 });
-      }
-      const row = {
-        unit,
-        inspected: num(q?.quantityInspected),
-        passed: num(q?.quantityPassed),
-        shrinkage: num(q?.quantityShrinkage),
-        rework: num(q?.quantityRework),
-        hold: num(q?.quantityHold),
-      };
-      for (const [label, v] of [['Quantity Inspected', row.inspected], ['Quantity Passed', row.passed], ['Shrinkage', row.shrinkage], ['Quantity Rework', row.rework], ['Quantity Hold', row.hold]] as const) {
-        if (!Number.isFinite(v) || v < 0) {
-          return NextResponse.json({ error: `${label} (${unit}) cannot be negative.` }, { status: 400 });
-        }
-      }
-      const sumCategories = row.passed + row.shrinkage + row.rework + row.hold;
-      if (row.inspected <= 0 && sumCategories <= 0) continue; // this unit is not part of this inspection
-      if (row.inspected <= 0) {
-        return NextResponse.json({ error: `Quantity Inspected (${unit}) must be a positive number greater than 0.` }, { status: 400 });
-      }
-      if (row.inspected > receivedByUnit[unit] + 0.001) {
-        return NextResponse.json(
-          { error: `Quantity Inspected (${row.inspected} ${unit}) cannot exceed Quantity Received from Dyeing (${receivedByUnit[unit]} ${unit}).` },
-          { status: 400 }
-        );
-      }
-      if (row.inspected > openOf(unit) + 0.001) {
-        const held = heldByUnit[unit] || 0;
-        return NextResponse.json(
-          {
-            error: held > 0
-              ? `Insufficient Available Quantity. ${held} ${unit} is currently on HOLD. Maximum quantity that can be inspected is ${openOf(unit)} ${unit}.`
-              : `Only ${openOf(unit)} ${unit} of this challan is still uninspected.`,
-          },
-          { status: 400 }
-        );
-      }
-      // Allow slight float precision variance (0.001)
-      if (sumCategories > row.inspected + 0.001) {
-        return NextResponse.json(
-          {
-            error: `The sum of Passed (${row.passed}) + Shrinkage (${row.shrinkage}) + Rework (${row.rework}) + Hold (${row.hold}) = ${sumCategories} ${unit}, which exceeds Quantity Inspected (${row.inspected} ${unit}).`,
-          },
-          { status: 400 }
-        );
-      }
-      byUnit.push(row);
-    }
-    if (byUnit.length === 0) {
-      return NextResponse.json({ error: 'Quantity Inspected must be a positive number greater than 0.' }, { status: 400 });
     const lineCheck = qc1LineQuantities(challan.items, { ...body, quantityInspected, quantityPassed, quantityShrinkage, quantityRework, quantityHold });
     if (!lineCheck.ok) {
       return NextResponse.json({ error: lineCheck.error }, { status: 400 });
@@ -186,6 +118,20 @@ export async function POST(
     const inspectedLines = lineCheck.lines;
     // Per-unit sums of the inspected lines, for header quantities, records and messages.
     const byUnit = qc1UnitTotals(inspectedLines);
+    // Quantity on HOLD (and what earlier inspections covered) cannot be inspected again.
+    for (const r of byUnit) {
+      if (r.inspected > openOf(r.unit) + 0.001) {
+        const held = heldByUnit[r.unit] || 0;
+        return NextResponse.json(
+          {
+            error: held > 0
+              ? `Insufficient Available Quantity. ${held} ${r.unit} is currently on HOLD. Maximum quantity that can be inspected is ${openOf(r.unit)} ${r.unit}.`
+              : `Only ${openOf(r.unit)} ${r.unit} of this challan is still uninspected.`,
+          },
+          { status: 400 }
+        );
+      }
+    }
     const lineSummary = inspectedLines.map((r) => ({
       challanItemId: r.item.id,
       line: lineLabel(r.item),

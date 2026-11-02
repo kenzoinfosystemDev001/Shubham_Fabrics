@@ -324,8 +324,6 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedProgram) {
-      setError('Please select a Production Serial Number.');
     if (sheetIds.length === 0 || !selectedProgram) {
       setError('Please add the Production Sheet (Serial Number) this challan is issued for.');
       return;
@@ -943,10 +941,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
               {/* 8. SERIAL NUMBER (Production Sheet Selector) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
-                  Production Serial Number <span className="text-danger-600">*</span>
                 <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4 sm:self-start sm:pt-2">
-                  Serial Number <span className="text-danger-600">*</span>
+                  Production Serial Number <span className="text-danger-600">*</span>
                 </label>
                 <div className="sm:col-span-2 max-w-lg space-y-2">
                   {sheetIds.length > 0 && (
@@ -989,8 +985,6 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     aria-label="Add a Production Sheet to this challan"
                     className="w-full text-xs font-mono font-bold text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition cursor-pointer"
                   >
-                    <option value="">Select Production Serial Number</option>
-                    {programs.map((p) => (
                     <option value="">{sheetIds.length ? 'Add another Production Sheet to this challan' : 'Select Production Sheet Serial Number'}</option>
                     {programs.filter((p) => !sheetIds.includes(p.id)).map((p) => (
                       <option key={p.id} value={p.id}>
