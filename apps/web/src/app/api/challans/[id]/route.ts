@@ -5,6 +5,7 @@ import { canUpdateChallan } from '@/lib/auth/department-access';
 import { workflowReceiving } from '@/lib/work-items-server';
 import { MIXED_UNIT, unitOf } from '@/lib/challan-units.mjs';
 import { ITEMS_WITH_SOURCE } from '@/lib/challan-sheets.mjs';
+import { challanEditOptions } from '@/lib/challan-edit-server';
 
 import {
   FabricStockError,
@@ -76,7 +77,11 @@ export async function GET(
       return NextResponse.json({ error: 'Challan not found' }, { status: 404 });
     }
 
-    return NextResponse.json(challan);
+    // What the signed-in user may edit (the edit endpoint checks every save again).
+    const { user } = await requireUser(request);
+    const editOptions = await challanEditOptions(challan as any, user ?? null).catch(() => null);
+
+    return NextResponse.json({ ...challan, editOptions });
   } catch (error: any) {
     console.error('Error fetching challan:', error);
     return NextResponse.json({ error: error.message || 'Failed to fetch challan' }, { status: 500 });

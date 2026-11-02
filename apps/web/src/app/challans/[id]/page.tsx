@@ -54,7 +54,8 @@ import {
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
 import { EditChallanDialog } from '@/components/challan/EditChallanDialog';
-import { Pencil } from 'lucide-react';
+import { ChallanHistoryDialog } from '@/components/challan/ChallanHistoryDialog';
+import { History, Pencil } from 'lucide-react';
 
 export default function ChallanDetailPage() {
   const { id } = useParams() as { id: string };
@@ -66,6 +67,22 @@ export default function ChallanDetailPage() {
   const [downloadingBarcode, setDownloadingBarcode] = useState(false);
   const [showSheetModal, setShowSheetModal] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  // Only the issuing department and administrators may edit (the server says; it checks every save again).
+  const canEdit = Boolean(challan?.editOptions?.canEdit);
+  // Opened from an issued-challans list's Edit link (?edit=1): the editor opens once the challan has loaded.
+  const [openEditOnLoad, setOpenEditOnLoad] = useState(false);
+  useEffect(() => {
+    try {
+      if (new URLSearchParams(window.location.search).get('edit') === '1') setOpenEditOnLoad(true);
+    } catch {}
+  }, []);
+  useEffect(() => {
+    if (openEditOnLoad && challan) {
+      setOpenEditOnLoad(false);
+      if (challan.editOptions?.canEdit) setEditing(true);
+    }
+  }, [openEditOnLoad, challan]);
   const [notice, setNotice] = useState<string | null>(null);
   // Finished garments (Finishing onward) are shown by name and image only, without colour or quantity.
   const finishedGoods = isFinishedGoodsChallan(challan);
@@ -286,14 +303,25 @@ export default function ChallanDetailPage() {
             <span>Back</span>
           </button>
           <div className="flex items-center gap-2 flex-wrap justify-end">
+            {canEdit && (
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-semibold rounded-md ring-1 ring-neutral-300 transition cursor-pointer"
+                title="Correct this challan"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>Edit</span>
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => setEditing(true)}
+              onClick={() => setShowHistory(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-semibold rounded-md ring-1 ring-neutral-300 transition cursor-pointer"
-              title="Correct this challan"
+              title="See every correction made to this challan"
             >
-              <Pencil className="w-3.5 h-3.5" />
-              <span>Edit</span>
+              <History className="w-3.5 h-3.5" />
+              <span>History</span>
             </button>
             <button
               type="button"
@@ -525,6 +553,7 @@ export default function ChallanDetailPage() {
           }}
         />
       )}
+      {showHistory && challan && <ChallanHistoryDialog challan={challan} onClose={() => setShowHistory(false)} />}
 
       {/* PRODUCTION SHEET PREVIEW */}
       {challan?.program && (
