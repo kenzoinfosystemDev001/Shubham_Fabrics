@@ -17,7 +17,8 @@ import { loadProgramDocument } from '@/lib/program-document';
 import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
 import { generateProductionSheetHtml } from '@/lib/download-production-sheet';
 import { garmentImageUrl, groupGarments, imageFor, isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
-import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText } from '@/lib/challan-units.mjs';
+import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText, widthText } from '@/lib/challan-units.mjs';
+import { lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 
 /** A finished garment as printed on the challan: its name and image (a data URL, so the file works offline). */
 export interface PrintedGarment {
@@ -115,6 +116,13 @@ export function generateChallanHtml(challan: any): string {
 
   // Items
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
+  // A challan carrying several Production Sheets names each line's sheet and totals each sheet.
+  const sheets = sheetBreakdown(challan);
+  const sheetPrefix = (it: any) => {
+    if (!sheets.multiSheet) return '';
+    const id = lineSheetId(it, challan);
+    return `[${sheetLabel(sheets.sheets.find((s: any) => s.programId === id)?.program)}] `;
+  };
   // Store → Dyeing lines carry the colour Dyeing must achieve next to the current (base) colour.
   const hasDyeColour = items.some((i: any) => String(i.requiredColour || '').trim());
   // Shade and width (width comes with lines listed on the Floor Board's Completed tab) print only when a line has one.
@@ -190,7 +198,7 @@ export function generateChallanHtml(challan: any): string {
     .fields > div:first-child { border-left: none; }
     table { width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; }
     th { background: #f9fafb; font-size: 10px; font-weight: 700; color: #4b5563; text-align: left; padding: 8px 10px; border-bottom: 1px solid #e5e7eb; }
-    td { padding: 9px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+    td { padding: 9px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; overflow-wrap: anywhere; }
     .num { text-align: right; font-variant-numeric: tabular-nums; }
     .total td { background: #f9fafb; font-weight: 800; border-bottom: none; }
     .muted { color: #4b5563; }
@@ -267,17 +275,20 @@ export function generateChallanHtml(challan: any): string {
             ${hasDyeColour ? '<th style="width: 15%;">Dye Colour</th>' : ''}
             ${hasShade ? '<th style="width: 10%;">Shade</th>' : ''}
             ${hasWidth ? '<th style="width: 9%;">Width</th>' : ''}
+            <th style="width: 12%;">${hasDyeColour ? 'Base Colour' : 'Colour'}</th>
+            ${hasDyeColour ? '<th style="width: 12%;">Dye Colour</th>' : ''}
             <th class="num" style="width: 12%;">Size</th>
             ${toRecuttingLayout ? '<th class="num" style="width: 11%;">Average</th>' : ''}
             <th style="width: 9%;">Unit</th>
             ${toRecuttingLayout ? '' : '<th class="num" style="width: 11%;">Average</th>'}
-            <th style="width: 24%;">Remarks</th>
+            <th style="width: 10%;">Width</th>
+            <th style="width: 18%;">Remarks</th>
           </tr>
         </thead>
         <tbody>
           ${items.map((it: any) => `
           <tr>
-            <td style="font-weight: 700;">${esc(it.fabricCode || it.itemDescription || '—')}</td>
+            <td style="font-weight: 700;">${esc(sheetPrefix(it) + (it.fabricCode || it.itemDescription || '—'))}</td>
             <td>${esc(it.colour || '—')}</td>
             ${hasDyeColour ? `<td style="font-weight: 700;">${esc(it.requiredColour || '—')}</td>` : ''}
             ${hasShade ? `<td>${esc(it.shade || '—')}</td>` : ''}
@@ -286,12 +297,22 @@ export function generateChallanHtml(challan: any): string {
             ${toRecuttingLayout ? `<td class="num">${esc(averageText(it))}</td>` : ''}
             <td>${esc(toRecuttingLayout ? unitQuantityText(it) : it.uom || '—')}</td>
             ${toRecuttingLayout ? '' : `<td class="num">${esc(averageText(it))}</td>`}
+            <td style="font-weight: 700;">${esc(widthText(it))}</td>
             <td class="muted">${esc([it.rollNumber ? `Roll ${it.rollNumber}` : '', userChallanRemarks(it.remarks)].filter(Boolean).join(' · ') || '—')}</td>
           </tr>`).join('')}
           ${items.length === 0 ? `<tr><td colspan="${itemColumns}" class="muted" style="text-align: center;">No items on this challan.</td></tr>` : ''}
           <tr class="total">
             <td colspan="2">Total</td>
             <td colspan="${itemColumns - 2}">${esc(totalsText)}</td>
+          ${items.length === 0 ? `<tr><td colspan="${hasDyeColour ? 8 : 7}" class="muted" style="text-align: center;">No items on this challan.</td></tr>` : ''}
+          ${sheets.multiSheet ? sheets.sheets.map((s: any) => `
+          <tr>
+            <td colspan="2">Sheet ${esc(sheetLabel(s.program))} (${s.lines.length} line${s.lines.length === 1 ? '' : 's'})</td>
+            <td colspan="${hasDyeColour ? 6 : 5}">${esc(formatTotals(s.totals))}</td>
+          </tr>`).join('') : ''}
+          <tr class="total">
+            <td colspan="2">Total</td>
+            <td colspan="${hasDyeColour ? 6 : 5}">${esc(totalsText)}</td>
           </tr>
         </tbody>
       </table>

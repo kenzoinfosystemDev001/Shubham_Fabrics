@@ -28,6 +28,7 @@ import {
 } from '@/lib/work-items.mjs';
 import { INVENTORY_UNIT, LEDGER, garmentLabel } from '@/lib/inventory.mjs';
 import { garmentName } from '@/lib/finished-garments.mjs';
+import { ITEMS_WITH_SHEET, lineSheetId } from '@/lib/challan-sheets.mjs';
 import { MIXED_UNIT, secondUnitOf } from '@/lib/challan-units.mjs';
 import { lineExtrasOf, lineExtrasWriter } from '@/lib/challan-item-average';
 
@@ -286,11 +287,14 @@ export const PROGRAM_SELECT = {
   status: true,
 } as const;
 export const USER_SELECT = { id: true, fullName: true, username: true } as const;
+/** Challan lines in order, each with its own Production Sheet. */
+export const LINES_WITH_SHEET = ITEMS_WITH_SHEET;
 
 export const WORK_ITEM_INCLUDE = {
   program: { select: PROGRAM_SELECT },
   inboundChallan: {
-    select: { id: true, challanNumber: true, challanType: true, fromDepartment: true, status: true, issuedDate: true, receivedDate: true },
+    // items: the fabric width of each incoming line (shown and kept when the line is issued onward).
+    select: { id: true, challanNumber: true, challanType: true, fromDepartment: true, status: true, issuedDate: true, receivedDate: true, items: { select: { id: true, width: true } } },
   },
   transfers: {
     orderBy: { createdAt: 'asc' as const },
@@ -348,7 +352,8 @@ export async function syncWorkItems(cfg: WorkflowConfig) {
               data: {
                 departmentCode: cfg.code,
                 itemNumber: `${cfg.prefix}-${year}-${String(seq++).padStart(4, '0')}`,
-                programId: challan.programId,
+                // The line's own Production Sheet (older lines: the challan's).
+                programId: lineSheetId(item, challan),
                 inboundChallanId: challan.id,
                 inboundChallanItemId: item.id,
                 sourceDepartment: challan.fromDepartment,
@@ -476,7 +481,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         where,
         include: {
           program: { select: PROGRAM_SELECT },
-          items: { orderBy: { createdAt: 'asc' } },
+          items: LINES_WITH_SHEET,
           issuedBy: { select: USER_SELECT },
           receivedBy: { select: USER_SELECT },
           parentChallan: { select: { id: true, challanNumber: true } },
@@ -964,7 +969,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
     prisma.challan.findUnique({
       where: { id },
       include: {
-        items: { orderBy: { createdAt: 'asc' } },
+        items: LINES_WITH_SHEET,
         program: { select: PROGRAM_SELECT },
         parentChallan: { select: { id: true, challanNumber: true } },
         issuedBy: { select: USER_SELECT },
@@ -990,10 +995,10 @@ export function workflowHandlers(cfg: WorkflowConfig) {
           fromDepartment: cfg.code,
           toDepartment: to.code,
           challanType: to.challanType,
-          ...(search ? { OR: [{ challanNumber: { contains: search, mode: 'insensitive' } }, { program: { programSerialNo: { contains: search, mode: 'insensitive' } } }] } : {}),
+          ...(search ? { OR: [{ challanNumber: { contains: search, mode: 'insensitive' } }, { program: { programSerialNo: { contains: search, mode: 'insensitive' } } }, { items: { some: { program: { programSerialNo: { contains: search, mode: 'insensitive' } } } } }] } : {}),
         },
         include: {
-          items: { orderBy: { createdAt: 'asc' } },
+          items: LINES_WITH_SHEET,
           program: { select: PROGRAM_SELECT },
           parentChallan: { select: { id: true, challanNumber: true } },
           issuedBy: { select: USER_SELECT },
@@ -1006,7 +1011,8 @@ export function workflowHandlers(cfg: WorkflowConfig) {
     }, 'Failed to load outgoing challans.');
 
   /**
-   * POST transfer-challans  { idempotencyKey, kind?, challanNumber, issuedDate?, remarks?, lines: [{ workItemId, quantity, average?, averageUnit?, unitQuantity?, unitQuantityUom?, remarks? }] }
+   * POST transfer-challans  { idempotencyKey, kind?, challanNumber, issuedDate?, remarks?, sourceChallanIds, lines: [{ workItemId, quantity, average?, averageUnit?, unitQuantity?, unitQuantityUom?, remarks? }] }
+   * sourceChallanIds: the incoming challans selected; every line must come from one of them.
    * Moves only the quantities actually transferred, never more than processed (QC: of that outcome) and
    * not yet sent. kind (QC only): PASS -> next department, REJECT -> defective shelf, REWORK -> back for rework.
    */
@@ -1050,7 +1056,8 @@ export function workflowHandlers(cfg: WorkflowConfig) {
             return { ...l, quantity: item ? availableFor(item, kind) : 0 };
           });
         }
-        const check = validateTransferLines(lines, byId, cfg.code, kind);
+        // The selected incoming challans are required: a line of any other challan is refused.
+        const check = validateTransferLines(lines, byId, cfg.code, kind, Array.isArray(body.sourceChallanIds) ? body.sourceChallanIds : []);
         if (!check.ok) throw new WorkRequestError(check.error);
         if (kind === 'PASS' && cfg.passUnit && check.unit !== cfg.passUnit) {
           throw new WorkRequestError(`${to.label} receives finished garments in ${cfg.passUnit} only. Record these garments in pieces before sending them; meters are never converted.`);
@@ -1065,13 +1072,21 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         const priority = body.priority ? String(body.priority).toUpperCase() : null;
         if (priority && !['LOW', 'NORMAL', 'HIGH', 'URGENT'].includes(priority)) throw new WorkRequestError('Choose a valid priority.');
         if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
+        // Fabric width of each line's incoming line: kept unless the request names another width.
+        const sourceWidths = new Map(
+          (await prisma.challanItem.findMany({ where: { id: { in: items.map((i) => i.inboundChallanItemId) } }, select: { id: true, width: true } })).map((i) => [i.id, i.width]),
+        );
         const prepared = lines.map((l, index) => {
           const item = byId.get(l.workItemId)!;
-          return { item, quantity: round(Number(l.quantity)), extras: lineExtrasOf(l, index, (m) => new WorkRequestError(m)), remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
+          const extras = lineExtrasOf(l, index, (m) => new WorkRequestError(m), sourceWidths.get(item.inboundChallanItemId) ?? null);
+          return { item, quantity: round(Number(l.quantity)), extras, remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
         });
         const extrasOf = await lineExtrasWriter(prepared.map((p) => p.extras));
         const total = round(prepared.reduce((s, p) => s + p.quantity, 0));
         const reasons = Array.from(new Set(prepared.map((p) => p.reason).filter(Boolean))).join('; ');
+        // Header parent: the first selected incoming challan used; every line also records its own source line.
+        const usedSources = new Set(prepared.map((p) => p.item.inboundChallanId));
+        const parentChallanId = check.sourceChallanIds.find((id) => usedSources.has(id)) || prepared[0].item.inboundChallanId;
         const now = new Date();
 
         const challanId = await prisma.$transaction(async (tx) => {
@@ -1080,7 +1095,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
               challanNumber,
               challanType: to.challanType,
               programId: check.programId,
-              parentChallanId: prepared[0].item.inboundChallanId,
+              parentChallanId,
               fromDepartment: cfg.code,
               toDepartment: to.code,
               status: 'ISSUED',
@@ -1133,6 +1148,8 @@ export function workflowHandlers(cfg: WorkflowConfig) {
                 fabricProcessingStatus: p.item.fabricProcessingStatus,
                 garmentCategory: p.item.garmentCategory,
                 styleRef: p.item.styleRef,
+                programId: p.item.programId,
+                sourceChallanItemId: p.item.inboundChallanItemId,
                 unitType: p.item.uom === 'PCS' ? 'PCS' : 'ROLL',
                 quantity: p.quantity,
                 uom: p.item.uom,
@@ -1188,7 +1205,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
               action: kind === 'PASS' ? `${cfg.code}_TRANSFER` : `${cfg.code}_${kind}_TRANSFER`,
               entity: 'Challan',
               entityId: challan.id,
-              afterState: JSON.stringify({ challanNumber, kind, to: to.code, total, unit: check.unit, lines: prepared.length }),
+              afterState: JSON.stringify({ challanNumber, kind, to: to.code, total, unit: check.unit, lines: prepared.length, sheets: check.programIds, sourceChallanIds: check.sourceChallanIds }),
             },
           });
           if (key) {
@@ -1437,7 +1454,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
       const data = await prisma.challan.findMany({
         where: { AND: and },
         include: {
-          items: { orderBy: { createdAt: 'asc' } },
+          items: LINES_WITH_SHEET,
           program: { select: PROGRAM_SELECT },
           parentChallan: { select: { id: true, challanNumber: true } },
           issuedBy: { select: USER_SELECT },

@@ -274,6 +274,8 @@ function IssueChallanContent() {
           uom: lineUnit(it),
           colour: it.color,
           fabricCode: it.fabric,
+          // This fabric's own width (each line keeps its own).
+          width: (it.width || '').trim() || null,
           average: String(it.average ?? '').trim() === '' ? null : Number(it.average),
           averageUnit: String(it.average ?? '').trim() === '' ? null : it.averageUnit || null,
           unitQuantity: Number(it.unitQuantity),
