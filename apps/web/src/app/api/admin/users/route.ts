@@ -3,6 +3,7 @@ import { prisma } from '@shubham/database';
 import bcrypt from 'bcryptjs';
 import { requireUser } from '@/lib/auth/require-user';
 import { validatePin } from '@/lib/auth/pin';
+import { DELETED_USER_USERNAME } from '@/lib/auth/delete-user';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,8 @@ export async function GET(request: Request) {
   if (!authUser) return authResponse;
   try {
     const users = await prisma.user.findMany({
+      // "Deleted User" only stands in on records of removed users; it is not an account to manage.
+      where: { username: { not: DELETED_USER_USERNAME } },
       select: {
         id: true,
         username: true,
@@ -79,6 +82,10 @@ export async function POST(request: Request) {
     const pinError = validatePin(pin);
     if (pinError) {
       return NextResponse.json({ error: pinError }, { status: 400 });
+    }
+
+    if (username === DELETED_USER_USERNAME) {
+      return NextResponse.json({ error: `The username "${DELETED_USER_USERNAME}" is reserved.` }, { status: 400 });
     }
 
     // Check if username already exists

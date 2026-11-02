@@ -3,6 +3,7 @@ import { prisma } from '@shubham/database';
 import bcrypt from 'bcryptjs';
 import { requireUser } from '@/lib/auth/require-user';
 import { validatePin } from '@/lib/auth/pin';
+import { DELETED_USER_USERNAME, deleteUserPermanently } from '@/lib/auth/delete-user';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,32 +36,17 @@ export async function DELETE(
       );
     }
 
-    // Delete the account; roles and account go together or not at all.
-    let retired = false;
-    try {
-      await prisma.$transaction([
-        prisma.userRole.deleteMany({ where: { userId: id } }),
-        prisma.user.delete({ where: { id } }),
-      ]);
-    } catch {
-      // Challans, inspections or audit records still name this user: keep the account for that history,
-      // switched off and renamed "<name>-old" (hidden from Users & RBAC), which also frees its username.
-      retired = true;
-      const base = user.username.replace(/-old(-[a-z0-9]+)?$/i, '');
-      const taken = await prisma.user.findUnique({ where: { username: `${base}-old` }, select: { id: true } });
-      await prisma.user.update({
-        where: { id },
-        data: {
-          isActive: false,
-          username: taken && taken.id !== id ? `${base}-old-${Date.now().toString(36)}` : `${base}-old`,
-        },
-      });
+    if (user.username === DELETED_USER_USERNAME) {
+      return NextResponse.json({ error: 'The Deleted User account cannot be removed.' }, { status: 400 });
     }
+
+    // The user and its roles are deleted from the database; records naming the user now name "Deleted User".
+    const { movedRecords } = await deleteUserPermanently(id);
 
     return NextResponse.json({
       success: true,
-      message: retired
-        ? `User ${user.username} removed. Older records still name this account, so it is kept for history, switched off and hidden.`
+      message: movedRecords > 0
+        ? `User ${user.username} deleted. ${movedRecords} earlier record(s) now show "Deleted User".`
         : `User ${user.username} deleted.`,
     });
   } catch (error: any) {
@@ -82,9 +68,12 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    const existing = await prisma.user.findUnique({ where: { id }, select: { id: true } });
+    const existing = await prisma.user.findUnique({ where: { id }, select: { id: true, username: true } });
     if (!existing) {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 });
+    }
+    if (existing.username === DELETED_USER_USERNAME) {
+      return NextResponse.json({ error: 'The Deleted User account cannot be changed.' }, { status: 400 });
     }
 
     const roleCode = typeof body.roleCode === 'string' ? body.roleCode.trim().toUpperCase() : '';
