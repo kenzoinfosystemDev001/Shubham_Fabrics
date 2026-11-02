@@ -440,6 +440,9 @@ export default function ProgrammingDashboardPage() {
                         <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold border ${ch.status === 'CANCELLED' ? 'bg-danger-50 text-danger-700 border-danger-200' : 'bg-brand-50 text-brand-800 border-brand-200'}`}>
                           {String(ch.status || '').replace(/_/g, ' ')}
                         </span>
+                        {ch.status === 'CANCELLED' && ch.remarks && (
+                          <span className="block text-[10px] text-danger-700 mt-1 max-w-[200px]">{ch.remarks}</span>
+                        )}
                       </td>
                       <td className="py-3 px-4 text-[11px] text-neutral-500">
                         {ch.createdAt ? new Date(ch.createdAt).toLocaleDateString() : '—'}
