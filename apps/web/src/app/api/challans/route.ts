@@ -4,7 +4,8 @@ import { prisma } from '@shubham/database';
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
 import { requireUser } from '@/lib/auth/require-user';
 import { canWriteColumns, lineExtrasOf, lineExtrasWriter } from '@/lib/challan-item-average';
-import { userBelongsToDepartment } from '@/lib/auth/department-access';
+import { departmentKeyFor, userBelongsToDepartment } from '@/lib/auth/department-access';
+import { checkGenericIssueRoute } from '@/lib/challan-transitions.mjs';
 import { workflowIssuing } from '@/lib/work-items-server';
 import {
   assertChallanNumbersAvailable,
@@ -270,6 +271,13 @@ export async function POST(request: Request) {
     const issuingScreen = workflowIssuing(fromDept, toDept);
     if (issuingScreen) {
       return NextResponse.json({ error: `Issue this challan from ${issuingScreen}.` }, { status: 400 });
+    }
+
+    // Only the routes listed in lib/challan-transitions are issued here; e.g. a Dyeing QC -> Embroidery challan
+    // comes only from the inspection, and stages with no module (Buttons) cannot receive orphaned challans.
+    const route = checkGenericIssueRoute(departmentKeyFor(fromDept), departmentKeyFor(toDept));
+    if (!route.ok) {
+      return NextResponse.json({ error: route.error }, { status: 400 });
     }
 
     // A department may only issue challans from itself.

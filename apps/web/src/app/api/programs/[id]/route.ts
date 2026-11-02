@@ -6,6 +6,8 @@ import { programSheetInclude, shapeProgramSheet } from '@/lib/program-sheet';
 import { assignWilcomSheets, wilcomEntriesForSheet, wilcomSheetError } from '@/lib/wilcom-sheets';
 
 import { syncChallanStock } from '@/lib/fabric-stock-ledger';
+import { writeAuditLog } from '@/lib/audit-log';
+import { destructiveAdminActionsDisabled } from '@/lib/auth/require-user';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,11 +78,30 @@ export async function DELETE(
     // Verify program exists
     const program = await prisma.program.findUnique({
       where: { id },
-      select: { id: true, programNumber: true, programSerialNo: true },
+      select: { id: true, programNumber: true, programSerialNo: true, status: true, _count: { select: { challans: true } } },
     });
 
     if (!program) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+    }
+
+    // A sheet no challan has used yet can be deleted by Programming (e.g. a mistaken draft). Once challans exist,
+    // deleting it erases their production, stock and QC history: only an administrator may do that, and only
+    // on a server where destructive actions are switched on.
+    if (program._count.challans > 0) {
+      if (!authUser.isAdmin) {
+        return NextResponse.json(
+          { error: `Production Sheet ${program.programSerialNo || program.programNumber} already has ${program._count.challans} challan(s). Only an administrator can delete it.` },
+          { status: 403 },
+        );
+      }
+      const disabled = destructiveAdminActionsDisabled();
+      if (disabled) {
+        return NextResponse.json(
+          { error: `Production Sheet ${program.programSerialNo || program.programNumber} already has challans. Deleting it would erase their production history, so it is disabled on this server.` },
+          { status: 403 },
+        );
+      }
     }
 
     // Cascade deletion safely inside a transaction to resolve all foreign key constraints
@@ -266,13 +287,17 @@ export async function DELETE(
         await tx.programColour.deleteMany({ where: { programId: id } });
         await tx.programFabric.deleteMany({ where: { programId: id } });
 
-        // 10. Delete audit logs associated with this program
-        await tx.auditLog.deleteMany({
-          where: {
-            OR: [
-              { entityId: id },
-              { entity: 'Program', entityId: id },
-            ],
+        // 10. Audit logs are kept: record the deletion itself, with what was removed.
+        await writeAuditLog(tx, {
+          actorId: authUser.id,
+          action: 'PROGRAM_DELETED',
+          entity: 'Program',
+          entityId: id,
+          before: {
+            programNumber: program.programNumber,
+            programSerialNo: program.programSerialNo,
+            status: program.status,
+            challanCount: program._count.challans,
           },
         });
 

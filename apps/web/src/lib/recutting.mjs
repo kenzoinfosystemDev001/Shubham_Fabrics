@@ -74,6 +74,36 @@ export function recuttingItemStatus(item, allocations) {
 const text = (v, max = 120) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
 
 /**
+ * Physically plausible fabric use per cut piece. Meters and pieces have no fixed conversion, but a cut piece
+ * (a panel up to a full garment set) uses between `min` and `max` of fabric per piece. Converting across
+ * units is bounded by these, so a typing error such as 999999 pieces from 10 MTR, or 50000 MTR from 5 pieces,
+ * is refused instead of flowing downstream as phantom quantity.
+ */
+export const FABRIC_PER_PIECE = /** @type {const} */ ({
+  MTR: { min: 0.02, max: 10 },
+  KG: { min: 0.02, max: 5 },
+});
+
+/**
+ * The most of `toUnit` that `quantity` of `fromUnit` can physically become (same unit: the quantity itself).
+ * Units with no plausible conversion (e.g. MTR <-> KG) allow none.
+ */
+export function maxConverted(quantity, fromUnit, toUnit) {
+  const q = Math.max(0, Number(quantity) || 0);
+  const from = unitOf(fromUnit) || String(fromUnit || '').toUpperCase();
+  const to = unitOf(toUnit) || String(toUnit || '').toUpperCase();
+  if (from === to) return round(q);
+  if (to === 'PCS' && FABRIC_PER_PIECE[from]) return Math.floor(round(q / FABRIC_PER_PIECE[from].min));
+  if (from === 'PCS' && FABRIC_PER_PIECE[to]) return round(q * FABRIC_PER_PIECE[to].max);
+  return 0;
+}
+
+function conversionError(prefix, quantity, unit, basis, basisUnit) {
+  const limit = maxConverted(basis, basisUnit, unit);
+  return `${prefix}${round(quantity)} ${unit} from ${round(basis)} ${basisUnit} is not possible (at most ${limit} ${unit}). Check the quantity and unit.`;
+}
+
+/**
  * Validates new allocation rows for one received line.
  * Row: { category, otherName?, styleRef?, allocatedQuantity, cutUom, cutQuantity?, remarks? }
  * @returns {{ ok: true, rows: Array<{ category: string, otherName: string|null, styleRef: string|null, allocatedQuantity: number, cutUom: string, cutQuantity: number, remarks: string|null }>, total: number } | { ok: false, error: string }}
@@ -96,6 +126,9 @@ export function validateAllocationRows(item, existing, rows) {
     if (!Number.isFinite(rawCut) || rawCut < 0) return { ok: false, error: `${n}: cut quantity must be zero or more.` };
     if (cutUom === item.uom && round(rawCut) > round(allocatedQuantity)) {
       return { ok: false, error: `${n}: cut quantity cannot exceed the allocated ${round(allocatedQuantity)} ${item.uom}.` };
+    }
+    if (cutUom !== item.uom && round(rawCut) > maxConverted(allocatedQuantity, item.uom, cutUom)) {
+      return { ok: false, error: conversionError(`${n}: cutting `, rawCut, cutUom, allocatedQuantity, item.uom) };
     }
     out.push({ category, otherName: category === 'OTHERS' ? otherName : null, styleRef: text(row.styleRef), allocatedQuantity: round(allocatedQuantity), cutUom, cutQuantity: round(rawCut), remarks: text(row.remarks, 300) });
   }
@@ -125,6 +158,9 @@ export function validateCut(allocation, cutQuantity) {
   if (allocation.cutUom === allocation.allocatedUom && round(cut) > round(allocation.allocatedQuantity)) {
     return { ok: false, error: `Cut quantity cannot exceed the allocated ${round(allocation.allocatedQuantity)} ${allocation.allocatedUom}.` };
   }
+  if (allocation.cutUom !== allocation.allocatedUom && round(cut) > maxConverted(allocation.allocatedQuantity, allocation.allocatedUom, allocation.cutUom)) {
+    return { ok: false, error: conversionError('Cutting ', cut, allocation.cutUom, allocation.allocatedQuantity, allocation.allocatedUom) };
+  }
   return { ok: true, cutQuantity: round(cut) };
 }
 
@@ -135,6 +171,11 @@ export function validateCut(allocation, cutQuantity) {
 export function validateCancel(allocation, reason) {
   if (allocation.status === 'CANCELLED') return { ok: false, error: 'This allocation is already cancelled.' };
   if (round(allocation.transferredQuantity) > 0) return { ok: false, error: 'Part of this allocation has gone to Stitching; it can no longer be cancelled.' };
+  // Cancelling returns the fabric to the line; once pieces are cut that fabric no longer exists, and
+  // returning it would let the same fabric be allocated and cut again.
+  if (round(allocation.cutQuantity) > 0) {
+    return { ok: false, error: `${round(allocation.cutQuantity)} ${allocation.cutUom} is already cut. Correct the cut quantity to 0 first if nothing was actually cut.` };
+  }
   if (!text(reason, 300)) return { ok: false, error: 'Enter the reason for cancelling.' };
   return { ok: true };
 }
@@ -181,6 +222,9 @@ export function validateStitchingLines(lines, allocationsById, sourceChallanIds 
     const ready = readyForStitching(a);
     if (ready <= 0) return { ok: false, error: `Line ${n}: nothing of ${a.allocationNumber} is cut and not yet issued.` };
     if (unit === a.cutUom && round(quantity) > ready) return { ok: false, error: `Line ${n}: only ${ready} ${a.cutUom} of ${a.allocationNumber} is cut and not yet issued.` };
+    if (unit !== a.cutUom && round(quantity) > maxConverted(ready, a.cutUom, unit)) {
+      return { ok: false, error: conversionError(`Line ${n}: sending `, quantity, unit, ready, a.cutUom) };
+    }
   }
   const allocations = lines.map((l) => allocationsById.get(l.allocationId));
   /** @type {string[]} */

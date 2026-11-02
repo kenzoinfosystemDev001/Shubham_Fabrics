@@ -3,6 +3,7 @@ import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { DyeingRequestError, TX_OPTIONS, dyeingErrorResponse } from '@/lib/dyeing-server';
 import { WorkRequestError, secondReceipt } from '@/lib/work-items-server';
+import { parseReceivedQuantity } from '@/lib/work-items.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,13 +57,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const receipts = pending.map((order, index) => {
       const line = byId.get(order.id);
       if (!line) throw new DyeingRequestError(`Enter the received quantity for line ${index + 1} (${order.fabricName}).`);
-      const qty = Number(line.receivedQuantity);
-      if (!Number.isFinite(qty) || qty < 0) throw new DyeingRequestError(`Line ${index + 1}: received quantity must be zero or more.`);
-      const received = round(qty);
+      // Blank is an error (never 0) and more than was dispatched is refused; shortages are recorded below.
+      const parsed = parseReceivedQuantity(line.receivedQuantity, order.requiredQuantity);
+      if (!parsed.ok) throw new DyeingRequestError(`Line ${index + 1} (${order.fabricName}): ${parsed.error}`);
+      const received = parsed.received;
       const difference = round(received - order.requiredQuantity);
       let second: ReturnType<typeof secondReceipt>;
       try {
-        second = secondReceipt(challan.items.find((l) => l.id === order.inboundChallanItemId), line.receivedUnitQuantity, `Line ${index + 1} (${order.fabricName})`, false);
+        second = secondReceipt(challan.items.find((l) => l.id === order.inboundChallanItemId), line.receivedUnitQuantity, `Line ${index + 1} (${order.fabricName})`, true);
       } catch (e) {
         throw e instanceof WorkRequestError ? new DyeingRequestError(e.message) : e;
       }

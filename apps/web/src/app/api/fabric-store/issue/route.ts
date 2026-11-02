@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { ConflictError } from '@/lib/record-claim';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,15 +96,20 @@ export async function POST(request: Request) {
 
       const issuedRolls = [];
       for (const roll of rolls) {
-        // Update roll
-        const updated = await tx.fabricStoreRoll.update({
-          where: { id: roll.id },
+        // Update roll only if it is still IN_STOCK and QC-passed: the checks above ran before the transaction,
+        // so a second request issuing the same roll (double-click, another tablet) finds no match and fails.
+        const claimed = await tx.fabricStoreRoll.updateMany({
+          where: { id: roll.id, status: 'IN_STOCK', qcStatus: 'PASSED' },
           data: {
             status: 'ISSUED',
             programIssuedToId: programId,
             issuedAt,
           },
         });
+        if (claimed.count !== 1) {
+          throw new ConflictError(`Roll ${roll.rollNumber} was issued or changed by someone else. Refresh and try again.`);
+        }
+        const updated = await tx.fabricStoreRoll.findUniqueOrThrow({ where: { id: roll.id } });
 
         // Stock ledger entry
         const entryNumber = `${slePrefix}${String(sleSeq).padStart(4, '0')}`;
@@ -149,6 +155,9 @@ export async function POST(request: Request) {
       message: `${result.length} roll(s) issued to program ${program.programNumber}`,
     });
   } catch (error: any) {
+    if (error instanceof ConflictError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Material issue error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
