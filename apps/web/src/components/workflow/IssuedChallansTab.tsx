@@ -321,8 +321,8 @@ export function IssuedChallansPanel({ department, onCount }: { department: strin
                             <td rowSpan={span} className={cell}>
                               <div className="flex items-center gap-1">
                                 <button type="button" onClick={() => setDetailId(c.id)} title="View details" aria-label={`View ${c.challanNumber}`} className="p-1.5 rounded-md text-brand-700 hover:bg-brand-50"><Eye className="w-3.5 h-3.5" /></button>
-                                <button type="button" onClick={() => printIssued(c)} title="Print challan" aria-label={`Print ${c.challanNumber}`} className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100"><Printer className="w-3.5 h-3.5" /></button>
-                                <button type="button" onClick={() => printIssued(c)} title="Download PDF (choose Save as PDF in the print dialog)" aria-label={`Download PDF of ${c.challanNumber}`} className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100"><FileText className="w-3.5 h-3.5" /></button>
+                                <button type="button" onClick={() => printIssued(c)} title="Print" aria-label={`Print ${c.challanNumber}`} className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100"><Printer className="w-3.5 h-3.5" /></button>
+                                <button type="button" onClick={() => printIssued(c)} title="Download" aria-label={`Download PDF of ${c.challanNumber}`} className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100"><FileText className="w-3.5 h-3.5" /></button>
                                 {c.program?.id && (
                                   <button type="button" onClick={() => setSheetProgramId(c.program.id)} title="View Production Sheet" className="px-1.5 py-1 rounded-md text-[10px] font-semibold text-neutral-600 hover:bg-neutral-100 whitespace-nowrap">Sheet</button>
                                 )}

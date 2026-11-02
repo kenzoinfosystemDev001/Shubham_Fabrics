@@ -209,7 +209,7 @@ export function Navigation() {
           <Link
             href="/programming"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition ${
               isDashboardActive
                 ? 'bg-accent-400/25 text-neutral-900 border-l-2 border-accent-500 pl-2.5 shadow-sm'
                 : 'text-neutral-900 hover:bg-neutral-100 hover:text-neutral-900'
@@ -222,7 +222,7 @@ export function Navigation() {
           <div>
             <div
               onClick={() => setMyWorkOpen(!myWorkOpen)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold cursor-pointer transition ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold cursor-pointer transition ${
                 isMyWorkRootActive || isCreateSheetActive || isIssueChallanActive
                   ? 'text-neutral-900'
                   : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
@@ -244,7 +244,7 @@ export function Navigation() {
                 <Link
                   href="/my-work/create-production-sheet"
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-bold transition ${
                     isCreateSheetActive
                       ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
                       : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
@@ -256,7 +256,7 @@ export function Navigation() {
                 <Link
                   href="/my-work/issue-challan"
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-bold transition ${
                     isIssueChallanActive
                       ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
                       : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
@@ -272,7 +272,7 @@ export function Navigation() {
           <Link
             href="/production-history"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition ${
               isHistoryActive
                 ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
                 : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
@@ -285,7 +285,7 @@ export function Navigation() {
           <Link
             href="/floor-board"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition ${
               isFloorBoardActive
                 ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
                 : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'

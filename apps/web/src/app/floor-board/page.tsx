@@ -178,7 +178,7 @@ export default function ProgrammingFloorBoardPage() {
                         type="button"
                         onClick={() => downloadProductionSheetHtml(prog)}
                         className="p-1 hover:bg-brand-50 text-brand-700 rounded transition"
-                        title="Download Production Sheet HTML"
+                        title="Download"
                       >
                         <Download className="w-3.5 h-3.5" />
                       </button>
@@ -186,7 +186,7 @@ export default function ProgrammingFloorBoardPage() {
                         type="button"
                         onClick={() => printProductionSheet(prog)}
                         className="p-1 hover:bg-neutral-100 text-neutral-700 rounded transition"
-                        title="Print Production Sheet"
+                        title="Print"
                       >
                         <Printer className="w-3.5 h-3.5" />
                       </button>

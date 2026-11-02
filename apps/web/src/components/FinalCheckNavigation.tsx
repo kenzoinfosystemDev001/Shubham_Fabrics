@@ -85,7 +85,7 @@ export function FinalCheckNavigation() {
       ? pathname === href
       : pathname === href || pathname.startsWith(`${href}/`);
 
-    return `flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition ${
+    return `flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold transition ${
       active
         ? 'border-l-2 border-brand-500 bg-brand-50 pl-2.5 text-brand-800'
         : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
