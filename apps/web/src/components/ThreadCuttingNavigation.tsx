@@ -20,8 +20,8 @@ export function ThreadCuttingNavigation() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>({
-    fullName: 'Thread Cutting Incharge',
-    username: 'cutting',
+    fullName: 'Threadcut Incharge',
+    username: 'threadcut',
     role: 'CUTTING_INCHARGE',
     departmentCode: 'THREAD_CUTTING',
   });

@@ -20,9 +20,9 @@ export function QC1Navigation() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>({
-    fullName: 'Vikram Singh',
-    username: 'qc_insp',
-    role: 'QC_INSPECTOR',
+    fullName: 'Dyeing QC Incharge',
+    username: 'dyeingqc',
+    role: 'QC1_INSPECTOR',
     departmentCode: 'QC1',
   });
 

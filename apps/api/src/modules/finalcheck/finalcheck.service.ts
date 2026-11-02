@@ -21,7 +21,7 @@ export class FinalCheckService {
   private async getFinalCheckUser() {
     return this.prisma.user.findFirst({
       where: {
-        OR: [{ username: 'finalcheck' }, { departmentCode: DepartmentCode.FINAL_CHECK }],
+        OR: [{ username: 'finalqc' }, { username: 'finalcheck' }, { departmentCode: DepartmentCode.FINAL_CHECK }],
       },
       select: { id: true, username: true, departmentCode: true },
     });

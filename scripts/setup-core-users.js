@@ -134,22 +134,27 @@ async function setup() {
     });
   }
 
-  // qc3 is the Washing QC account; "qcwashing" is only a sign-in name for it (lib/departments.ts).
-  const qc3User = await prisma.user.upsert({
-    where: { username: 'qc3' },
-    update: { departmentCode: 'QC3', fullName: 'Washing QC Incharge' },
-    create: {
-      username: 'qc3',
-      email: 'qc3@subhamfabrics.com',
-      fullName: 'Washing QC Incharge',
-      passwordHash: hash,
-      departmentCode: 'QC3',
-    },
-  });
+  // washingqc is the Washing QC account; "qc3" and "qcwashing" are older sign-in names for it (lib/departments.ts).
+  const existingQc3 =
+    (await prisma.user.findUnique({ where: { username: 'washingqc' } })) || (await prisma.user.findUnique({ where: { username: 'qc3' } }));
+  const qc3User = existingQc3
+    ? await prisma.user.update({
+        where: { id: existingQc3.id },
+        data: { username: 'washingqc', departmentCode: 'QC3', fullName: 'Washing QC Incharge' },
+      })
+    : await prisma.user.create({
+        data: {
+          username: 'washingqc',
+          email: 'washingqc@subhamfabrics.com',
+          fullName: 'Washing QC Incharge',
+          passwordHash: hash,
+          departmentCode: 'QC3',
+        },
+      });
   await prisma.userRole.deleteMany({ where: { userId: qc3User.id } });
   await prisma.userRole.create({ data: { userId: qc3User.id, roleId: qcWashingRole.id } });
   await prisma.userRole.create({ data: { userId: qc3User.id, roleId: qcInspectorRole.id } });
-  console.log('✓ Washing QC user ready: qc3 (QC3_INSPECTOR)');
+  console.log('✓ Washing QC user ready: washingqc (QC3_INSPECTOR)');
 
   // 6. Recutting & Stitching Departments, Roles, and User
   await prisma.department.upsert({
@@ -288,20 +293,26 @@ async function setup() {
     });
   }
 
-  const finalCheckUser = await prisma.user.upsert({
-    where: { username: 'finalcheck' },
-    update: { departmentCode: 'FINAL_CHECK', fullName: 'Final QC Incharge' },
-    create: {
-      username: 'finalcheck',
-      email: 'finalcheck@subhamfabrics.com',
-      fullName: 'Final QC Incharge',
-      passwordHash: hash,
-      departmentCode: 'FINAL_CHECK',
-    },
-  });
+  // finalqc is the Final QC account; "finalcheck" is its older sign-in name.
+  const existingFinalCheck =
+    (await prisma.user.findUnique({ where: { username: 'finalqc' } })) || (await prisma.user.findUnique({ where: { username: 'finalcheck' } }));
+  const finalCheckUser = existingFinalCheck
+    ? await prisma.user.update({
+        where: { id: existingFinalCheck.id },
+        data: { username: 'finalqc', departmentCode: 'FINAL_CHECK', fullName: 'Final QC Incharge' },
+      })
+    : await prisma.user.create({
+        data: {
+          username: 'finalqc',
+          email: 'finalqc@subhamfabrics.com',
+          fullName: 'Final QC Incharge',
+          passwordHash: hash,
+          departmentCode: 'FINAL_CHECK',
+        },
+      });
   await prisma.userRole.deleteMany({ where: { userId: finalCheckUser.id } });
   await prisma.userRole.create({ data: { userId: finalCheckUser.id, roleId: finalCheckRole.id } });
-  console.log('✓ Final QC user ready: finalcheck (FINAL_CHECK_INSPECTOR)');
+  console.log('✓ Final QC user ready: finalqc (FINAL_CHECK_INSPECTOR)');
 
   // 12. Inventory Department & User (Packing is a module of Inventory, not a department).
   // An existing "packing" station user (the earlier Packing & Inventory department) is reused.

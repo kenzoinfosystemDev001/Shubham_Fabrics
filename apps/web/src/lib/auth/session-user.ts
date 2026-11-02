@@ -62,7 +62,8 @@ export function buildSessionUser(user: SessionUserSource): SessionUser {
     !isAdmin &&
     !isStore &&
     !isProgramming &&
-    (user.username.toLowerCase() === 'qcwashing' ||
+    (user.username.toLowerCase() === 'washingqc' ||
+      user.username.toLowerCase() === 'qcwashing' ||
       user.username.toLowerCase() === 'qc_washing' ||
       user.username.toLowerCase() === 'qc3' ||
       user.username.toLowerCase() === 'qc3_insp' ||
@@ -78,7 +79,8 @@ export function buildSessionUser(user: SessionUserSource): SessionUser {
     !isProgramming &&
     !isDyeing &&
     !isQCWashing &&
-    (user.username.toLowerCase() === 'qc1' ||
+    (user.username.toLowerCase() === 'dyeingqc' ||
+      user.username.toLowerCase() === 'qc1' ||
       user.username.toLowerCase() === 'qc_insp' ||
       user.departmentCode === 'QC1' ||
       roleCodes.includes('QC1_INSPECTOR') ||
@@ -108,7 +110,8 @@ export function buildSessionUser(user: SessionUserSource): SessionUser {
     !isQCWashing &&
     !isQC1 &&
     !isEmbroidery &&
-    (user.username.toLowerCase() === 'thread-cutting' ||
+    (user.username.toLowerCase() === 'threadcut' ||
+      user.username.toLowerCase() === 'thread-cutting' ||
       user.username.toLowerCase() === 'cutting' ||
       user.departmentCode === 'THREAD_CUTTING' ||
       roleCodes.includes('THREAD_CUTTING_INCHARGE') ||
@@ -124,7 +127,8 @@ export function buildSessionUser(user: SessionUserSource): SessionUser {
     !isQC1 &&
     !isEmbroidery &&
     !isThreadCutting &&
-    (user.username.toLowerCase() === 'qc2' ||
+    (user.username.toLowerCase() === 'threadcutqc' ||
+      user.username.toLowerCase() === 'qc2' ||
       user.username.toLowerCase() === 'qc2_insp' ||
       user.departmentCode === 'QC2' ||
       roleCodes.includes('QC2_INSPECTOR') ||
@@ -222,7 +226,8 @@ export function buildSessionUser(user: SessionUserSource): SessionUser {
 
   const isFinalCheck =
     !isAdmin &&
-    (user.username.toLowerCase() === 'finalcheck' ||
+    (user.username.toLowerCase() === 'finalqc' ||
+      user.username.toLowerCase() === 'finalcheck' ||
       user.username.toLowerCase() === 'final_check' ||
       user.departmentCode === 'FINAL_CHECK' ||
       roleCodes.includes('FINAL_CHECK_INSPECTOR') ||
