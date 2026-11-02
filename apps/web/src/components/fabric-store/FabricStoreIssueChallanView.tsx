@@ -142,7 +142,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       const progRes = await fetch('/api/programs');
       const progData = await progRes.json();
 
-      let progList: any[] = Array.isArray(progData) ? progData : [];
+      // Only sheets with an active (not cancelled) challan received in the Fabric Store can be issued onward.
+      let progList: any[] = (Array.isArray(progData) ? progData : []).filter((p: any) =>
+        (p.challans || []).some((c: any) => c.toDepartment === 'STORE' && c.status !== 'CANCELLED')
+      );
 
       if (destinationDepartment === 'DYEING') {
         progList = [...progList].sort((a, b) => {

@@ -67,6 +67,7 @@ export default function FabricStoreDashboard() {
       RECEIVED: 'bg-brand-100 text-brand-800',
       IN_TRANSIT: 'bg-brand-100 text-brand-800',
       COMPLETED: 'bg-accent-100 text-accent-800',
+      CANCELLED: 'bg-danger-50 text-danger-700',
     };
     return (
       <span
@@ -223,7 +224,9 @@ export default function FabricStoreDashboard() {
                         <td className="py-3 px-4">{statusBadge(ch.status)}</td>
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                            {prog?.fabricDyeingRequired ? (
+                            {ch.status === 'CANCELLED' ? (
+                              <span className="text-[11px] font-semibold text-danger-700">Cancelled: no challan can be issued</span>
+                            ) : prog?.fabricDyeingRequired ? (
                               <>
                                 <Link
                                   href={`/fabric-store/my-work/challan-to-dyeing?programId=${progId || ''}`}
