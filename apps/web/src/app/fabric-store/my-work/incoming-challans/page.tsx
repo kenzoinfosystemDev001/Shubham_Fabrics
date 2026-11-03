@@ -29,32 +29,17 @@ import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 export default function IncomingChallansPage() {
   const [loading, setLoading] = useState(true);
   const [challans, setChallans] = useState<any[]>([]);
-  const [availabilityMap, setAvailabilityMap] = useState<Record<string, any>>({});
   const [actionError, setActionError] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [selectedSheetModal, setSelectedSheetModal] = useState<any | null>(null);
 
   const loadChallans = async () => {
     try {
       setLoading(true);
-      // Load challans where toDepartment = STORE and live Fabric Store availability
-      const [res, availRes] = await Promise.all([
-        fetch('/api/challans?toDepartment=STORE'),
-        fetch('/api/fabric-store/check-availability').catch(() => null),
-      ]);
+      const res = await fetch('/api/challans?toDepartment=STORE');
       const json = await res.json();
       const data = Array.isArray(json) ? json : json.data || [];
-
-      if (availRes && availRes.ok) {
-        const availJson = await availRes.json();
-        const map: Record<string, any> = {};
-        if (Array.isArray(availJson.data)) {
-          for (const item of availJson.data) {
-            if (item.programId) map[item.programId] = item;
-          }
-        }
-        setAvailabilityMap(map);
-      }
 
       // Filter: addressed to store and active (cancelled ones stay listed as CANCELLED)
       setChallans(data.filter((c: any) =>
@@ -65,30 +50,6 @@ export default function IncomingChallansPage() {
       setChallans([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Confirm Stock: the fabric is in the store. It only marks the stock confirmed; the next challan is sent with
-  // the Store to Dyeing / Store to Embroidery buttons.
-  const handleConfirmStock = async (programId: string) => {
-    setActionError(null);
-    try {
-      setActionInProgress(programId);
-      const res = await fetch('/api/fabric-store/check-availability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ programId, isAvailable: true }),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        setActionError(body.error || 'Could not confirm the stock.');
-        return;
-      }
-      await loadChallans();
-    } catch {
-      setActionError('Could not confirm the stock.');
-    } finally {
-      setActionInProgress(null);
     }
   };
 
@@ -136,28 +97,43 @@ export default function IncomingChallansPage() {
     loadChallans();
   }, []);
 
-  // Receive: the challan's fabrics with MTR and PCS are shown first, then received.
+  // Confirm Stock receives the challan, and only after the user has checked its lines and confirmed. Opening,
+  // viewing or leaving the challan changes nothing. The server receives it once (a second click or tablet is
+  // refused) and only for Fabric Store or an administrator. Stock is not added here: this fabric is already counted
+  // from its Inward Stock entry and leaves stock when it is issued to Dyeing or Embroidery.
   const [confirmReceive, setConfirmReceive] = useState<any | null>(null);
   const [receiveError, setReceiveError] = useState<string | null>(null);
-  const handleMarkReceived = async (challanId: string) => {
+  const handleConfirmStock = async (ch: any) => {
+    if (actionInProgress) return;
     setReceiveError(null);
+    setActionMessage(null);
     try {
-      setActionInProgress(challanId);
-      const res = await fetch(`/api/challans/${challanId}`, {
+      setActionInProgress(ch.id);
+      const res = await fetch(`/api/challans/${ch.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'RECEIVED' }),
       });
-      if (res.ok) {
-        setConfirmReceive(null);
-        await loadChallans();
-      } else {
+      if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        setReceiveError(body.error || 'Failed to receive the challan.');
+        setReceiveError(body.error || 'Could not receive the challan. Nothing was changed.');
+        return;
       }
-    } catch (err) {
-      console.error('Failed to mark challan received:', err);
-      setReceiveError('Failed to receive the challan.');
+      // The sheet's fabric is confirmed in the store (it unlocks Store to Dyeing / Embroidery when the stock check
+      // cannot see it). The challan is already received; a failure here only leaves that flag as it was.
+      const progId = ch.programId || ch.program?.id;
+      if (progId) {
+        await fetch('/api/fabric-store/check-availability', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ programId: progId, isAvailable: true }),
+        }).catch(() => null);
+      }
+      setConfirmReceive(null);
+      setActionMessage(`Challan ${ch.challanNumber} received. Stock confirmed in Fabric Store.`);
+      await loadChallans();
+    } catch {
+      setReceiveError('Could not reach the server. The challan was not received; try again.');
     } finally {
       setActionInProgress(null);
     }
@@ -198,6 +174,14 @@ export default function IncomingChallansPage() {
       </header>
 
       <main className="p-4 sm:p-8 max-w-6xl mx-auto space-y-4">
+        {actionMessage && (
+          <div role="status" className="px-4 py-2.5 rounded-lg border border-accent-300 bg-accent-50 text-xs font-semibold text-neutral-900 flex items-center justify-between gap-3">
+            <span>{actionMessage}</span>
+            <button type="button" onClick={() => setActionMessage(null)} className="text-neutral-500 hover:text-neutral-900" aria-label="Dismiss">
+              <XCircle className="w-4 h-4" />
+            </button>
+          </div>
+        )}
         {actionError && (
           <div role="alert" className="px-4 py-2.5 rounded-lg border border-danger-200 bg-danger-50 text-xs font-semibold text-danger-700">
             {actionError}
@@ -245,7 +229,7 @@ export default function IncomingChallansPage() {
                     const client = ch.program?.clientName || ch.program?.buyerName || '';
                     const style = ch.program?.mainStyle || ch.program?.styleCode || '';
                     const isCancelled = ch.status === 'CANCELLED';
-                    const stockConfirmed = Boolean(progId && availabilityMap[progId]?.isAvailable);
+                    const isReceived = ['RECEIVED', 'COMPLETED', 'CLOSED'].includes(ch.status);
 
                     return (
                       <tr key={ch.id} className="hover:bg-neutral-50/70 transition">
@@ -290,38 +274,42 @@ export default function IncomingChallansPage() {
                           )}
                         </td>
 
-                        {/* FABRIC IN STORE: Confirm Stock, or Not in Stock (cancels the challan) */}
+                        {/* FABRIC IN STORE: Confirm Stock (receives the challan), or Not in Stock (cancels it) */}
                         <td className="py-3 px-4">
                           {isCancelled ? (
                             <span className="text-[10px] text-neutral-500">—</span>
+                          ) : isReceived ? (
+                            <span
+                              className="inline-flex items-center gap-1 text-[10px] font-bold text-neutral-900 bg-accent-50 border border-accent-200 px-2 py-0.5 rounded-full"
+                              title={ch.receivedDate ? `Received on ${new Date(ch.receivedDate).toLocaleString()}` : 'Received'}
+                            >
+                              <Check className="w-3 h-3 text-accent-700" />
+                              <span>Stock Confirmed · Received</span>
+                            </span>
                           ) : (
                             <div className="flex flex-col items-start gap-1">
-                              {stockConfirmed ? (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 bg-accent-50 border border-accent-200 px-2 py-0.5 rounded-full">
-                                  <Check className="w-3 h-3 text-accent-700" />
-                                  <span>Stock Confirmed</span>
-                                </span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  disabled={!progId || actionInProgress === progId}
-                                  onClick={() => handleConfirmStock(progId)}
-                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-accent-800 bg-accent-100/90 hover:bg-accent-200 border border-accent-300 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60"
-                                  title="Fabric is in the store"
-                                >
-                                  <Check className="w-3 h-3 text-accent-700" />
-                                  <span>{actionInProgress === progId ? '…' : 'Confirm Stock'}</span>
-                                </button>
-                              )}
+                              <button
+                                type="button"
+                                disabled={actionInProgress === ch.id}
+                                onClick={() => {
+                                  setReceiveError(null);
+                                  setConfirmReceive(ch);
+                                }}
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-neutral-900 bg-accent-100 hover:bg-accent-200 border border-accent-300 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                                title="Check the challan lines, then receive it into Fabric Store"
+                              >
+                                <Check className="w-3 h-3 text-accent-700" />
+                                <span>{actionInProgress === ch.id ? 'Receiving…' : 'Confirm Stock'}</span>
+                              </button>
                               <button
                                 type="button"
                                 disabled={actionInProgress === ch.id}
                                 onClick={() => openCancel(ch)}
-                                className="inline-flex items-center gap-1 text-[10px] font-bold text-danger-700 bg-danger-50 hover:bg-danger-100 border border-danger-200 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60"
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-danger-700 bg-danger-50 hover:bg-danger-100 border border-danger-200 px-2 py-0.5 rounded transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                                 title="Fabric is not in the store: cancel this challan"
                               >
                                 <XCircle className="w-3 h-3 text-danger-600" />
-                                <span>{actionInProgress === ch.id ? 'Cancelling…' : 'Not in Stock'}</span>
+                                <span>Not in Stock</span>
                               </button>
                             </div>
                           )}
@@ -336,23 +324,6 @@ export default function IncomingChallansPage() {
 
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                            {/* Receive button if status is not yet RECEIVED */}
-                            {ch.status !== 'RECEIVED' && !isCancelled && (
-                              <button
-                                type="button"
-                                disabled={actionInProgress === ch.id}
-                                onClick={() => {
-                                  setReceiveError(null);
-                                  setConfirmReceive(ch);
-                                }}
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-accent-800 hover:text-accent-800 bg-accent-50 hover:bg-accent-100 border border-accent-200 px-2 py-1 rounded transition cursor-pointer"
-                                title="Mark as received in Fabric Store"
-                              >
-                                <CheckCircle2 className="w-3.5 h-3.5 text-accent-700" />
-                                <span>{actionInProgress === ch.id ? 'Saving…' : 'Receive'}</span>
-                              </button>
-                            )}
-
                             {/* NEXT DEPARTMENT MOVEMENT BUTTONS */}
                             {isCancelled ? null : ch.program?.fabricDyeingRequired ? (
                                 <>
@@ -413,8 +384,10 @@ export default function IncomingChallansPage() {
           challan={confirmReceive}
           busy={actionInProgress === confirmReceive.id}
           error={receiveError}
-          onConfirm={() => handleMarkReceived(confirmReceive.id)}
+          onConfirm={() => handleConfirmStock(confirmReceive)}
           onClose={() => setConfirmReceive(null)}
+          question="Are you sure you want to receive this challan and confirm this fabric in Fabric Store stock?"
+          confirmLabel="Yes, Receive Challan"
         />
       )}
       {cancelTarget && (
