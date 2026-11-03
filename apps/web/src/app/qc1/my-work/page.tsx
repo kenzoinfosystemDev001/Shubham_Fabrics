@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { DepartmentStockView } from '@/components/DepartmentStockView';
 import { ReceiveChallanConfirm } from '@/components/challan/ReceiptLines';
+import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
@@ -920,6 +921,16 @@ export default function QC1MyWorkPage() {
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 <span>Inspect</span>
                               </button>
+                            )}
+                            {/* A receipt entered by mistake goes back to Issued, only while nothing was inspected or held. */}
+                            {isReceived && (
+                              <DeleteRecordButton
+                                target={{ kind: 'RECEIPT_CHALLAN', id: challan.id, label: challan.challanNumber }}
+                                onDeleted={(m) => {
+                                  setDecisionMessage(m);
+                                  loadChallans();
+                                }}
+                              />
                             )}
 
                             {/* INSPECTION COMPLETED: VIEW DETAILS */}

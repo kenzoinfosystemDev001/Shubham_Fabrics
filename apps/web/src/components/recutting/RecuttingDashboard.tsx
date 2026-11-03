@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 import { ArrowRight } from 'lucide-react';
 import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 import {
@@ -30,6 +31,7 @@ export function RecuttingDashboard() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [alertsKey, setAlertsKey] = useState(0);
 
   const load = async () => {
@@ -86,6 +88,7 @@ export function RecuttingDashboard() {
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
+        {notice && <Notice kind="success" onClose={() => setNotice(null)}>{notice}</Notice>}
 
         <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
           {cards.map((card) => (
@@ -161,6 +164,14 @@ export function RecuttingDashboard() {
                         <span>{t.status === 'AWAITING_RECEIPT' ? 'Receive' : 'Allocate'}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
+                      {/* Pending work comes from a received line: deleting it deletes that receipt (checked on the server). */}
+                      <DeleteRecordButton
+                        target={{ kind: 'RECEIPT_WORK_ITEM', id: t.id, label: t.itemNumber || t.fabricName }}
+                        onDeleted={(m) => {
+                          setNotice(m);
+                          load();
+                        }}
+                      />
                     </td>
                   </tr>
                 ))}

@@ -6,6 +6,7 @@ import { BTN_PRIMARY, BTN_QUIET, EmptyRow, FIELD, Notice, Panel, THEAD, fetchJso
 import { INVENTORY_STATUS_LABEL } from '@/lib/inventory.mjs';
 import { API, CategorySelect, DesignCell, GarmentCell, GarmentImage, InventoryStatusBadge, Pager, RecordDrawer, SendForPackingDialog, pcs } from '@/components/inventory/InventoryUi';
 import { CATEGORY_LABEL } from '@/lib/recutting.mjs';
+import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 
 export type RecordsMode = 'received' | 'stock' | 'packing';
 
@@ -185,6 +186,16 @@ export function RecordsBrowser({ mode, title, focusId }: { mode: RecordsMode; ti
                         </button>
                       )}
                       <button type="button" onClick={() => setOpenId(r.id)} className={BTN_QUIET}>View Details</button>
+                      {/* A receipt entered by mistake goes back to To Receive, only while nothing was sent for packing. */}
+                      {mode === 'received' && (
+                        <DeleteRecordButton
+                          target={{ kind: 'RECEIPT_WORK_ITEM', id: r.id, label: r.itemNumber || r.garment || 'garments' }}
+                          onDeleted={(m) => {
+                            setNotice(m);
+                            reload();
+                          }}
+                        />
+                      )}
                     </div>
                   </td>
                 </tr>

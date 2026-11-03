@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 import { ArrowRight } from 'lucide-react';
 import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 import {
@@ -37,6 +38,7 @@ export default function DyeingDashboardPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [alertsKey, setAlertsKey] = useState(0);
 
   const load = async () => {
@@ -82,6 +84,7 @@ export default function DyeingDashboardPage() {
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
+        {notice && <Notice kind="success" onClose={() => setNotice(null)}>{notice}</Notice>}
 
         <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {cards.map((card) => (
@@ -155,6 +158,14 @@ export default function DyeingDashboardPage() {
                         <span>{t.status === 'AWAITING_RECEIPT' ? 'Receive' : 'Open'}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
+                      {/* Pending work comes from a received dyeing line: deleting it deletes that receipt (checked on the server). */}
+                      <DeleteRecordButton
+                        target={{ kind: 'RECEIPT_DYEING_ORDER', id: t.id, label: t.orderNumber || t.fabricName }}
+                        onDeleted={(m) => {
+                          setNotice(m);
+                          load();
+                        }}
+                      />
                     </td>
                   </tr>
                 ))}

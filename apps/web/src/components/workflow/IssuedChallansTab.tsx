@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Eye, FileText, Pencil, Printer, RefreshCw, Search, X } from 'lucide-react';
+import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 import { printChallan } from '@/lib/download-challan';
 import { ProductionSheetPrintModal } from '@/components/production-sheet/ProductionSheetPrintModal';
 
@@ -121,6 +122,7 @@ export function IssuedChallansPanel({ department, onCount }: { department: strin
   const [error, setError] = useState<string | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [sheetProgramId, setSheetProgramId] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -259,6 +261,12 @@ export function IssuedChallansPanel({ department, onCount }: { department: strin
           <button type="button" onClick={load} className="font-bold underline">Retry</button>
         </div>
       )}
+      {notice && (
+        <div role="status" className="px-3 py-2.5 rounded-lg bg-accent-50 border border-accent-300 text-xs font-semibold text-neutral-900 flex items-center justify-between gap-2">
+          <span>{notice}</span>
+          <button type="button" onClick={() => setNotice(null)} aria-label="Dismiss"><X className="w-3.5 h-3.5" /></button>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -327,6 +335,14 @@ export function IssuedChallansPanel({ department, onCount }: { department: strin
                                 )}
                                 <button type="button" onClick={() => printIssued(c)} title="Print" aria-label={`Print ${c.challanNumber}`} className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100"><Printer className="w-3.5 h-3.5" /></button>
                                 <button type="button" onClick={() => printIssued(c)} title="Download" aria-label={`Download PDF of ${c.challanNumber}`} className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100"><FileText className="w-3.5 h-3.5" /></button>
+                                {/* The issuing department deletes its own challan until it is received (the dialog says why otherwise). */}
+                                <DeleteRecordButton
+                                  target={{ kind: 'CHALLAN', id: c.id, label: c.challanNumber }}
+                                  onDeleted={(m) => {
+                                    setNotice(m);
+                                    load();
+                                  }}
+                                />
                                 {c.program?.id && (
                                   <button type="button" onClick={() => setSheetProgramId(c.program.id)} title="View Production Sheet" className="px-1.5 py-1 rounded-md text-[10px] font-semibold text-neutral-600 hover:bg-neutral-100 whitespace-nowrap">Sheet</button>
                                 )}

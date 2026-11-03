@@ -2107,7 +2107,7 @@ model DepartmentHold {
   reason                String // PRODUCTION_PENDING, QUALITY_ISSUE ... OTHER (lib/holds.mjs)
   reasonOther           String? // the typed reason when reason is OTHER
   remarks               String?
-  status                String                @default("ON_HOLD") // ON_HOLD, PARTIALLY_RELEASED, PARTIALLY_FORWARDED, RELEASED, FORWARDED, CLEARED
+  status                String                @default("ON_HOLD") // ON_HOLD, PARTIALLY_RELEASED, PARTIALLY_FORWARDED, RELEASED, FORWARDED, CLEARED, DELETED (placed by mistake)
   heldById              String?
   heldBy                User?                 @relation("HoldPlacer", fields: [heldById], references: [id], onDelete: SetNull)
   heldByName            String
@@ -2129,7 +2129,7 @@ model DepartmentHoldEvent {
   id             String         @id @default(uuid())
   holdId         String
   hold           DepartmentHold @relation(fields: [holdId], references: [id], onDelete: Cascade)
-  action         String // HOLD | RELEASE | CLOSE
+  action         String // HOLD | RELEASE | CLOSE | DECISION | DELETE
   quantity       Float
   remainingAfter Float
   unit           String

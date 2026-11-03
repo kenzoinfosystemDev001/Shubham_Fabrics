@@ -99,16 +99,16 @@ export async function GET(
 }
 
 /**
- * DELETE { reason } (preview: GET /api/admin/challans/:id/delete-impact): an administrator deletes one challan.
- * Its Production Sheet and other challans stay; the quantity returns to the sending side, Fabric Store stock
- * returns to the store, and the receiving side's records of it are removed (lib/admin-delete-server.ts). Refused
- * while later work depends on it (the error names what to delete first).
+ * DELETE { reason } (preview: GET /api/challans/:id/delete-impact): an administrator, or the issuing department
+ * before the challan is received, deletes one challan. Its Production Sheet and other challans stay; the quantity
+ * returns to the sending side, Fabric Store stock returns to the store, and the receiving side's records of it are
+ * removed (lib/admin-delete-server.ts). Refused while later work depends on it (the error names what to delete first).
  */
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  const { user: authUser, response: authResponse } = await requireUser(request);
   if (!authUser) return authResponse;
   try {
     const { id } = await params;

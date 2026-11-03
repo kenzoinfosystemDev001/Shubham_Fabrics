@@ -446,7 +446,8 @@ async function defectRecords(): Promise<MonitorRecord[]> {
 // ---------------------------------------------------------------- HOLD
 
 async function holdRecords(): Promise<MonitorRecord[]> {
-  const holds = await listHolds(Object.keys(HOLD_DEPARTMENTS), 'all', '');
+  // A HOLD deleted as placed by mistake never held anything for the monitor's totals.
+  const holds = (await listHolds(Object.keys(HOLD_DEPARTMENTS), 'all', '')).filter((h) => h.status !== 'DELETED');
   const raw = holds.length
     ? await prisma.departmentHold.findMany({
         where: { id: { in: holds.map((h) => h.id) } },
@@ -840,7 +841,7 @@ export async function monitorRecordDetail(id: string, user: AuthenticatedUser) {
   } else if (prefix === 'hold') {
     const h = await holdDetail(rawId, user);
     line = { label: h.holdNumber, received: h.receivedQuantity, unit: h.unit };
-    const actionLabel: Record<string, string> = { HOLD: 'Placed on HOLD', RELEASE: 'Released', CLOSE: 'Closed', FORWARD: 'Forwarded', DECISION: 'Given a QC decision' };
+    const actionLabel: Record<string, string> = { HOLD: 'Placed on HOLD', RELEASE: 'Released', CLOSE: 'Closed', FORWARD: 'Forwarded', DECISION: 'Given a QC decision', DELETE: 'Deleted (placed by mistake)' };
     history = h.history.map((e: any) => ({ at: iso(e.createdAt)!, department: h.departmentName, action: actionLabel[e.action] || e.action, detail: [e.remarks, e.remainingAfter != null ? `Remaining on HOLD: ${e.remainingAfter} ${e.unit}` : null].filter(Boolean).join(' · '), quantity: e.quantity, unit: e.unit, reference: h.holdNumber, by: e.actorName }));
     const hold = await prisma.departmentHold.findUnique({ where: { id: rawId }, select: { sourceType: true, sourceId: true } });
     if (hold?.sourceType === 'WORK_ITEM') {

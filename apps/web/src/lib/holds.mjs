@@ -31,9 +31,10 @@ export const HOLD_STATUS_LABEL = {
   RELEASED: 'Released',
   FORWARDED: 'Forwarded',
   CLEARED: 'Cleared',
+  DELETED: 'Deleted',
 };
 
-export const HOLD_EVENT_LABEL = { HOLD: 'Placed on HOLD', RELEASE: 'Released', CLOSE: 'Closed', FORWARD: 'Forwarded', DECISION: 'Given a QC decision' };
+export const HOLD_EVENT_LABEL = { HOLD: 'Placed on HOLD', RELEASE: 'Released', CLOSE: 'Closed', FORWARD: 'Forwarded', DECISION: 'Given a QC decision', DELETE: 'Deleted' };
 
 const round = (n) => Math.round((Number(n) || 0) * 1000) / 1000;
 

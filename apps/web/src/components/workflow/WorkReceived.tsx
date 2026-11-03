@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight, Search } from 'lucide-react';
 import { DepartmentStockView } from '@/components/DepartmentStockView';
@@ -48,6 +49,7 @@ function ReceivedContent({ flow, only }: { flow: WorkflowView; only?: 'defective
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -106,6 +108,7 @@ function ReceivedContent({ flow, only }: { flow: WorkflowView; only?: 'defective
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
+        {notice && <Notice kind="success" onClose={() => setNotice(null)}>{notice}</Notice>}
 
         {tab === 'fabric' && (
           <Panel
@@ -210,6 +213,14 @@ function ReceivedContent({ flow, only }: { flow: WorkflowView; only?: 'defective
                           <span>{flow.qc ? 'Inspect' : flow.allocation ? 'Allocate' : i.status === 'RECEIVED' ? 'Start' : 'Continue'}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
+                        {/* A receipt entered by mistake goes back to Awaiting Receipt, only while nothing was done with it. */}
+                        <DeleteRecordButton
+                          target={{ kind: 'RECEIPT_WORK_ITEM', id: i.id, label: i.itemNumber }}
+                          onDeleted={(m) => {
+                            setNotice(m);
+                            load();
+                          }}
+                        />
                       </td>
                     </tr>
                   ))}
