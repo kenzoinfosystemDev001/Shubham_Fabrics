@@ -33,6 +33,7 @@ import { quantityPairError } from '@/components/challan/AverageField';
 import { addTotals, formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 import { SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 import { ProductionSheetQuickView } from '@/components/challan/ProductionSheetQuickView';
+import { sheetDesignLabel } from '@/lib/challan-sheets.mjs';
 
 import {
   ColorFabricMeasurementTable,
@@ -272,7 +273,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
   const selectedProgram = programs.find((p) => p.id === selectedProgramId);
   const sheetOf = (id: string) => programs.find((p) => p.id === id);
-  const sheetName = (p: any) => p?.programSerialNo || p?.programNumber || '—';
+  // Sheets are picked and named by Design No. (then Serial No.) on this screen.
+  const sheetName = (p: any) => sheetDesignLabel(p);
   // Lines with details, per sheet on the challan (only measured rows are material leaving the store).
   const sheetLines = sheetIds.map((id) => ({
     id,
@@ -297,7 +299,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     e.preventDefault();
 
     if (sheetIds.length === 0 || !selectedProgram) {
-      setError('Please add the Production Sheet (Serial Number) this challan is issued for.');
+      setError('Please add the Production Sheet (Design No.) this challan is issued for.');
       return;
     }
 
@@ -525,7 +527,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         <ProductionSheetQuickView
           sheets={sheetIds.map((id) => sheetOf(id)).filter(Boolean)}
           title={sheetIds.length > 1 ? "Production Sheets on this challan" : "Production Sheet"}
-          emptyText="Select the Production Sheet (Serial Number) below to open it here."
+          emptyText="Select the Production Sheet (Design No.) below to open it here."
         />
         {/* ERROR NOTIFICATION */}
         {error && (
@@ -667,7 +669,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 </button>
               ) : (
                 <span className="text-xs text-neutral-500 italic">
-                  Select Production Serial Number to preview Production Sheet
+                  Select the Production Sheet (Design No.) to preview it
                 </span>
               )}
             </div>
@@ -799,7 +801,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               {/* 8. SERIAL NUMBER (Production Sheet Selector) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
                 <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4 sm:self-start sm:pt-2">
-                  Production Serial Number <span className="text-danger-600">*</span>
+                  Production Sheet (Design No.) <span className="text-danger-600">*</span>
                 </label>
                 <div className="sm:col-span-2 max-w-lg space-y-2">
                   {sheetIds.length > 0 && (
@@ -842,10 +844,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     aria-label="Add a Production Sheet to this challan"
                     className="w-full text-xs font-mono font-bold text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition cursor-pointer"
                   >
-                    <option value="">{sheetIds.length ? 'Add another Production Sheet to this challan' : 'Select Production Sheet Serial Number'}</option>
+                    <option value="">{sheetIds.length ? 'Add another Production Sheet to this challan' : 'Select Production Sheet by Design No.'}</option>
                     {programs.filter((p) => !sheetIds.includes(p.id)).map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.programSerialNo || p.programNumber} — {p.clientName || p.buyerName || 'Buyer'} ({p.mainStyle || p.styleCode || 'Style'})
+                        {sheetDesignLabel(p)} — {p.clientName || p.buyerName || 'Buyer'} ({p.mainStyle || p.styleCode || 'Style'})
                       </option>
                     ))}
                   </select>
@@ -880,7 +882,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     {sheetIds.length > 1 && <SheetBreakdown title="All sheets on this challan" rows={breakdownRows} />}
                   </>
                 ) : (
-                  <p className="text-xs text-neutral-500 italic">Select the Production Sheet (Serial Number) to enter its Color / Fabric / Measurement lines.</p>
+                  <p className="text-xs text-neutral-500 italic">Select the Production Sheet (Design No.) to enter its Color / Fabric / Measurement lines.</p>
                 )}
               </div>
 

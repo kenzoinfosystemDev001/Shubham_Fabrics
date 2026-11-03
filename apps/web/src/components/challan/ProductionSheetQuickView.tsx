@@ -42,8 +42,11 @@ export function ProductionSheetQuickView({
             title="View, print or download this Production Sheet"
           >
             <FileText className="w-3.5 h-3.5" />
-            <span className="font-mono">{s.programSerialNo || s.programNumber || 'Sheet'}</span>
-            {s.designNumber && <span className="font-normal text-brand-700">· {s.designNumber}</span>}
+            {/* Design No. leads; the Serial No. follows (lib/challan-sheets sheetDesignLabel). */}
+            <span className="font-mono">{s.designNumber || s.wilcomDesignNumber || s.programSerialNo || s.programNumber || 'Sheet'}</span>
+            {(s.designNumber || s.wilcomDesignNumber) && (s.programSerialNo || s.programNumber) && (
+              <span className="font-normal text-brand-700">· {s.programSerialNo || s.programNumber}</span>
+            )}
           </button>
         ))}
       </div>

@@ -2,8 +2,8 @@
 
 import React, { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
-import { EmptyRow, FIELD, Panel, THEAD, fmtDate, sheetRef } from '@/components/workflow/WorkflowUi';
-import { NO_INCOMING_CHALLAN, sheetLabel } from '@/lib/challan-sheets.mjs';
+import { EmptyRow, FIELD, Panel, THEAD, fmtDate } from '@/components/workflow/WorkflowUi';
+import { NO_INCOMING_CHALLAN, sheetDesignLabel } from '@/lib/challan-sheets.mjs';
 import { formatTotals } from '@/lib/challan-units.mjs';
 
 export interface IncomingOption {
@@ -117,7 +117,7 @@ export function IncomingChallanPicker({
                   <td className="py-2.5 px-3 text-xs text-neutral-600 whitespace-nowrap">{fmtDate(o.challan?.issuedDate || o.challan?.createdAt)}</td>
                   <td className="py-2.5 px-3 text-xs text-neutral-700">{deptName(o.challan?.fromDepartment)}</td>
                   <td className="py-2.5 px-3 font-mono text-xs">
-                    {o.sheets.map((s) => sheetRef(s)).join(', ') || '—'}
+                    {o.sheets.map((s) => sheetDesignLabel(s)).join(', ') || '—'}
                   </td>
                   <td className="py-2.5 px-3 text-right tabular-nums text-xs">{o.lines.length}</td>
                   <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap font-semibold">{formatTotals(o.available, '—')}</td>
@@ -179,7 +179,7 @@ export function SheetBreakdown({
               <React.Fragment key={g.program?.id || 'none'}>
                 {g.rows.map((r, i) => (
                   <tr key={r.key}>
-                    <td className="py-2 px-4 font-mono text-xs font-semibold text-neutral-900">{i === 0 ? sheetLabel(g.program) : ''}</td>
+                    <td className="py-2 px-4 font-mono text-xs font-semibold text-neutral-900">{i === 0 ? sheetDesignLabel(g.program) : ''}</td>
                     <td className="py-2 px-3 text-neutral-900">{r.fabric}</td>
                     <td className="py-2 px-3 text-neutral-700">{r.colour || '—'}</td>
                     <td className="py-2 px-3 font-mono text-xs text-neutral-600">{r.source || '—'}</td>
@@ -187,7 +187,7 @@ export function SheetBreakdown({
                   </tr>
                 ))}
                 <tr className="bg-neutral-50/70">
-                  <td colSpan={4} className="py-2 px-4 text-xs font-semibold text-neutral-600">Sheet {sheetLabel(g.program)} total</td>
+                  <td colSpan={4} className="py-2 px-4 text-xs font-semibold text-neutral-600">Sheet {sheetDesignLabel(g.program)} total</td>
                   <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs font-semibold">{formatTotals(g.totals)}</td>
                 </tr>
               </React.Fragment>

@@ -19,14 +19,13 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
-  sheetRef,
 } from '@/components/dyeing/DyeingUi';
 import { availableForQc, needsColorReview } from '@/lib/dyeing-workflow.mjs';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 import { StockItemsSection, newStockFabric, stockLinesOf, type StockFabric, type StockSource } from '@/components/challan/StockItemsSection';
 import { ProductionSheetQuickView } from '@/components/challan/ProductionSheetQuickView';
 import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
-import { NO_INCOMING_CHALLAN, challanSheetRefs, distinct, incomingChallanOptions } from '@/lib/challan-sheets.mjs';
+import { NO_INCOMING_CHALLAN, challanSheetRefs, distinct, incomingChallanOptions, sheetDesignLabel } from '@/lib/challan-sheets.mjs';
 
 const sourceOf = (o: any) => o.inboundChallanId || NO_INCOMING_CHALLAN;
 
@@ -89,7 +88,7 @@ function IssueChallanContent() {
   // Step 2: only dyed lines of the selected incoming challans (of any Production Sheet on them).
   const sheetOrders = eligible.filter((o) => sourceIds.includes(sourceOf(o)));
   const orderById = (id: string) => sheetOrders.find((o) => o.id === id);
-  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetRef(s))));
+  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetDesignLabel(s))));
   // Items section: each colour is a dyed line (colour as recorded in Dyeing Process).
   const [fabrics, setFabrics] = useState<StockFabric[]>([newStockFabric()]);
   const colourOf = (o: any) => o.dyedColor || o.targetColor || '';
@@ -101,7 +100,7 @@ function IssueChallanContent() {
     available: availableForQc(o),
     // Each dyed line names its Production Sheet and incoming challan.
     detail: [
-      `Sheet ${sheetRef(o.program)}`,
+      `Sheet ${sheetDesignLabel(o.program)}`,
       o.inboundChallan?.challanNumber ? `Challan ${o.inboundChallan.challanNumber}` : '',
       baseColour(o) ? `Base ${baseColour(o)}` : '',
       o.targetColor && o.targetColor !== colourOf(o) ? `Required ${o.targetColor}` : '',
