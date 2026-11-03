@@ -44,6 +44,8 @@ const ADMIN_CLOSE_TO = ['COMPLETED', 'HANDED_OVER'];
 export function checkGenericStatusChange(from, to, ctx) {
   const current = String(from || '').toUpperCase();
   const next = String(to || '').toUpperCase();
+  // A challan is received once: a second receipt (double click, second tablet) is refused, not re-stamped.
+  if (next === 'RECEIVED' && current === 'RECEIVED') return { ok: false, status: 409, error: 'This challan has already been received.' };
   if (!next || next === current) return { ok: true };
 
   if (next === 'RECEIVED') {

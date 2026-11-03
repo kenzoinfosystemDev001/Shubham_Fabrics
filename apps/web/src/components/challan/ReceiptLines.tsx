@@ -192,12 +192,17 @@ export function ReceiveChallanConfirm({
   error,
   onConfirm,
   onClose,
+  question,
+  confirmLabel = 'Receive Challan',
 }: {
   challan: any;
   busy?: boolean;
   error?: string | null;
   onConfirm: () => void;
   onClose: () => void;
+  /** Asked above the buttons, so receiving is a deliberate second step. */
+  question?: React.ReactNode;
+  confirmLabel?: string;
 }) {
   const rows: ReceiptRow[] = (challan?.items || []).map((line: any) => ({ key: line.id, line }));
   return (
@@ -215,18 +220,21 @@ export function ReceiveChallanConfirm({
             <ReceiptLinesTable challan={challan} rows={rows} />
           )}
         </div>
-        <div className="px-5 py-4 border-t border-neutral-200 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200 text-xs font-semibold rounded-lg transition cursor-pointer">
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            disabled={busy}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition disabled:opacity-50 cursor-pointer"
-          >
-            {busy ? 'Receiving…' : 'Receive Challan'}
-          </button>
+        <div className="px-5 py-4 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-end gap-3">
+          {question && <p className="text-sm font-semibold text-neutral-900 sm:mr-auto">{question}</p>}
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={onClose} disabled={busy} className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200 text-xs font-semibold rounded-lg transition cursor-pointer">
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={busy}
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition disabled:opacity-50 cursor-pointer"
+            >
+              {busy ? 'Receiving…' : confirmLabel}
+            </button>
+          </div>
         </div>
       </div>
     </div>
