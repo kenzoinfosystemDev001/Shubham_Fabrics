@@ -775,6 +775,9 @@ model Challan {
 
   shrinkageRecords    ShrinkageRecord[]
 
+  // HOLD releases this challan carried onward (lib/hold-forward-server.ts).
+  holdReleases        DepartmentHoldRelease[] @relation("HoldReleaseChallan")
+
   // A department cannot reuse its own challan number; another department may use the same number.
   @@unique([fromDepartment, challanNumber])
   @@index([challanNumber])
@@ -2111,6 +2114,7 @@ model DepartmentHold {
   heldAt                DateTime              @default(now())
   closedAt              DateTime?
   events                DepartmentHoldEvent[]
+  releases              DepartmentHoldRelease[]
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
 
@@ -2136,4 +2140,37 @@ model DepartmentHoldEvent {
   createdAt      DateTime       @default(now())
 
   @@index([holdId])
+}
+
+// One release of quantity from a HOLD: back to the department's available quantity (AVAILABLE), or released and
+// sent on in the same transaction on a new challan (FORWARD). Keeps the exact original challan line and the new
+// challan, so every released quantity can be traced. Numbers are copied so the trail survives a challan delete.
+model DepartmentHoldRelease {
+  id                    String         @id @default(uuid())
+  holdId                String
+  hold                  DepartmentHold @relation(fields: [holdId], references: [id], onDelete: Cascade)
+  departmentCode        String
+  mode                  String // AVAILABLE | FORWARD
+  quantity              Float
+  unit                  String // MTR | PCS, the HOLD's own unit; never converted
+  remainingAfter        Float
+  programId             String
+  originalChallanId     String?
+  originalChallanNumber String?
+  originalChallanItemId String?
+  newChallanId          String?
+  newChallan            Challan?       @relation("HoldReleaseChallan", fields: [newChallanId], references: [id], onDelete: SetNull)
+  newChallanNumber      String?
+  newChallanItemId      String?
+  destinationDepartment String?
+  eventId               String?
+  idempotencyKey        String?        @unique
+  remarks               String?
+  releasedById          String?
+  releasedByName        String
+  createdAt             DateTime       @default(now())
+
+  @@index([holdId])
+  @@index([departmentCode, createdAt])
+  @@index([newChallanId])
 }

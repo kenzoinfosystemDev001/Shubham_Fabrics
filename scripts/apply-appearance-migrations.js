@@ -60,6 +60,7 @@ const MIGRATIONS = [
   '20261102_station_account_names.sql',
   '20261102_fabric_stock_import_rerunnable.sql',
   '20261102_hot_path_indexes.sql',
+  '20261103_hold_releases.sql',
   // Keep last: it deletes every role, including any an earlier file adds when re-applied.
   '20261102_remove_roles.sql',
 ];

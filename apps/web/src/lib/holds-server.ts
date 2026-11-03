@@ -89,6 +89,22 @@ export const HOLD_DEPARTMENTS: Record<string, { page: string; forward: string; r
   INVENTORY: { page: '/inventory/hold', forward: '/inventory/packing', receivedLabel: 'Total Received' },
 };
 
+/**
+ * Where released HOLD quantity of a department may be sent straight on a new challan ("Release and Forward"): the
+ * department's own next step, on its own challan type. QC departments send on only after a PASS / REJECT / REWORK
+ * decision, Recutting through its allocations and Inventory sends nothing on, so their released quantity only
+ * returns to the department's normal work (`reason` says why).
+ */
+export function forwardRouteOf(code: string): { to: string; toName: string; challanType: string } | { to: null; reason: string } {
+  if (code === 'DYEING') return { to: 'QC1', toName: departmentName('QC1'), challanType: 'DYEING_TO_QC1' };
+  const cfg = (WORKFLOWS as Record<string, WorkflowConfig>)[code];
+  if (cfg?.qc) return { to: null, reason: `${cfg.label} is a QC department: released quantity goes back to inspection and moves on only after its PASS / REJECT / REWORK decision.` };
+  if (cfg?.allocation) return { to: null, reason: `${cfg.label} sends work on through its allocations: released quantity goes back to My Work > ${cfg.issueScreen}.` };
+  if (code === 'QC1') return { to: null, reason: 'Dyeing QC is a QC department: released quantity goes back to inspection and moves on only after its PASS / REWORK decision.' };
+  if (!cfg?.next) return { to: null, reason: `${cfg?.label || departmentName(code)} sends nothing onward: released quantity returns to its stock.` };
+  return { to: cfg.next.code, toName: cfg.next.label, challanType: cfg.next.challanType };
+}
+
 const round = (n: number) => Math.round((Number(n) || 0) * 1000) / 1000;
 const codesOf = (key: keyof typeof DEPARTMENT_ACCESS) => [...DEPARTMENT_ACCESS[key].codes] as string[];
 /** Challans that never moved quantity. */
@@ -355,7 +371,7 @@ export async function loadLines(code: string, sourceIds?: string[]): Promise<Hol
 
 // ---------------------------------------------------------------- HOLD records
 
-type HoldRow = Awaited<ReturnType<typeof prisma.departmentHold.findFirstOrThrow>>;
+export type HoldRow = Awaited<ReturnType<typeof prisma.departmentHold.findFirstOrThrow>>;
 
 /** A line as screens show it; `outstanding` is what is still free to hold (what is already on HOLD is not). */
 const lineFields = (line: HoldLine, onHold = 0) => ({
@@ -411,7 +427,7 @@ export async function holdsOfSource(code: string, sourceId: string) {
 }
 
 /** A HOLD as screens show it; `line` (live figures) is absent for closed HOLDs and for lines no longer found. */
-function shapeHold(hold: HoldRow, line: HoldLine | null) {
+export function shapeHold(hold: HoldRow, line: HoldLine | null) {
   const active = ACTIVE_HOLD_STATUSES.includes(hold.status);
   return {
     id: hold.id,
@@ -454,6 +470,10 @@ function shapeHold(hold: HoldRow, line: HoldLine | null) {
     heldAt: hold.heldAt,
     closedAt: hold.closedAt,
     forwardPath: line?.forwardPath || HOLD_DEPARTMENTS[hold.departmentCode]?.forward || null,
+    forwardTo: (() => {
+      const route = forwardRouteOf(hold.departmentCode);
+      return 'reason' in route ? null : { code: route.to, name: route.toName };
+    })(),
   };
 }
 
@@ -462,7 +482,7 @@ function shapeHold(hold: HoldRow, line: HoldLine | null) {
  * nothing left closes (FORWARDED, or CLEARED when the rest was written off). Writes only when something
  * changed, and only while the HOLD is still open, so two readers never close it twice.
  */
-async function refreshHold(hold: HoldRow, line: HoldLine | undefined): Promise<HoldRow> {
+export async function refreshHold(hold: HoldRow, line: HoldLine | undefined): Promise<HoldRow> {
   if (!line || !ACTIVE_HOLD_STATUSES.includes(hold.status)) return hold;
   const remaining = remainingOnHold(hold, line);
   const status = activeHoldStatus(hold, line, remaining);
@@ -543,6 +563,7 @@ export interface HoldFilters {
   unit?: string | null;
   from?: string | null;
   to?: string | null;
+  status?: string | null;
 }
 
 const dayStart = (v: string | null | undefined) => (v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(`${v}T00:00:00`) : null);
@@ -561,6 +582,8 @@ export async function listHolds(departments: string[], rawView: string | null, s
       ...(status ? { status } : {}),
       ...(filters.reason ? { reason: filters.reason.toUpperCase() } : {}),
       ...(filters.unit ? { unit: filters.unit.toUpperCase() } : {}),
+      // One HOLD status (ON_HOLD, PARTIALLY_RELEASED ... CLEARED), within the open / closed view.
+      ...(filters.status ? { AND: [{ status: filters.status.toUpperCase() }] } : {}),
       ...(heldAt ? { heldAt } : {}),
       ...(q
         ? {
@@ -600,10 +623,188 @@ export async function holdDetail(id: string, user: AuthenticatedUser) {
     ...latestEvents.map((e) => ({ id: e.id, action: e.action, quantity: e.quantity, unit: e.unit, remainingAfter: e.remainingAfter, remarks: e.remarks, actorName: e.actorName, createdAt: e.createdAt })),
     ...forwards,
   ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-  return { ...shapeHold(hold, line), writtenOff: line?.writtenOff ?? null, outstanding: line ? outstandingOf(line) : null, history };
+  const [original, releases] = await Promise.all([originalLineOf(hold), releasesOf({ holdId: hold.id })]);
+  const route = forwardRouteOf(hold.departmentCode);
+  // Original challan -> received here -> HOLD -> each release (and its new challan, and its receipt downstream).
+  const movement = [
+    ...(hold.challanNumber
+      ? [{ at: hold.challanDate, step: 'Original Challan', detail: `${hold.challanNumber}${hold.sendingDepartment ? ` from ${departmentName(departmentKeyFor(hold.sendingDepartment) || hold.sendingDepartment)}` : ''}` }]
+      : []),
+    { at: original.receivedAt, step: `Received in ${departmentName(hold.departmentCode)}`, detail: `${fmt(hold.receivedQuantity)} ${hold.unit}` },
+    { at: hold.heldAt, step: 'HOLD Created', detail: `${hold.holdNumber}: ${fmt(hold.holdQuantity)} ${hold.unit} by ${hold.heldByName}` },
+    ...releases.flatMap((r) => [
+      { at: r.createdAt, step: r.mode === 'FORWARD' ? 'HOLD Released and Forwarded' : 'HOLD Released to Available', detail: `${fmt(r.quantity)} ${r.unit} by ${r.releasedByName} · ${fmt(r.remainingAfter)} ${r.unit} left on HOLD` },
+      ...(r.newChallanNumber
+        ? [{ at: r.newChallanIssuedAt || r.createdAt, step: 'New Challan Issued', detail: `${r.newChallanNumber} to ${r.destinationName || '—'}${r.newChallanDeleted ? ' (challan since deleted)' : ''}` }]
+        : []),
+      ...(r.receivedAt ? [{ at: r.receivedAt, step: `Received by ${r.destinationName}`, detail: `${r.newChallanNumber}${r.receivedByName ? ` by ${r.receivedByName}` : ''}` }] : []),
+    ]),
+  ];
+  return {
+    ...shapeHold(hold, line),
+    writtenOff: line?.writtenOff ?? null,
+    outstanding: line ? outstandingOf(line) : null,
+    history,
+    original,
+    releases,
+    movement,
+    forwardBlockedReason: 'reason' in route ? route.reason : null,
+  };
 }
 
-const actorNameOf = (user: AuthenticatedUser) => user.fullName || user.username;
+const fmt = (n: number | null | undefined) => String(round(Number(n) || 0));
+
+/**
+ * The exact incoming line a HOLD was placed on (by its challan line id, never by design or serial number), with
+ * its shade and when the department received it. Dyeing QC holds cover a challan's lines of one unit, so they
+ * have no single line.
+ */
+export async function originalLineOf(hold: Pick<HoldRow, 'sourceType' | 'sourceId' | 'challanId'>) {
+  let challanItemId: string | null = null;
+  let receivedAt: Date | null = null;
+  if (hold.sourceType === 'WORK_ITEM') {
+    const w = await prisma.departmentWorkItem.findUnique({ where: { id: hold.sourceId }, select: { inboundChallanItemId: true, receivedAt: true } });
+    challanItemId = w?.inboundChallanItemId || null;
+    receivedAt = w?.receivedAt || null;
+  } else if (hold.sourceType === 'DYEING_ORDER') {
+    const o = await prisma.dyeingOrder.findUnique({ where: { id: hold.sourceId }, select: { inboundChallanItemId: true, receivedAt: true } });
+    challanItemId = o?.inboundChallanItemId || null;
+    receivedAt = o?.receivedAt || null;
+  } else if (hold.challanId) {
+    const c = await prisma.challan.findUnique({ where: { id: hold.challanId }, select: { receivedDate: true } });
+    receivedAt = c?.receivedDate || null;
+  }
+  const item = challanItemId
+    ? await prisma.challanItem.findUnique({ where: { id: challanItemId }, select: { id: true, shade: true, quantity: true, uom: true, garmentCategory: true } })
+    : null;
+  return {
+    challanItemId,
+    shade: item?.shade || null,
+    issuedQuantity: item ? round(item.quantity) : null,
+    issuedUnit: item?.uom || null,
+    receivedAt,
+  };
+}
+
+const RECEIVED_CHALLAN = ['RECEIVED', 'COMPLETED', 'CLOSED'];
+
+/** Status of a release as screens show it: Released (to available), Forwarded (challan not yet received), Received. */
+function releaseStatus(mode: string, challan: { status: string } | null, hadChallan: boolean) {
+  if (mode !== 'FORWARD') return 'RELEASED';
+  if (!challan) return hadChallan ? 'CHALLAN_DELETED' : 'FORWARDED';
+  if (DEAD_CHALLAN.includes(challan.status)) return 'CHALLAN_CANCELLED';
+  return RECEIVED_CHALLAN.includes(challan.status) ? 'RECEIVED' : 'FORWARDED';
+}
+
+export const RELEASE_STATUS_LABEL: Record<string, string> = {
+  RELEASED: 'Released',
+  FORWARDED: 'Forwarded',
+  RECEIVED: 'Received',
+  CHALLAN_CANCELLED: 'Challan cancelled',
+  CHALLAN_DELETED: 'Challan deleted',
+};
+
+/** HOLD releases (newest first) with their HOLD's production details and the new challan's live state. */
+export async function releasesOf(where: Record<string, unknown>, take = 500) {
+  const rows = await prisma.departmentHoldRelease.findMany({
+    where,
+    orderBy: { createdAt: 'desc' },
+    take,
+    include: {
+      hold: { select: { holdNumber: true, designNumber: true, serialNumber: true, productionSheetNumber: true, programId: true, fabricName: true, colour: true, productionType: true } },
+      newChallan: { select: { id: true, status: true, issuedDate: true, createdAt: true, receivedDate: true, toDepartment: true, receivedBy: { select: { fullName: true, username: true } } } },
+    },
+  });
+  return rows.map((r) => {
+    const status = releaseStatus(r.mode, r.newChallan, Boolean(r.newChallanNumber));
+    const destination = r.destinationDepartment || r.newChallan?.toDepartment || null;
+    return {
+      id: r.id,
+      holdId: r.holdId,
+      holdNumber: r.hold.holdNumber,
+      departmentCode: r.departmentCode,
+      departmentName: departmentName(r.departmentCode),
+      mode: r.mode,
+      quantity: r.quantity,
+      unit: r.unit,
+      remainingAfter: r.remainingAfter,
+      programId: r.hold.programId,
+      designNumber: r.hold.designNumber,
+      serialNumber: r.hold.serialNumber,
+      productionSheetNumber: r.hold.productionSheetNumber,
+      fabricName: r.hold.fabricName,
+      colour: r.hold.colour,
+      productionType: r.hold.productionType,
+      originalChallanId: r.originalChallanId,
+      originalChallanNumber: r.originalChallanNumber,
+      originalChallanItemId: r.originalChallanItemId,
+      newChallanId: r.newChallan?.id || null,
+      newChallanNumber: r.newChallanNumber,
+      newChallanIssuedAt: r.newChallan ? r.newChallan.issuedDate || r.newChallan.createdAt : null,
+      newChallanDeleted: Boolean(r.newChallanNumber && !r.newChallan),
+      destinationDepartment: destination,
+      destinationName: destination ? departmentName(departmentKeyFor(destination) || destination) : null,
+      receivedAt: r.newChallan && RECEIVED_CHALLAN.includes(r.newChallan.status) ? r.newChallan.receivedDate : null,
+      receivedByName: userName(r.newChallan?.receivedBy),
+      releasedByName: r.releasedByName,
+      remarks: r.remarks,
+      createdAt: r.createdAt,
+      status,
+      statusLabel: RELEASE_STATUS_LABEL[status] || status,
+    };
+  });
+}
+
+/**
+ * HOLD totals of these departments, per unit (MTR and PCS never added): held now, released in total, released and
+ * forwarded on a new challan; plus the same per department.
+ */
+export async function holdSummary(departments: string[]) {
+  const [held, released] = await Promise.all([
+    prisma.departmentHold.groupBy({
+      by: ['departmentCode', 'unit'],
+      where: { departmentCode: { in: departments }, status: { in: ACTIVE_HOLD_STATUSES } },
+      _sum: { remainingQuantity: true },
+      _count: { _all: true },
+    }),
+    prisma.departmentHoldRelease.groupBy({
+      by: ['departmentCode', 'unit', 'mode'],
+      where: { departmentCode: { in: departments } },
+      _sum: { quantity: true },
+    }),
+  ]);
+  type Totals = { held: Record<string, number>; released: Record<string, number>; forwarded: Record<string, number>; openHolds: number };
+  const empty = (): Totals => ({ held: {}, released: {}, forwarded: {}, openHolds: 0 });
+  const add = (bucket: Record<string, number>, unit: string, q: number | null) => {
+    if (q) bucket[unit] = round((bucket[unit] || 0) + q);
+  };
+  const total = empty();
+  const byDept = new Map<string, Totals>();
+  const dept = (code: string) => {
+    if (!byDept.has(code)) byDept.set(code, empty());
+    return byDept.get(code)!;
+  };
+  for (const h of held) {
+    for (const t of [total, dept(h.departmentCode)]) {
+      add(t.held, h.unit, h._sum.remainingQuantity);
+      t.openHolds += h._count._all;
+    }
+  }
+  for (const r of released) {
+    for (const t of [total, dept(r.departmentCode)]) {
+      add(t.released, r.unit, r._sum.quantity);
+      if (r.mode === 'FORWARD') add(t.forwarded, r.unit, r._sum.quantity);
+    }
+  }
+  return {
+    total,
+    departments: departments
+      .filter((code) => byDept.has(code))
+      .map((code) => ({ code, name: departmentName(code), ...byDept.get(code)! })),
+  };
+}
+
+export const actorNameOf = (user: AuthenticatedUser) => user.fullName || user.username;
 
 /**
  * Sets the line's heldQuantity to what its open HOLDs still keep back. Call inside the transaction that changed a
@@ -621,6 +822,16 @@ export async function syncHeld(tx: any, sourceType: string, sourceId: string) {
 }
 
 /**
+ * Dyeing QC marks a challan ON_HOLD while part of it is held. Once nothing of it is held any more, the released
+ * quantity is waiting for inspection again (UNDER_INSPECTION), so the challan no longer counts as on HOLD.
+ */
+export async function reopenHeldChallan(tx: any, sourceType: string, sourceId: string) {
+  if (sourceType !== 'QC1_CHALLAN') return;
+  const stillHeld = await tx.departmentHold.count({ where: { sourceType, sourceId, status: { in: ACTIVE_HOLD_STATUSES } } });
+  if (stillHeld === 0) await tx.challan.updateMany({ where: { id: sourceId, status: 'ON_HOLD' }, data: { status: 'UNDER_INSPECTION' } });
+}
+
+/**
  * Locks the line's row for the rest of the transaction (and changes its updatedAt), so a challan, inspection or
  * allocation being saved at the same moment either finishes first or fails its guard and is retried.
  */
@@ -633,13 +844,25 @@ export async function lockSource(tx: any, sourceType: string, sourceId: string) 
 
 /**
  * Places a HOLD on one line of the department, or adds to the line's open HOLD (one open HOLD per line; each
- * addition is its own entry in the HOLD's history). Never more than the line still has free.
+ * addition is its own entry in the HOLD's history). Never more than the line still has free. The same submission
+ * (idempotencyKey) is saved once: a double click or retry returns the HOLD it already placed.
  */
 export async function placeHold(code: string, body: any, user: AuthenticatedUser) {
   const key = String(body?.lineKey || '');
   const [sourceType, sourceId] = key.split(':');
   if (!sourceType || !sourceId) throw new WorkRequestError('Select the line to place on HOLD.');
+  const raw = typeof body?.idempotencyKey === 'string' ? body.idempotencyKey.trim().slice(0, 128) : '';
+  const submission = raw ? `HOLD_PLACE:${user.id}:${raw}` : null;
+  const replay = async () => {
+    if (!submission) return null;
+    const record = await prisma.idempotencyRecord.findUnique({ where: { key: submission } });
+    if (!record || record.endpoint !== 'HOLD_PLACE') return null;
+    const hold = await prisma.departmentHold.findUnique({ where: { id: JSON.parse(record.responseBody).holdId } });
+    return hold ? shapeHold(hold, null) : null;
+  };
   for (let attempt = 0; attempt < 3; attempt++) {
+    const earlier = await replay();
+    if (earlier) return earlier;
     try {
       return await prisma.$transaction(async (tx) => {
         await lockSource(tx, sourceType, sourceId);
@@ -647,10 +870,15 @@ export async function placeHold(code: string, body: any, user: AuthenticatedUser
         const line = (await loadLines(code, [sourceId])).find((l) => l.key === key) || null;
         const check = validateHold(line, body);
         if (!check.ok) throw new WorkRequestError(check.error);
-        return addToHold(tx, code, line as HoldLine, check, user);
+        const placed = await addToHold(tx, code, line as HoldLine, check, user);
+        if (submission) {
+          await tx.idempotencyRecord.create({ data: { key: submission, endpoint: 'HOLD_PLACE', method: 'POST', statusCode: 201, responseBody: JSON.stringify({ holdId: placed.id }) } });
+        }
+        return placed;
       }, TX);
     } catch (error) {
-      // P2002: the HOLD number was taken at the same moment; try the next.
+      // P2002: the HOLD number was taken at the same moment (try the next), or this same submission was saved
+      // first (the replay above returns it).
       if ((error as { code?: string } | null)?.code !== 'P2002') throw error;
     }
   }
@@ -777,11 +1005,18 @@ export async function takeFromHold(tx: any, code: string, sourceKey: string, qua
   return hold;
 }
 
-/** Releases part or all of what is still on HOLD; the HOLD closes as RELEASED when nothing is left. */
+/**
+ * Releases part or all of what is still on HOLD back to the department's available quantity; the HOLD closes as
+ * RELEASED when nothing is left. The same submission (idempotencyKey) is applied once.
+ */
 export async function releaseHold(id: string, body: any, user: AuthenticatedUser) {
   const found = await prisma.departmentHold.findUnique({ where: { id } });
   if (!found) throw new WorkRequestError('HOLD record not found.', 404);
   if (!userBelongsToDepartment(user, found.departmentCode)) throw new WorkRequestError('You do not have access to this department.', 403);
+  const key = releaseKey(body, user);
+  if (key && (await prisma.departmentHoldRelease.findUnique({ where: { idempotencyKey: key } }))) {
+    return shapeHold(await prisma.departmentHold.findUniqueOrThrow({ where: { id } }), null);
+  }
   const line = (await loadLines(found.departmentCode, [found.sourceId])).find((l) => l.key === found.sourceKey);
   const hold = await refreshHold(found, line);
   const remaining = line ? remainingOnHold(hold, line) : hold.remainingQuantity;
@@ -789,26 +1024,61 @@ export async function releaseHold(id: string, body: any, user: AuthenticatedUser
   if (!check.ok) throw new WorkRequestError(check.error);
   const after = round(remaining - check.quantity);
   const status = after <= 0 ? 'RELEASED' : 'PARTIALLY_RELEASED';
-  return prisma.$transaction(async (tx) => {
-    const res = await tx.departmentHold.updateMany({
-      where: { id: hold.id, updatedAt: hold.updatedAt, status: { in: ACTIVE_HOLD_STATUSES } },
-      data: {
-        releasedQuantity: round(hold.releasedQuantity + check.quantity),
-        remainingQuantity: after,
-        status,
-        ...(after <= 0 ? { activeKey: null, closedAt: new Date() } : {}),
-      },
-    });
-    if (res.count !== 1) throw new WorkRequestError('This HOLD was changed by someone else. Refresh and try again.', 409);
-    // The released quantity is available again on the line straight away.
-    await syncHeld(tx, hold.sourceType, hold.sourceId);
-    await tx.departmentHoldEvent.create({
-      data: { holdId: hold.id, action: 'RELEASE', quantity: check.quantity, remainingAfter: after, unit: hold.unit, remarks: check.remarks, actorId: user.id, actorName: actorNameOf(user) },
-    });
-    await tx.auditLog.create({
-      data: { actorId: user.id, action: 'HOLD_RELEASE', entity: 'DepartmentHold', entityId: hold.id, afterState: JSON.stringify({ quantity: check.quantity, unit: hold.unit, remaining: after }) },
-    });
-    const updated = await tx.departmentHold.findUniqueOrThrow({ where: { id: hold.id } });
-    return shapeHold(updated, line || null);
-  }, TX);
+  const original = await originalLineOf(hold);
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const res = await tx.departmentHold.updateMany({
+        where: { id: hold.id, updatedAt: hold.updatedAt, status: { in: ACTIVE_HOLD_STATUSES } },
+        data: {
+          releasedQuantity: round(hold.releasedQuantity + check.quantity),
+          remainingQuantity: after,
+          status,
+          ...(after <= 0 ? { activeKey: null, closedAt: new Date() } : {}),
+        },
+      });
+      if (res.count !== 1) throw new WorkRequestError('This HOLD was changed by someone else. Refresh and try again.', 409);
+      // The released quantity is available again on the line straight away.
+      await syncHeld(tx, hold.sourceType, hold.sourceId);
+      await reopenHeldChallan(tx, hold.sourceType, hold.sourceId);
+      const event = await tx.departmentHoldEvent.create({
+        data: { holdId: hold.id, action: 'RELEASE', quantity: check.quantity, remainingAfter: after, unit: hold.unit, remarks: check.remarks, actorId: user.id, actorName: actorNameOf(user) },
+      });
+      await tx.departmentHoldRelease.create({
+        data: {
+          holdId: hold.id,
+          departmentCode: hold.departmentCode,
+          mode: 'AVAILABLE',
+          quantity: check.quantity,
+          unit: hold.unit,
+          remainingAfter: after,
+          programId: hold.programId,
+          originalChallanId: hold.challanId,
+          originalChallanNumber: hold.challanNumber,
+          originalChallanItemId: original.challanItemId,
+          eventId: event.id,
+          idempotencyKey: key,
+          remarks: check.remarks,
+          releasedById: user.id,
+          releasedByName: actorNameOf(user),
+        },
+      });
+      await tx.auditLog.create({
+        data: { actorId: user.id, action: 'HOLD_RELEASE', entity: 'DepartmentHold', entityId: hold.id, afterState: JSON.stringify({ quantity: check.quantity, unit: hold.unit, remaining: after }) },
+      });
+      const updated = await tx.departmentHold.findUniqueOrThrow({ where: { id: hold.id } });
+      return shapeHold(updated, line || null);
+    }, TX);
+  } catch (error) {
+    // A concurrent copy of this same submission was saved first: return the HOLD as it now is.
+    if (key && (error as { code?: string } | null)?.code === 'P2002' && (await prisma.departmentHoldRelease.findUnique({ where: { idempotencyKey: key } }))) {
+      return shapeHold(await prisma.departmentHold.findUniqueOrThrow({ where: { id } }), null);
+    }
+    throw error;
+  }
+}
+
+/** The per-user key that makes one release submission apply once (a double click or retry finds it). */
+export function releaseKey(body: any, user: AuthenticatedUser) {
+  const raw = typeof body?.idempotencyKey === 'string' ? body.idempotencyKey.trim().slice(0, 128) : '';
+  return raw ? `HOLD_RELEASE:${user.id}:${raw}` : null;
 }

@@ -83,8 +83,15 @@ export async function GET(
     // What the signed-in user may edit (the edit endpoint checks every save again).
     const { user } = await requireUser(request);
     const editOptions = await challanEditOptions(challan as any, user ?? null).catch(() => null);
+    // Fabric released from a HOLD and sent on this challan: the HOLD and the original challan it came from.
+    const holdReleases = await prisma.departmentHoldRelease
+      .findMany({
+        where: { newChallanId: id },
+        select: { quantity: true, unit: true, departmentCode: true, originalChallanId: true, originalChallanNumber: true, releasedByName: true, createdAt: true, hold: { select: { holdNumber: true } } },
+      })
+      .catch(() => []);
 
-    return NextResponse.json({ ...challan, editOptions });
+    return NextResponse.json({ ...challan, editOptions, holdReleases });
   } catch (error: any) {
     console.error('Error fetching challan:', error);
     return NextResponse.json({ error: error.message || 'Failed to fetch challan' }, { status: 500 });

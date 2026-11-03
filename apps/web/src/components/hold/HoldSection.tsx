@@ -1,10 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { PauseCircle } from 'lucide-react';
 import { BTN_PRIMARY, FIELD, Notice, fetchJson, fmtDate, fmtQty } from '@/components/workflow/WorkflowUi';
 import { HOLD_REASONS } from '@/lib/holds.mjs';
+
+/** A key for one HOLD submission: a double click or retry sends the same key, so the HOLD is placed once. */
+const newKey = () =>
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 // Hold Quantity section of a department's processing form (Dyeing to Inventory). It sits inside the form but
 // saves on its own (POST /api/holds); the form's Save never sends HOLD fields. The server validates the
@@ -27,6 +31,7 @@ export function HoldSection({ department, sourceId, holdPage, onChanged }: { dep
   const [reasonOther, setReasonOther] = useState('');
   const [remarks, setRemarks] = useState('');
   const [saving, setSaving] = useState(false);
+  const submissionKey = useRef(newKey());
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -65,9 +70,11 @@ export function HoldSection({ department, sourceId, holdPage, onChanged }: { dep
       const body = await fetchJson('/api/holds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ department, lineKey: line.key, quantity, unit, reason, reasonOther, remarks }),
+        body: JSON.stringify({ department, lineKey: line.key, quantity, unit, reason, reasonOther, remarks, idempotencyKey: submissionKey.current }),
       });
       setMessage(body.message);
+      // The next HOLD is a new submission.
+      submissionKey.current = newKey();
       setQuantity('');
       setReason('');
       setReasonOther('');

@@ -851,6 +851,13 @@ export async function monitorRecordDetail(id: string, user: AuthenticatedUser) {
       const c = await prisma.challan.findUnique({ where: { id: h.challanId }, select: challanBrief });
       if (c) challans.push(c);
     }
+    // Quantity released and forwarded from the HOLD: the new challan it left on and its receipt downstream.
+    for (const r of h.releases.filter((x: any) => x.mode === 'FORWARD')) {
+      history.push({ at: iso(r.newChallanIssuedAt || r.createdAt)!, department: h.departmentName, action: 'New challan issued from HOLD', detail: `${h.departmentName} → ${r.destinationName}${r.newChallanDeleted ? ' (challan since deleted)' : ''}`, quantity: r.quantity, unit: r.unit, reference: r.newChallanNumber, by: r.releasedByName });
+      if (r.receivedAt) history.push({ at: iso(r.receivedAt)!, department: r.destinationName, action: 'Received by next department', detail: `Received at ${r.destinationName}`, quantity: null, unit: null, reference: r.newChallanNumber, by: r.receivedByName });
+    }
+    const forwarded = h.releases.map((x: any) => x.newChallanId).filter(Boolean);
+    if (forwarded.length) challans.push(...(await prisma.challan.findMany({ where: { id: { in: forwarded } }, select: challanBrief })));
   }
 
   const program = record.programId

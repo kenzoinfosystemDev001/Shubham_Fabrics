@@ -190,6 +190,11 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
                           <Link href={`/challans/${ch.id}`} className="font-mono text-xs font-bold text-brand-800 hover:underline">
                             {ch.challanNumber}
                           </Link>
+                          {/Released from HOLD/i.test(ch.remarks || '') && (
+                            <span className="block mt-1 w-fit px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent-100 text-neutral-900" title={ch.remarks}>
+                              From HOLD release{ch.parentChallan ? ` · Original ${ch.parentChallan.challanNumber}` : ''}
+                            </span>
+                          )}
                         </td>
                         <td className="py-3 px-3 text-xs text-neutral-600 whitespace-nowrap">{fmtDate(ch.issuedDate || ch.createdAt)}</td>
                         <td className="py-3 px-3 text-xs text-neutral-700 whitespace-nowrap">{departmentName(ch.fromDepartment)}</td>

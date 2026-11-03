@@ -363,6 +363,22 @@ export default function ChallanDetailPage() {
 
       {/* THE CHALLAN */}
       <main className="p-4 sm:p-8 max-w-4xl mx-auto">
+        {challan.holdReleases?.length > 0 && (
+          <div className="print:hidden mb-4 rounded-xl border border-accent-300 bg-accent-50 px-4 py-3 text-sm text-neutral-900">
+            <p className="font-bold">Fabric released from HOLD</p>
+            {challan.holdReleases.map((r: any, i: number) => (
+              <p key={i}>
+                {r.quantity} {r.unit} released from HOLD {r.hold?.holdNumber} by {r.releasedByName}. Original challan:{' '}
+                {r.originalChallanId ? (
+                  <Link href={`/challans/${r.originalChallanId}`} className="font-mono font-semibold text-brand-700 hover:underline">{r.originalChallanNumber}</Link>
+                ) : (
+                  <span className="font-mono font-semibold">{r.originalChallanNumber || '—'}</span>
+                )}
+                . New challan: <span className="font-mono font-semibold">{challan.challanNumber}</span>.
+              </p>
+            ))}
+          </div>
+        )}
         <article className="bg-white rounded-2xl ring-1 ring-neutral-200 shadow-sm p-6 sm:p-10 space-y-8">
           {/* Heading */}
           <div className="flex items-start justify-between gap-6">
