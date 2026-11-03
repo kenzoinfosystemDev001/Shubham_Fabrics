@@ -9,6 +9,8 @@ import { STOCK_TRANSACTION_OPTIONS, syncChallanStock } from '@/lib/fabric-stock-
 import { syncItem as syncRecuttingItem } from '@/lib/recutting-server';
 import { writeAuditLog } from '@/lib/audit-log';
 import { wilcomSheetLabel } from '@/lib/wilcom-sheets';
+import { userBelongsToDepartment } from '@/lib/auth/department-access';
+import { departmentName } from '@/lib/workflow-views';
 
 // Administrator deletes of one challan or one Production Sheet, done so nothing is left inconsistent.
 //
@@ -100,8 +102,13 @@ async function challanFacts(db: Db, id: string) {
   if (linked.length) blockers.push(`Later department lines were issued from ${linked.map((w) => w.itemNumber).join(', ')}. Delete those challans first.`);
 
   const mtrPcs = totalsText(challan.items);
+  // Lines the receiving department has already received (department lines, dyeing orders, or the challan itself).
+  const receivedLines =
+    workItems.filter((w) => w.status !== 'AWAITING_RECEIPT').length + orders.filter((o) => o.status !== 'AWAITING_RECEIPT').length;
+  const received = Boolean(challan.receivedDate) || receivedLines > 0 || !['DRAFT', 'SUBMITTED', 'ISSUED', 'IN_TRANSIT', ...INACTIVE].includes(challan.status);
   return {
     challan,
+    received,
     blockers,
     summary: {
       id: challan.id,
@@ -129,11 +136,36 @@ async function challanFacts(db: Db, id: string) {
   };
 }
 
-/** What deleting the challan would do (for the confirmation dialog), or why it cannot be deleted yet. */
-export async function challanDeleteImpact(id: string) {
+/**
+ * Who may delete a challan: an administrator, or the department that issued it while the receiving department has
+ * not received it yet (afterwards the receiver first deletes its receipt). A receiving department never deletes
+ * the sender's challan.
+ */
+function permissionBlockers(facts: NonNullable<Awaited<ReturnType<typeof challanFacts>>>, user: AuthenticatedUser): string[] {
+  if (user.isAdmin) return [];
+  const { fromDepartment, toDepartment } = facts.challan;
+  if (!userBelongsToDepartment(user, fromDepartment)) {
+    return [`Only ${departmentName(fromDepartment)} (the department that issued it) or an administrator can delete this challan.`];
+  }
+  if (facts.received) {
+    return [`${departmentName(toDepartment)} has already received this challan. ${departmentName(toDepartment)} must first delete its received entry, or an administrator can delete the challan.`];
+  }
+  return [];
+}
+
+/** What deleting the challan would do (for the confirmation dialog), or why this user cannot delete it yet. */
+export async function challanDeleteImpact(id: string, user: AuthenticatedUser) {
   const facts = await challanFacts(prisma, id);
   if (!facts) throw new WorkRequestError('Challan not found.', 404);
-  return { ...facts.summary, blockers: facts.blockers, effects: facts.effects };
+  return {
+    ...facts.summary,
+    fromDepartmentName: departmentName(facts.challan.fromDepartment),
+    toDepartmentName: departmentName(facts.challan.toDepartment),
+    received: facts.received,
+    warning: facts.received ? `${departmentName(facts.challan.toDepartment)} has already received this challan; deleting it also removes that receipt.` : null,
+    blockers: [...permissionBlockers(facts, user), ...facts.blockers],
+    effects: facts.effects,
+  };
 }
 
 /** Rolls back the sending side of a challan's lines (the quantity returns to the line it was issued from). */
@@ -229,14 +261,18 @@ const snapshotOf = (facts: NonNullable<Awaited<ReturnType<typeof challanFacts>>>
   effects: facts.effects,
 });
 
-/** Deletes one challan as an administrator (refused while later work depends on it). */
+/**
+ * Deletes one challan: an administrator, or the issuing department before the challan is received (refused while
+ * later work depends on it). Checked again inside the transaction, so a receipt saved meanwhile stops it.
+ */
 export async function deleteChallanAsAdmin(id: string, reason: string | null | undefined, user: AuthenticatedUser) {
-  if (!user.isAdmin) throw new WorkRequestError('Only an administrator can delete challans.', 403);
   const why = typeof reason === 'string' ? reason.trim().slice(0, 500) : '';
   if (!why) throw new WorkRequestError('Enter the reason for deleting this challan.');
   return prisma.$transaction(async (tx) => {
     const facts = await challanFacts(tx, id);
     if (!facts) throw new WorkRequestError('Challan not found.', 404);
+    const denied = permissionBlockers(facts, user);
+    if (denied.length) throw new WorkRequestError(denied.join(' '), 403);
     if (facts.blockers.length) throw new WorkRequestError(`Challan ${facts.challan.challanNumber} cannot be deleted yet. ${facts.blockers.join(' ')}`, 409);
     await removeChallan(tx, facts, user.id);
     await writeAuditLog(tx, { actorId: user.id, action: 'CHALLAN_DELETED', entity: 'Challan', entityId: id, before: { ...snapshotOf(facts), reason: why } });

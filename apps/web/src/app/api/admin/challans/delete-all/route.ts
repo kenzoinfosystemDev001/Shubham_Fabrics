@@ -28,13 +28,13 @@ export async function DELETE(request: Request) {
           data: { parentChallanId: null },
         });
 
-        // 2. Department work items are derived from challans: remove them with the challans.
+        // 2. Department work items and dyeing orders exist only because of challans: remove them with the challans
+        // (their transfers, allocations and inspections cascade). Unlinking dyeing orders instead left them open,
+        // so deleted challans kept appearing in Dyeing's Pending Work. Every HOLD is on one of these lines (or on
+        // a Dyeing QC challan), so HOLDs and their release records go too.
+        await tx.departmentHold.deleteMany({});
         await tx.departmentWorkItem.deleteMany({});
-
-        // Unlink Challans from Dyeing Orders
-        await tx.dyeingOrder.updateMany({
-          data: { inboundChallanId: null, qc1ChallanId: null },
-        });
+        await tx.dyeingOrder.deleteMany({});
 
         // 3. Delete production logs referencing challans
         await tx.productionTransaction.deleteMany({});

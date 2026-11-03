@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 import { Eye, PauseCircle, PlayCircle, Search, Send, X } from 'lucide-react';
 import {
   BTN_PRIMARY,
@@ -38,6 +39,7 @@ const STATUS_TONE: Record<string, string> = {
   RELEASED: 'bg-neutral-100 text-neutral-600',
   FORWARDED: 'bg-neutral-100 text-neutral-600',
   CLEARED: 'bg-neutral-100 text-neutral-500',
+  DELETED: 'bg-danger-50 text-danger-700',
 };
 
 function HoldStatusBadge({ hold }: { hold: any }) {
@@ -370,6 +372,10 @@ export function DepartmentHold({ departmentCode }: { departmentCode: string }) {
                           <PlayCircle className="w-3.5 h-3.5" />
                           Release
                         </button>
+                      )}
+                      {/* A HOLD placed by mistake (nothing released or decided on it yet) is deleted; the server checks. */}
+                      {h.active && (
+                        <DeleteRecordButton target={{ kind: 'HOLD', id: h.id, label: h.holdNumber }} onDeleted={done} />
                       )}
                     </td>
                     <td className="py-2.5 pl-1 pr-3 text-right">

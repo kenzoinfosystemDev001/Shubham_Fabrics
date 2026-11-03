@@ -11,7 +11,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!user) return response;
   try {
     const { id } = await params;
-    return NextResponse.json({ data: await challanDeleteImpact(id) });
+    return NextResponse.json({ data: await challanDeleteImpact(id, user) });
   } catch (error) {
     return errorResponse(error, 'Failed to check what deleting this challan would affect.');
   }

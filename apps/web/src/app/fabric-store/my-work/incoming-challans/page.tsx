@@ -24,6 +24,7 @@ import {
 import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { ReceiveChallanConfirm } from '@/components/challan/ReceiptLines';
+import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 export default function IncomingChallansPage() {
@@ -286,7 +287,21 @@ export default function IncomingChallansPage() {
                               <Check className="w-3 h-3 text-accent-700" />
                               <span>Stock Confirmed · Received</span>
                             </span>
-                          ) : (
+                          ) : null}
+                          {/* A receipt confirmed by mistake goes back to pending, only while nothing was issued for the sheet. */}
+                          {isReceived && !isCancelled && (
+                            <span className="block mt-1">
+                              <DeleteRecordButton
+                                target={{ kind: 'RECEIPT_CHALLAN', id: ch.id, label: ch.challanNumber }}
+                                text="Delete receipt"
+                                onDeleted={(m) => {
+                                  setActionMessage(m);
+                                  loadChallans();
+                                }}
+                              />
+                            </span>
+                          )}
+                          {isCancelled || isReceived ? null : (
                             <div className="flex flex-col items-start gap-1">
                               <button
                                 type="button"

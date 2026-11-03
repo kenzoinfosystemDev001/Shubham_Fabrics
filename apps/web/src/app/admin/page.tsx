@@ -36,6 +36,7 @@ import { ShubhamLogo } from '@/components/ShubhamLogo';
 import { AppearancePanel, SidebarImagePanel } from '@/components/admin/LoginAppearancePanel';
 import { AdminDepartmentMenu } from '@/components/admin/AdminDepartmentMenu';
 import { AdminDeleteDialog, type AdminDeleteTarget } from '@/components/admin/AdminDeleteDialog';
+import { DeletionHistoryPanel } from '@/components/admin/DeletionHistoryPanel';
 import { QualityMonitorPanel, type MonitorKind } from '@/components/admin/QualityMonitorPanel';
 import { departmentName } from '@/lib/workflow-views';
 import { printProductionSheet } from '@/lib/download-production-sheet';
@@ -83,7 +84,7 @@ interface EditableUser {
 export default function AdminConsolePage() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabrics' | 'stocks' | 'rejected' | 'rework' | 'hold' | 'sidebar-image' | 'login-appearance'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabrics' | 'stocks' | 'rejected' | 'rework' | 'hold' | 'deletions' | 'sidebar-image' | 'login-appearance'>('users');
   const [loading, setLoading] = useState(true);
 
   // Data states
@@ -491,6 +492,7 @@ export default function AdminConsolePage() {
             { id: 'rejected', label: 'Rejected Fabric', icon: ShieldAlert, count: qualityCounts?.REJECT },
             { id: 'rework', label: 'Rework Fabric', icon: RotateCcw, count: qualityCounts?.REWORK },
             { id: 'hold', label: 'Hold Fabric', icon: PauseCircle, count: qualityCounts?.HOLD },
+            { id: 'deletions', label: 'Deletion History', icon: Trash2, count: undefined },
             { id: 'sidebar-image', label: 'Sidebar Image', icon: ImageIcon, count: undefined },
             { id: 'login-appearance', label: 'Appearance', icon: Palette, count: undefined },
           ].map((tab) => {
@@ -535,6 +537,7 @@ export default function AdminConsolePage() {
         ) : (
           <>
             {/* DEPARTMENT SIDEBAR IMAGES */}
+            {activeTab === 'deletions' && <DeletionHistoryPanel />}
             {activeTab === 'sidebar-image' && <SidebarImagePanel onNotify={showNotification} />}
             {activeTab === 'login-appearance' && <AppearancePanel onNotify={showNotification} />}
 
