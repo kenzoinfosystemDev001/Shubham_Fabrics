@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Suspense, useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
@@ -236,6 +237,20 @@ function SubStyleMultiSelectCell({
   setCustomSubStyleInput,
   canApplyAll,
 }: SubStyleMultiSelectCellProps) {
+  const [search, setSearch] = useState('');
+  // The parent passes a new close handler on every render; keep the latest without re-running the effects.
+  const closeRef = React.useRef(onClosePicker);
+  closeRef.current = onClosePicker;
+  // The search starts empty each time the pop-up opens (not after every tick), and Esc closes it.
+  useEffect(() => {
+    if (!isPickerOpen) return;
+    setSearch('');
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeRef.current();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isPickerOpen]);
   let rowSubStyles = Array.isArray(row.subStyles) ? row.subStyles : [];
   if (rowSubStyles.length === 0 && row.subStyle) {
     rowSubStyles = String(row.subStyle)
@@ -277,20 +292,22 @@ function SubStyleMultiSelectCell({
         </button>
       </div>
 
-      {isPickerOpen && (
-        <>
+      {isPickerOpen && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-neutral-900/40 backdrop-blur-[1px]"
+          onClick={onClosePicker}
+        >
           <div
-            className="fixed inset-0 z-40 bg-neutral-900/10 backdrop-blur-[0.5px]"
-            onClick={onClosePicker}
-          />
-          <div
-            className="absolute left-1/2 -translate-x-1/2 top-full mt-1 z-50 w-72 bg-white rounded-lg shadow-2xl border-2 border-neutral-200 p-3 text-left"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`substyle-title-${cat}-${rIdx}`}
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl border border-neutral-200 p-4 text-left"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-neutral-200 pb-2 mb-2">
               <div>
-                <span className="text-[11px] font-black uppercase text-neutral-900 block">
-                  Sub Styles &middot; Row #{rIdx + 1}
+                <span id={`substyle-title-${cat}-${rIdx}`} className="text-xs font-black uppercase text-neutral-900 block">
+                  Sub Styles &middot; {cat} &middot; Row #{rIdx + 1}
                 </span>
                 <span className="text-[10px] text-brand-800 font-bold">
                   {rowSubStyles.length} selected
@@ -337,8 +354,23 @@ function SubStyleMultiSelectCell({
               )}
             </div>
 
-            <div className="max-h-40 overflow-y-auto space-y-1 mb-2 pr-1 border border-neutral-100 rounded p-1 bg-neutral-50/50">
-              {compSubStyles.map((sub, sIdx) => {
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search sub style"
+              aria-label="Search sub styles"
+              autoFocus
+              className="w-full mb-2 px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500"
+            />
+
+            <div className="max-h-64 overflow-y-auto space-y-1 mb-2 pr-1 border border-neutral-100 rounded p-1 bg-neutral-50/50">
+              {compSubStyles.filter((sub) => sub.name.toUpperCase().includes(search.trim().toUpperCase())).length === 0 && (
+                <p className="px-2 py-2 text-[11px] text-neutral-500">
+                  {compSubStyles.length === 0 ? 'No sub styles defined for this item yet. Add one below.' : 'No sub style matches the search.'}
+                </p>
+              )}
+              {compSubStyles.filter((sub) => sub.name.toUpperCase().includes(search.trim().toUpperCase())).map((sub, sIdx) => {
                 const isChecked = rowSubStyles.includes(sub.name.toUpperCase());
                 return (
                   <label
@@ -427,7 +459,8 @@ function SubStyleMultiSelectCell({
               </button>
             </div>
           </div>
-        </>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -21,7 +21,6 @@ import {
   fmtDate,
   fmtQty,
   challanRef,
-  sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { TRANSFERABLE_STATUSES, availableFor } from '@/lib/work-items.mjs';
 import { destinationName, workPath, type TransferKind, type WorkflowView } from '@/lib/workflow-views';
@@ -29,7 +28,7 @@ import { GarmentTag } from '@/components/recutting/RecuttingUi';
 import { GarmentImageUpload, GarmentThumb, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { garmentName, groupGarments, imageFor } from '@/lib/finished-garments.mjs';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
-import { challanSheetRefs, distinct, incomingChallanOptions, lineSheetId } from '@/lib/challan-sheets.mjs';
+import { challanSheetRefs, distinct, incomingChallanOptions, lineSheetId, sheetDesignLabel } from '@/lib/challan-sheets.mjs';
 import { ProductionSheetQuickView } from '@/components/challan/ProductionSheetQuickView';
 import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 
@@ -186,7 +185,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
     acc[l.item.uom] = (acc[l.item.uom] || 0) + l.quantity;
     return acc;
   }, {});
-  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetRef(s))));
+  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetDesignLabel(s))));
   const breakdownRows = chosenLines.map((l, index) => ({
     key: `${l.item.id}-${index}`,
     program: l.item.program,
@@ -374,7 +373,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                               <select value={r.itemId} onChange={(e) => updateRow(r.key, { itemId: e.target.value })} className={FIELD} aria-label="Finished garment">
                                 <option value="">Choose a finished garment</option>
                                 {garments.filter((x) => !taken.has(x.key)).map((x) => (
-                                  <option key={x.key} value={x.key}>{sheetRef(x.items[0]?.program)} · {x.name}</option>
+                                  <option key={x.key} value={x.key}>{sheetDesignLabel(x.items[0]?.program)} · {x.name}</option>
                                 ))}
                               </select>
                               {g && canAddImages && (
@@ -446,12 +445,12 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                               <option value="">Choose a ready line</option>
                               {sheetItems.filter((x) => !taken.has(x.id)).map((x) => (
                                 <option key={x.id} value={x.id}>
-                                  {sheetRef(x.program)} · {challanRef(x) ? `${challanRef(x)} · ` : ''}{x.garmentCategory ? `${x.garmentCategory}${x.styleRef ? ` ${x.styleRef}` : ''} · ` : ''}{x.fabricName} · {x.colour || '—'} · {x.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed'}
+                                  {sheetDesignLabel(x.program)} · {challanRef(x) ? `${challanRef(x)} · ` : ''}{x.garmentCategory ? `${x.garmentCategory}${x.styleRef ? ` ${x.styleRef}` : ''} · ` : ''}{x.fabricName} · {x.colour || '—'} · {x.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed'}
                                 </option>
                               ))}
                             </select>
                           </td>
-                          <td className="py-2.5 px-3 font-mono text-xs">{i ? sheetRef(i.program) : '—'}</td>
+                          <td className="py-2.5 px-3 font-mono text-xs">{i ? sheetDesignLabel(i.program) : '—'}</td>
                           <td className="py-2.5 px-3 text-neutral-700">{i?.colour || '—'}</td>
                           <td className="py-2.5 px-3 font-semibold text-neutral-900">{i?.fabricName || '—'}<GarmentTag item={i} /></td>
                           <td className="py-2.5 px-3">{i ? <FabricStatusBadge status={i.fabricProcessingStatus} /> : '—'}</td>

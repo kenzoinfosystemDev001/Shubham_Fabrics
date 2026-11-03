@@ -33,6 +33,18 @@ export function sheetLabel(program) {
   return program?.programSerialNo || program?.programNumber || '—';
 }
 
+/**
+ * A Production Sheet as picked on challan screens (creating, selecting and issuing): its Design No. first,
+ * then its Serial No. ("DN-4521 · 045"). Falls back to the Serial No. alone when the sheet has no design no.
+ * Challan documents (view, print, download) keep using sheetLabel.
+ */
+export function sheetDesignLabel(program) {
+  const design = program?.designNumber || program?.wilcomDesignNumber || '';
+  const serial = program?.programSerialNo || program?.programNumber || '';
+  if (design && serial) return `${design} · ${serial}`;
+  return design || serial || '—';
+}
+
 /** Distinct values in first-seen order (null and empty skipped). */
 export function distinct(values) {
   return Array.from(new Set(Array.from(values || []).filter(Boolean)));

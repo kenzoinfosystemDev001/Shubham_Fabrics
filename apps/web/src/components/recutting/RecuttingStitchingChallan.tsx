@@ -19,12 +19,11 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
-  sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { CategoryBadge } from '@/components/recutting/RecuttingUi';
 import { AverageField, QuantityUnitField, averageError, quantityPairError, type QtyUnit } from '@/components/challan/AverageField';
 import { CATEGORY_LABEL, GARMENT_CATEGORIES, categoryName, readyForStitching } from '@/lib/recutting.mjs';
-import { distinct, incomingChallanOptions } from '@/lib/challan-sheets.mjs';
+import { distinct, incomingChallanOptions, sheetDesignLabel } from '@/lib/challan-sheets.mjs';
 import { ProductionSheetQuickView } from '@/components/challan/ProductionSheetQuickView';
 import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 
@@ -141,7 +140,7 @@ function StitchingChallanContent() {
     return acc;
   }, {});
   const allocationRefs = filled.map((r) => byId(r.allocationId)?.allocationNumber).filter(Boolean);
-  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetRef(s))));
+  const chosenSheets = distinct(selectedOptions.flatMap((o) => o.sheets.map((s: any) => sheetDesignLabel(s))));
   const breakdownRows = filled
     .map((r) => ({ r, a: byId(r.allocationId) }))
     .filter((x) => x.a)
@@ -310,12 +309,12 @@ function StitchingChallanContent() {
                               <option value="">Choose a cut allocation</option>
                               {choices.filter((x) => !taken.has(x.id)).map((x) => (
                                 <option key={x.id} value={x.id}>
-                                  {sheetRef(x.program)} · {x.allocationNumber} · {categoryName(x)}{x.styleRef ? ` · ${x.styleRef}` : ''} · {x.workItem?.colour || '—'} · {fmtQty(readyForStitching(x), x.cutUom)}
+                                  {sheetDesignLabel(x.program)} · {x.allocationNumber} · {categoryName(x)}{x.styleRef ? ` · ${x.styleRef}` : ''} · {x.workItem?.colour || '—'} · {fmtQty(readyForStitching(x), x.cutUom)}
                                 </option>
                               ))}
                             </select>
                           </td>
-                          <td className="py-2.5 px-3 font-mono text-xs">{a ? sheetRef(a.program) : '—'}</td>
+                          <td className="py-2.5 px-3 font-mono text-xs">{a ? sheetDesignLabel(a.program) : '—'}</td>
                           <td className="py-2.5 px-3">{a ? <CategoryBadge category={a.category} otherName={a.otherName} /> : '—'}</td>
                           <td className="py-2.5 px-3 text-neutral-800">{a?.styleRef || '—'}</td>
                           <td className="py-2.5 px-3 text-neutral-700">{a?.workItem?.colour || '—'}</td>

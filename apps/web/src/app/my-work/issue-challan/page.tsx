@@ -27,6 +27,8 @@ import {
   DepartmentInOutTracking
 } from '@/components/ColorFabricMeasurementTable';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { ProductionSheetQuickView } from '@/components/challan/ProductionSheetQuickView';
+import { sheetDesignLabel } from '@/lib/challan-sheets.mjs';
 import { printProductionSheet, downloadProductionSheetHtml } from '@/lib/download-production-sheet';
 import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
 import { quantityPairError } from '@/components/challan/AverageField';
@@ -441,6 +443,12 @@ function IssueChallanContent() {
           </div>
         ) : (
           <form onSubmit={handleIssueChallan} className="space-y-6">
+            {/* The chosen Production Sheet can be opened (view, print, download) while the challan is filled. */}
+            <ProductionSheetQuickView
+              sheets={selectedProgram ? [selectedProgram] : []}
+              emptyText="Choose the Production Sheet below to open it here."
+            />
+
             {/* STEP 1: SELECT PRODUCTION SHEET */}
             <div className="bg-white border border-neutral-200/90 rounded-xl p-6 shadow-xs space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
@@ -461,7 +469,7 @@ function IssueChallanContent() {
 
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-                  Production Sheet / Program File <span className="text-danger-600">*</span>
+                  Production Sheet (Design No.) <span className="text-danger-600">*</span>
                 </label>
                 <select
                   required
@@ -472,20 +480,31 @@ function IssueChallanContent() {
                   }}
                   className="w-full px-3.5 py-2.5 border border-neutral-300 rounded-lg text-sm text-neutral-900 font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/30 bg-white cursor-pointer"
                 >
-                  <option value="">Choose a production sheet</option>
+                  <option value="">Choose a production sheet by Design No.</option>
                   {programs.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {[
-                        p.designNumber || p.mainStyle || p.styleCode,
-                        `Serial ${p.programSerialNo || p.programNumber}`,
-                        p.clientName || p.buyerName,
-                      ]
+                      {/* The style is left out when it only repeats the Design No. */}
+                      {[sheetDesignLabel(p), p.clientName || p.buyerName, [p.mainStyle || p.styleCode].find((st) => st && st !== (p.designNumber || p.wilcomDesignNumber))]
                         .filter(Boolean)
                         .join('   ·   ')}
                     </option>
                   ))}
                 </select>
               </div>
+
+              {selectedProgram && (
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowSheetModal(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-300 rounded-lg text-xs font-bold transition cursor-pointer"
+                    title="View, print or download this Production Sheet"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    View Sheet
+                  </button>
+                </div>
+              )}
 
               {selectedProgram && (
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 rounded-xl ring-1 ring-neutral-200 bg-white overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-neutral-200">
