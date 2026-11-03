@@ -436,12 +436,12 @@ export function AppBackgroundPanel({ onNotify }: { onNotify: Notify }) {
   );
 }
 
-/** Admin > Sidebar Image: one image for the sidebar of every department. */
+/** Admin > Appearance > Sidebar Background Image: one image for the sidebar of every department. */
 export function SidebarImagePanel({ onNotify }: { onNotify: Notify }) {
   return (
     <BrandingImagePanel
       api="/api/admin/branding/sidebar-image"
-      title="Sidebar Image"
+      title="Sidebar Background Image"
       description={`One textile image behind the sidebar of every department; it fills the sidebar from the bottom. JPG, PNG or WebP up to ${
         MAX_DEPARTMENT_IMAGE_BYTES / (1024 * 1024)
       } MB; a tall portrait photo around 800 × 1600 works best.`}
@@ -469,10 +469,12 @@ export function LoginAppearancePanel({ onNotify }: { onNotify: Notify }) {
   );
 }
 
-/** Admin > Appearance: the shared department background and the login background. */
+/** Admin > Appearance: every visual setting in one place: sidebar image, department background, login background. */
 export function AppearancePanel({ onNotify }: { onNotify: Notify }) {
   return (
     <div className="space-y-10">
+      <SidebarImagePanel onNotify={onNotify} />
+      <div className="border-t border-neutral-200" />
       <AppBackgroundPanel onNotify={onNotify} />
       <div className="border-t border-neutral-200" />
       <LoginAppearancePanel onNotify={onNotify} />
