@@ -465,7 +465,7 @@ export default function AdminConsolePage() {
 
       {/* PAGE HEADING & TABS */}
       <div className="bg-white border-b border-neutral-200/80">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-5">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <h1 className="text-2xl font-semibold text-neutral-900 tracking-tight">
               Enterprise Administration &amp; Master Control
@@ -479,9 +479,13 @@ export default function AdminConsolePage() {
             </Link>
           </div>
 
-        {/* SECTIONS: grouped navigation. Wraps by group on wide screens, scrolls sideways on small ones. */}
-        <nav aria-label="Administration sections" className="mt-5 -mx-4 px-4 md:mx-0 md:px-0 overflow-x-auto lg:overflow-visible">
-          <div className="flex items-start gap-x-8 gap-y-4 pb-4 w-max lg:w-auto lg:flex-wrap">
+        </div>
+      </div>
+
+      {/* CONTENT AREA: sections listed one below another on the left (a single scrolling row on small screens) */}
+      <div className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-6 lg:py-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <nav aria-label="Administration sections" className="lg:w-60 shrink-0 lg:sticky lg:top-6 lg:self-start -mx-4 px-4 md:mx-0 md:px-0 overflow-x-auto lg:overflow-visible">
+          <div className="flex gap-1 w-max lg:w-auto lg:flex-col lg:gap-5 lg:bg-white lg:rounded-2xl lg:ring-1 lg:ring-neutral-200 lg:shadow-xs lg:p-3">
             {[
               {
                 label: 'General Management',
@@ -516,9 +520,9 @@ export default function AdminConsolePage() {
                 ],
               },
             ].map((group) => (
-              <div key={group.label} role="group" aria-label={group.label} className="shrink-0">
-                <p className="px-2.5 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-neutral-400">{group.label}</p>
-                <div className="flex items-center gap-1 p-1 rounded-xl bg-neutral-50 ring-1 ring-inset ring-neutral-200/70">
+              <div key={group.label} role="group" aria-label={group.label} className="contents lg:block">
+                <p className="hidden lg:block px-2.5 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-neutral-400">{group.label}</p>
+                <div className="contents lg:flex lg:flex-col lg:gap-0.5">
                   {group.tabs.map((tab) => {
                     const Icon = tab.icon;
                     const active = activeTab === tab.id;
@@ -528,19 +532,19 @@ export default function AdminConsolePage() {
                         type="button"
                         onClick={() => setActiveTab(tab.id as any)}
                         aria-current={active ? 'page' : undefined}
-                        title={tab.label}
-                        className={`inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 ${
+                        className={`relative inline-flex lg:flex items-center gap-2.5 h-9 px-3 lg:w-full rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 ${
                           active
-                            ? 'bg-white text-neutral-900 shadow-xs ring-1 ring-inset ring-neutral-200'
-                            : 'text-neutral-600 hover:text-neutral-900 hover:bg-white/70'
+                            ? 'bg-brand-50 text-brand-800 ring-1 ring-inset ring-brand-100'
+                            : 'bg-white lg:bg-transparent ring-1 ring-inset ring-neutral-200 lg:ring-0 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
                         }`}
                       >
+                        {active && <span aria-hidden className="hidden lg:block absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-brand-600" />}
                         <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-brand-600' : 'text-neutral-400'}`} />
                         <span>{tab.label}</span>
                         {tab.count !== undefined && tab.count !== null && (
                           <span
-                            className={`text-[11px] leading-[18px] min-w-[20px] px-1.5 rounded-md tabular-nums text-center font-semibold ${
-                              active ? 'bg-brand-50 text-brand-700' : 'bg-neutral-200/60 text-neutral-500'
+                            className={`lg:ml-auto text-[11px] leading-[18px] min-w-[22px] px-1.5 rounded-md tabular-nums text-center font-semibold ${
+                              active ? 'bg-white text-brand-700 ring-1 ring-inset ring-brand-100' : 'bg-neutral-100 text-neutral-500'
                             }`}
                           >
                             {tab.count}
@@ -554,11 +558,8 @@ export default function AdminConsolePage() {
             ))}
           </div>
         </nav>
-        </div>
-      </div>
 
-      {/* CONTENT AREA */}
-      <div className="flex-1 px-4 md:px-8 py-8 max-w-7xl w-full mx-auto">
+        <div className="flex-1 min-w-0">
         {loading ? (
           <div className="p-12 flex flex-col items-center justify-center text-neutral-500">
             <RefreshCw className="w-8 h-8 animate-spin mb-3 text-brand-600" />
@@ -1143,6 +1144,7 @@ export default function AdminConsolePage() {
             )}
           </>
         )}
+        </div>
       </div>
 
       {/* MODAL: ADD USER */}
