@@ -35,6 +35,7 @@ import { getCurrentUser, isAdminUser } from '@/lib/rbac';
 import { ShubhamLogo } from '@/components/ShubhamLogo';
 import { AppearancePanel, SidebarImagePanel } from '@/components/admin/LoginAppearancePanel';
 import { AdminDepartmentMenu } from '@/components/admin/AdminDepartmentMenu';
+import { AdminDeleteDialog, type AdminDeleteTarget } from '@/components/admin/AdminDeleteDialog';
 import { QualityMonitorPanel, type MonitorKind } from '@/components/admin/QualityMonitorPanel';
 import { departmentName } from '@/lib/workflow-views';
 import { printProductionSheet } from '@/lib/download-production-sheet';
@@ -256,33 +257,10 @@ export default function AdminConsolePage() {
     }
   };
 
-  // Delete Program Sheet handler (Admin remove capability)
-  const handleDeleteProgram = async (id: string, progNo: string) => {
-    if (!confirm(`Are you sure you want to completely remove Production Sheet "${progNo}"? This action will permanently remove it and all linked records from the database.`)) return;
-    try {
-      const res = await fetch(`/api/programs/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to delete program');
-      showNotification(`Production Sheet "${progNo}" permanently removed.`);
-      loadData();
-    } catch (err: any) {
-      showNotification(err.message, 'error');
-    }
-  };
-
-  // Delete Challan handler (Admin remove capability)
-  const handleDeleteChallan = async (id: string, challanNo: string) => {
-    if (!confirm(`Are you sure you want to permanently delete Challan "${challanNo}"? This action will permanently remove it from the database.`)) return;
-    try {
-      const res = await fetch(`/api/challans/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to delete challan');
-      showNotification(`Challan "${challanNo}" permanently deleted.`);
-      loadData();
-    } catch (err: any) {
-      showNotification(err.message, 'error');
-    }
-  };
+  // Delete one Production Sheet or one challan: the dialog shows what it affects, asks for a reason, then deletes.
+  const [deleteTarget, setDeleteTarget] = useState<AdminDeleteTarget | null>(null);
+  const handleDeleteProgram = (id: string, progNo: string) => setDeleteTarget({ kind: 'program', id, label: progNo });
+  const handleDeleteChallan = (id: string, challanNo: string) => setDeleteTarget({ kind: 'challan', id, label: challanNo });
 
   // Delete ALL Program Sheets (Admin only)
   const handleDeleteAllPrograms = async () => {
@@ -343,7 +321,11 @@ export default function AdminConsolePage() {
     }
     try {
       setLoading(true);
-      const res = await fetch('/api/admin/clear-all-data', { method: 'POST' });
+      const res = await fetch('/api/admin/clear-all-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirm: confirmation }),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to clear factory data');
       showNotification('All factory data successfully cleared. Database is in pristine initial state.');
@@ -1518,6 +1500,18 @@ export default function AdminConsolePage() {
             </form>
           </div>
         </div>
+      )}
+
+      {deleteTarget && (
+        <AdminDeleteDialog
+          target={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={(message) => {
+            setDeleteTarget(null);
+            showNotification(message);
+            loadData();
+          }}
+        />
       )}
     </div>
   );

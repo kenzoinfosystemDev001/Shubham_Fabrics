@@ -160,15 +160,3 @@ export function canViewClientCode(user: Pick<AuthenticatedUser, 'isAdmin' | 'ses
     user.roles.some((role) => programmingRoles.includes(role))
   );
 }
-
-/**
- * Bulk-delete endpoints (clear-all-data, delete-all) are disabled unless
- * ALLOW_DESTRUCTIVE_ADMIN_ACTIONS=true is set explicitly for the deployment.
- */
-export function destructiveAdminActionsDisabled(): NextResponse | null {
-  if (process.env.ALLOW_DESTRUCTIVE_ADMIN_ACTIONS === 'true') return null;
-  return NextResponse.json(
-    { error: 'Bulk delete actions are disabled on this server. Set ALLOW_DESTRUCTIVE_ADMIN_ACTIONS=true to enable them.' },
-    { status: 403 },
-  );
-}

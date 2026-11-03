@@ -2,13 +2,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
-import { workflowReceiving } from '@/lib/work-items-server';
+import { errorResponse, workflowReceiving } from '@/lib/work-items-server';
+import { deleteChallanAsAdmin } from '@/lib/admin-delete-server';
 import { checkChallanStatusChange } from '@/lib/challan-status-server';
 import { ConflictError, claimChallan } from '@/lib/record-claim';
 import { MIXED_UNIT, unitOf } from '@/lib/challan-units.mjs';
 import { ITEMS_WITH_SOURCE } from '@/lib/challan-sheets.mjs';
-import { writeAuditLog } from '@/lib/audit-log';
-import { destructiveAdminActionsDisabled } from '@/lib/auth/require-user';
 import { challanEditOptions } from '@/lib/challan-edit-server';
 
 import {
@@ -92,6 +91,12 @@ export async function GET(
   }
 }
 
+/**
+ * DELETE { reason } (preview: GET /api/admin/challans/:id/delete-impact): an administrator deletes one challan.
+ * Its Production Sheet and other challans stay; the quantity returns to the sending side, Fabric Store stock
+ * returns to the store, and the receiving side's records of it are removed (lib/admin-delete-server.ts). Refused
+ * while later work depends on it (the error names what to delete first).
+ */
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -100,154 +105,15 @@ export async function DELETE(
   if (!authUser) return authResponse;
   try {
     const { id } = await params;
-
-    const challan = await prisma.challan.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        challanNumber: true,
-        status: true,
-        fromDepartment: true,
-        toDepartment: true,
-        programId: true,
-        _count: { select: { workTransfers: true, productionLogs: true, inspections: true } },
-      },
-    });
-
-    if (!challan) {
-      return NextResponse.json({ error: 'Challan not found' }, { status: 404 });
-    }
-
-    // A challan nothing has happened on yet (no line received, processed, inspected or issued from it) can be
-    // removed to correct a mistake. Once work exists, deleting it would erase production history and leave the
-    // sending department's counts wrong, so it needs the server's destructive-actions switch as well.
-    const receivedLines = await prisma.departmentWorkItem.count({ where: { inboundChallanId: id, status: { not: 'AWAITING_RECEIPT' } } });
-    const hasActivity =
-      receivedLines > 0 ||
-      challan._count.workTransfers > 0 ||
-      challan._count.productionLogs > 0 ||
-      challan._count.inspections > 0 ||
-      !['DRAFT', 'SUBMITTED', 'ISSUED', 'IN_TRANSIT', 'CANCELLED'].includes(challan.status);
-    if (hasActivity) {
-      const disabled = destructiveAdminActionsDisabled();
-      if (disabled) {
-        return NextResponse.json(
-          {
-            error: `Challan ${challan.challanNumber} already has recorded work (${challan.status}). Deleting it would erase production history, so it is disabled on this server. Correct it from the department's screen instead.`,
-          },
-          { status: 403 },
-        );
-      }
-    }
-
-    // Cascade delete all dependencies safely in transaction
-    await prisma.$transaction(
-      async (tx) => {
-        // 1. Unlink any child challans that reference this challan as parent
-        await tx.challan.updateMany({
-          where: { parentChallanId: id },
-          data: { parentChallanId: null },
-        });
-
-        // 2. Department work items received on this challan go with it (their transfers cascade).
-        await tx.departmentWorkItem.deleteMany({ where: { inboundChallanId: id } });
-
-        // Unlink or clean up DyeingOrder references
-        await tx.dyeingOrder.updateMany({
-          where: { inboundChallanId: id },
-          data: { inboundChallanId: null },
-        });
-        await tx.dyeingOrder.updateMany({
-          where: { qc1ChallanId: id },
-          data: { qc1ChallanId: null },
-        });
-
-        // 3. Delete production transactions referencing this challan
-        await tx.productionTransaction.deleteMany({
-          where: { challanId: id },
-        });
-
-        // 4. Delete quality inspections (clean up children first)
-        const chInspections = await tx.qualityInspection.findMany({
-          where: { challanId: id },
-          select: { id: true },
-        });
-        const chInspectionIds = chInspections.map((i) => i.id);
-        if (chInspectionIds.length > 0) {
-          await tx.defectLog.deleteMany({
-            where: { inspectionId: { in: chInspectionIds } },
-          });
-          await tx.qualityInspectionParameter.deleteMany({
-            where: { inspectionId: { in: chInspectionIds } },
-          });
-        }
-        await tx.qualityInspection.deleteMany({
-          where: { challanId: id },
-        });
-
-        // 5. Delete defect records
-        await tx.defectRecord.deleteMany({
-          where: { challanId: id },
-        });
-
-        // 6. Delete bundles (clear cartonBundle first)
-        const chBundles = await tx.bundle.findMany({
-          where: { challanId: id },
-          select: { id: true },
-        });
-        const chBundleIds = chBundles.map((b) => b.id);
-        if (chBundleIds.length > 0) {
-          await tx.cartonBundle.deleteMany({
-            where: { bundleId: { in: chBundleIds } },
-          });
-        }
-        await tx.bundle.deleteMany({
-          where: { challanId: id },
-        });
-
-        // 7. Return any Fabric Store stock this challan issued, then delete items & events
-        await syncChallanStock(tx, id, authUser.id, { removed: true });
-        await tx.challanItem.deleteMany({
-          where: { challanId: id },
-        });
-        await tx.challanEvent.deleteMany({
-          where: { challanId: id },
-        });
-
-        // 8. Audit logs are kept: record the deletion itself, with what was removed.
-        await writeAuditLog(tx, {
-          actorId: authUser.id,
-          action: 'CHALLAN_DELETED',
-          entity: 'Challan',
-          entityId: id,
-          before: {
-            challanNumber: challan.challanNumber,
-            status: challan.status,
-            fromDepartment: challan.fromDepartment,
-            toDepartment: challan.toDepartment,
-            programId: challan.programId,
-            hadRecordedWork: hasActivity,
-          },
-        });
-
-        // 9. Permanently delete the challan record from PostgreSQL
-        await tx.challan.delete({
-          where: { id },
-        });
-      },
-      { maxWait: 15000, timeout: 30000 }
-    );
-
+    const body = await request.json().catch(() => ({}));
+    const deleted = await deleteChallanAsAdmin(id, body?.reason, authUser);
     return NextResponse.json({
       success: true,
-      message: `Challan ${challan.challanNumber} permanently deleted from database.`,
+      message: `Challan ${deleted.challanNumber} permanently deleted.`,
     });
   } catch (error: any) {
-    console.error('Error permanently deleting challan:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to permanently delete challan' },
-      { status: 500 }
-    );
+    if (error instanceof FabricStockError) return NextResponse.json(fabricStockErrorBody(error), { status: 409 });
+    return errorResponse(error, 'Failed to delete the challan.');
   }
 }
 

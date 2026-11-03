@@ -1,16 +1,22 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import bcrypt from 'bcryptjs';
-import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
+import { requireUser } from '@/lib/auth/require-user';
 import { randomBytes } from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
+/** The phrase the admin types on the Admin page; without it nothing is deleted. */
+const CONFIRM_PHRASE = 'WIPE ALL DATA';
+
+/** Wipes all factory data. Admin only, and only with the typed confirmation phrase (like the other bulk deletes). */
 export async function POST(request: Request) {
   const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
   if (!authUser) return authResponse;
-  const disabledResponse = destructiveAdminActionsDisabled();
-  if (disabledResponse) return disabledResponse;
+  const body = await request.json().catch(() => null);
+  if (body?.confirm !== CONFIRM_PHRASE) {
+    return NextResponse.json({ error: `Type "${CONFIRM_PHRASE}" to confirm wiping all factory data.` }, { status: 400 });
+  }
   try {
     await prisma.$transaction(
       async (tx) => {
