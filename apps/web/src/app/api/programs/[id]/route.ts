@@ -5,9 +5,10 @@ import { requireDepartment } from '@/lib/auth/department-access';
 import { programSheetInclude, shapeProgramSheet } from '@/lib/program-sheet';
 import { assignWilcomSheets, wilcomEntriesForSheet, wilcomSheetError } from '@/lib/wilcom-sheets';
 
-import { syncChallanStock } from '@/lib/fabric-stock-ledger';
+import { FabricStockError, fabricStockErrorBody } from '@/lib/fabric-stock-ledger';
+import { errorResponse } from '@/lib/work-items-server';
+import { deleteProgramAsAdmin } from '@/lib/admin-delete-server';
 import { writeAuditLog } from '@/lib/audit-log';
-import { destructiveAdminActionsDisabled } from '@/lib/auth/require-user';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,6 +67,11 @@ export async function GET(
   }
 }
 
+/**
+ * DELETE { reason } (preview: GET /api/admin/programs/:id/delete-impact): a sheet no challan has used yet can be deleted by Programming (e.g. a mistaken draft). Once
+ * challans exist, only an administrator can delete it, with a reason: its challans are deleted first, each rolled
+ * back as a single challan delete is (lib/admin-delete-server.ts), then the sheet and its own records.
+ */
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -74,249 +80,97 @@ export async function DELETE(
   if (!authUser) return authResponse;
   try {
     const { id } = await params;
+    const body = await request.json().catch(() => ({}));
 
-    // Verify program exists
     const program = await prisma.program.findUnique({
       where: { id },
       select: { id: true, programNumber: true, programSerialNo: true, status: true, _count: { select: { challans: true } } },
     });
-
     if (!program) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
     }
+    const label = program.programSerialNo || program.programNumber;
 
-    // A sheet no challan has used yet can be deleted by Programming (e.g. a mistaken draft). Once challans exist,
-    // deleting it erases their production, stock and QC history: only an administrator may do that, and only
-    // on a server where destructive actions are switched on.
-    if (program._count.challans > 0) {
+    // The sheet's own records (everything not reached through its challans), then the sheet itself.
+    const removeSheetRecords = async (tx: any) => {
+      // Fabric store rolls issued to this sheet go back into stock.
+      await tx.fabricStoreRoll.updateMany({
+        where: { programIssuedToId: id },
+        data: { programIssuedToId: null, status: 'IN_STOCK' },
+      });
+
+      await tx.departmentWorkItem.deleteMany({ where: { programId: id } });
+      await tx.dyeingOrder.deleteMany({ where: { programId: id } });
+      await tx.productionTransaction.deleteMany({ where: { programId: id } });
+      await tx.reworkTransaction.deleteMany({ where: { programId: id } });
+      await tx.recutRequest.deleteMany({ where: { programId: id } });
+      await tx.stockLedgerEntry.deleteMany({ where: { programId: id } });
+      await tx.defectRecord.deleteMany({ where: { programId: id } });
+
+      // Bundles, cartons, fabric rolls, fabric batches (clear cartonBundle first)
+      const progBundles = await tx.bundle.findMany({ where: { programId: id }, select: { id: true } });
+      if (progBundles.length > 0) {
+        await tx.cartonBundle.deleteMany({ where: { bundleId: { in: progBundles.map((b: { id: string }) => b.id) } } });
+      }
+      const progCartons = await tx.carton.findMany({ where: { programId: id }, select: { id: true } });
+      if (progCartons.length > 0) {
+        await tx.cartonBundle.deleteMany({ where: { cartonId: { in: progCartons.map((c: { id: string }) => c.id) } } });
+      }
+      await tx.bundle.deleteMany({ where: { programId: id } });
+      await tx.carton.deleteMany({ where: { programId: id } });
+      await tx.fabricRoll.deleteMany({ where: { programId: id } });
+      await tx.fabricBatch.deleteMany({ where: { programId: id } });
+
+      // Routes & steps
+      const routes = await tx.programRoute.findMany({ where: { programId: id }, select: { id: true } });
+      if (routes.length > 0) {
+        const routeIds = routes.map((r: { id: string }) => r.id);
+        await tx.programRouteStep.deleteMany({ where: { programRouteId: { in: routeIds } } });
+        await tx.programRoute.deleteMany({ where: { id: { in: routeIds } } });
+      }
+
+      // BOM, specifications, sizes, colours, fabrics. Wilcom designs live in the sheet's metadata and go with it.
+      await tx.programBOM.deleteMany({ where: { programId: id } });
+      await tx.programSpecification.deleteMany({ where: { programId: id } });
+      await tx.programSize.deleteMany({ where: { programId: id } });
+      await tx.programColour.deleteMany({ where: { programId: id } });
+      await tx.programFabric.deleteMany({ where: { programId: id } });
+
+      await tx.program.delete({ where: { id } });
+    };
+
+    if (program._count.challans > 0 || authUser.isAdmin) {
       if (!authUser.isAdmin) {
         return NextResponse.json(
-          { error: `Production Sheet ${program.programSerialNo || program.programNumber} already has ${program._count.challans} challan(s). Only an administrator can delete it.` },
+          { error: `Production Sheet ${label} already has ${program._count.challans} challan(s). Only an administrator can delete it.` },
           { status: 403 },
         );
       }
-      const disabled = destructiveAdminActionsDisabled();
-      if (disabled) {
-        return NextResponse.json(
-          { error: `Production Sheet ${program.programSerialNo || program.programNumber} already has challans. Deleting it would erase their production history, so it is disabled on this server.` },
-          { status: 403 },
-        );
-      }
+      await deleteProgramAsAdmin(id, body?.reason, authUser, removeSheetRecords);
+    } else {
+      // Programming deleting an unused sheet: no challans, so nothing else to roll back.
+      await prisma.$transaction(
+        async (tx) => {
+          await removeSheetRecords(tx);
+          await writeAuditLog(tx, {
+            actorId: authUser.id,
+            action: 'PROGRAM_DELETED',
+            entity: 'Program',
+            entityId: id,
+            before: { programNumber: program.programNumber, programSerialNo: program.programSerialNo, status: program.status, challanCount: 0, reason: typeof body?.reason === 'string' ? body.reason.trim().slice(0, 500) || null : null },
+          });
+        },
+        { maxWait: 15000, timeout: 30000 }
+      );
     }
-
-    // Cascade deletion safely inside a transaction to resolve all foreign key constraints
-    await prisma.$transaction(
-      async (tx) => {
-        // 1. Release fabric store rolls attached to this program
-        await tx.fabricStoreRoll.updateMany({
-          where: { programIssuedToId: id },
-          data: { programIssuedToId: null, status: 'IN_STOCK' },
-        });
-
-        // 2. Identify all challans associated with this program
-        const challans = await tx.challan.findMany({
-          where: { programId: id },
-          select: { id: true },
-        });
-        const challanIds = challans.map((c) => c.id);
-
-        // Fabric Store stock issued on these challans goes back to the store.
-        for (const challanId of challanIds) {
-          await syncChallanStock(tx, challanId, authUser.id, { removed: true });
-        }
-
-        if (challanIds.length > 0) {
-          // Unlink parentChallanId on any child challans
-          await tx.challan.updateMany({
-            where: { parentChallanId: { in: challanIds } },
-            data: { parentChallanId: null },
-          });
-
-          // Department work items (and their transfers) belong to these challans/this program.
-          await tx.departmentWorkItem.deleteMany({
-            where: { OR: [{ programId: id }, { inboundChallanId: { in: challanIds } }] },
-          });
-
-          // Unlink DyeingOrder references to these challans, clearing only the link that points at one
-          await tx.dyeingOrder.updateMany({
-            where: { inboundChallanId: { in: challanIds } },
-            data: { inboundChallanId: null },
-          });
-          await tx.dyeingOrder.updateMany({
-            where: { qc1ChallanId: { in: challanIds } },
-            data: { qc1ChallanId: null },
-          });
-
-          // Delete production transactions linked to these challans
-          await tx.productionTransaction.deleteMany({
-            where: { challanId: { in: challanIds } },
-          });
-
-          // Delete quality inspections on these challans (clean up children first)
-          const chInspections = await tx.qualityInspection.findMany({
-            where: { challanId: { in: challanIds } },
-            select: { id: true },
-          });
-          const chInspIds = chInspections.map((i) => i.id);
-          if (chInspIds.length > 0) {
-            await tx.defectLog.deleteMany({
-              where: { inspectionId: { in: chInspIds } },
-            });
-            await tx.qualityInspectionParameter.deleteMany({
-              where: { inspectionId: { in: chInspIds } },
-            });
-          }
-          await tx.qualityInspection.deleteMany({
-            where: { challanId: { in: challanIds } },
-          });
-
-          // Delete defect records on these challans
-          await tx.defectRecord.deleteMany({
-            where: { challanId: { in: challanIds } },
-          });
-
-          // Delete bundles on these challans (clear cartonBundle first)
-          const challanBundles = await tx.bundle.findMany({
-            where: { challanId: { in: challanIds } },
-            select: { id: true },
-          });
-          const chBundleIds = challanBundles.map((b) => b.id);
-          if (chBundleIds.length > 0) {
-            await tx.cartonBundle.deleteMany({
-              where: { bundleId: { in: chBundleIds } },
-            });
-          }
-          await tx.bundle.deleteMany({
-            where: { challanId: { in: challanIds } },
-          });
-
-          // Delete challan items & events
-          await tx.challanItem.deleteMany({
-            where: { challanId: { in: challanIds } },
-          });
-          await tx.challanEvent.deleteMany({
-            where: { challanId: { in: challanIds } },
-          });
-
-          // Delete the challans
-          await tx.challan.deleteMany({
-            where: { id: { in: challanIds } },
-          });
-        }
-
-        // 3. Delete department work items and DyeingOrders for this program
-        await tx.departmentWorkItem.deleteMany({ where: { programId: id } });
-        await tx.dyeingOrder.deleteMany({
-          where: { programId: id },
-        });
-
-        // 4. Delete any remaining ProductionTransactions for this program
-        await tx.productionTransaction.deleteMany({
-          where: { programId: id },
-        });
-
-        // 5. Delete rework transactions & recut requests
-        await tx.reworkTransaction.deleteMany({
-          where: { programId: id },
-        });
-        await tx.recutRequest.deleteMany({
-          where: { programId: id },
-        });
-
-        // 6. Delete stock ledger entries & defect records
-        await tx.stockLedgerEntry.deleteMany({
-          where: { programId: id },
-        });
-        await tx.defectRecord.deleteMany({
-          where: { programId: id },
-        });
-
-        // 7. Delete bundles, cartons, fabric rolls, fabric batches (clear cartonBundle first)
-        const progBundles = await tx.bundle.findMany({
-          where: { programId: id },
-          select: { id: true },
-        });
-        const pBundleIds = progBundles.map((b) => b.id);
-        if (pBundleIds.length > 0) {
-          await tx.cartonBundle.deleteMany({
-            where: { bundleId: { in: pBundleIds } },
-          });
-        }
-        const progCartons = await tx.carton.findMany({
-          where: { programId: id },
-          select: { id: true },
-        });
-        const pCartonIds = progCartons.map((c) => c.id);
-        if (pCartonIds.length > 0) {
-          await tx.cartonBundle.deleteMany({
-            where: { cartonId: { in: pCartonIds } },
-          });
-        }
-        await tx.bundle.deleteMany({
-          where: { programId: id },
-        });
-        await tx.carton.deleteMany({
-          where: { programId: id },
-        });
-        await tx.fabricRoll.deleteMany({
-          where: { programId: id },
-        });
-        await tx.fabricBatch.deleteMany({
-          where: { programId: id },
-        });
-
-        // 8. Delete routes & steps
-        const routes = await tx.programRoute.findMany({
-          where: { programId: id },
-          select: { id: true },
-        });
-        const routeIds = routes.map((r) => r.id);
-        if (routeIds.length > 0) {
-          await tx.programRouteStep.deleteMany({
-            where: { programRouteId: { in: routeIds } },
-          });
-          await tx.programRoute.deleteMany({
-            where: { id: { in: routeIds } },
-          });
-        }
-
-        // 9. Delete BOM, specifications, sizes, colours, fabrics
-        await tx.programBOM.deleteMany({ where: { programId: id } });
-        await tx.programSpecification.deleteMany({ where: { programId: id } });
-        await tx.programSize.deleteMany({ where: { programId: id } });
-        await tx.programColour.deleteMany({ where: { programId: id } });
-        await tx.programFabric.deleteMany({ where: { programId: id } });
-
-        // 10. Audit logs are kept: record the deletion itself, with what was removed.
-        await writeAuditLog(tx, {
-          actorId: authUser.id,
-          action: 'PROGRAM_DELETED',
-          entity: 'Program',
-          entityId: id,
-          before: {
-            programNumber: program.programNumber,
-            programSerialNo: program.programSerialNo,
-            status: program.status,
-            challanCount: program._count.challans,
-          },
-        });
-
-        // 11. Finally, permanently delete the program itself
-        await tx.program.delete({ where: { id } });
-      },
-      { maxWait: 15000, timeout: 30000 }
-    );
 
     return NextResponse.json({
       success: true,
-      message: `Production Sheet ${program.programSerialNo || program.programNumber} permanently removed from database.`,
+      message: `Production Sheet ${label} permanently deleted.`,
     });
   } catch (error: any) {
-    console.error('Error deleting program:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to permanently remove program' },
-      { status: 500 }
-    );
+    if (error instanceof FabricStockError) return NextResponse.json(fabricStockErrorBody(error), { status: 409 });
+    return errorResponse(error, 'Failed to delete the Production Sheet.');
   }
 }
 

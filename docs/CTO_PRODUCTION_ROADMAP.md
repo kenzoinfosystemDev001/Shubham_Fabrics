@@ -171,7 +171,7 @@ Fabric Store keeps three stock models that disagree with each other.
 - **CI** on every PR: install → lint → typecheck → `prisma validate` → unit + integration tests → build. Branch protection on `main` with required review (recent commits went straight to `main`).
 - **CD:** Vercel deploys `main` to production and PRs to previews against the staging DB. The migrations step runs before the traffic switch, with a documented rollback.
 - Drop the Render free-plan NestJS service. Choose paid plans that don't cold-start during a shift.
-- Manage environment variables per environment, with a written list of required variables (AUTH_SECRET, DATABASE_URL, CLOUDINARY_*, ALLOW_DESTRUCTIVE_ADMIN_ACTIONS).
+- Manage environment variables per environment, with a written list of required variables (AUTH_SECRET, DATABASE_URL, CLOUDINARY_*).
 
 ### 4.7 Observability & support (P0 → P1, ~2 pw)
 

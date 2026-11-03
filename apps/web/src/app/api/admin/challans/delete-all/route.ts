@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
-import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
+import { requireUser } from '@/lib/auth/require-user';
 
 import { STOCK_REFERENCE, STORE_STOCK_DEPARTMENT } from '@/lib/fabric-stock-ledger';
 
@@ -10,15 +10,11 @@ export const dynamic = 'force-dynamic';
 const CONFIRM_PHRASE = 'DELETE ALL';
 
 /**
- * Deletes every challan. Admin only, and only with the typed confirmation phrase (unlike the
- * production-sheet and full-data wipes, this one is not behind ALLOW_DESTRUCTIVE_ADMIN_ACTIONS).
+ * Deletes every challan. Admin only, and only with the typed confirmation phrase.
  */
 export async function DELETE(request: Request) {
   const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
   if (!authUser) return authResponse;
-  // Bulk deletes erase production history: only on a server where destructive actions are switched on.
-  const disabledResponse = destructiveAdminActionsDisabled();
-  if (disabledResponse) return disabledResponse;
   const body = await request.json().catch(() => null);
   if (body?.confirm !== CONFIRM_PHRASE) {
     return NextResponse.json({ error: `Type "${CONFIRM_PHRASE}" to confirm deleting every challan.` }, { status: 400 });
