@@ -61,3 +61,61 @@ export async function GET(request: Request) {
     return errorResponse(error, 'Failed to load the deletion history.');
   }
 }
+
+/** The phrase an administrator types to clear the history in bulk. */
+const CLEAR_PHRASE = 'CLEAR HISTORY';
+
+/**
+ * DELETE { scope: 'ALL' | 'BEFORE' | 'ONE', before?: 'YYYY-MM-DD', id?, confirm } : clears Deletion History (Admin only).
+ * Only the delete entries this history lists are removed; nothing else in the audit log, and no production data.
+ * Bulk clears need the typed phrase. The clear itself is recorded (DELETION_HISTORY_CLEARED), not listed here.
+ */
+export async function DELETE(request: Request) {
+  const { user, response } = await requireUser(request, { admin: true });
+  if (!user) return response;
+  try {
+    const body = await request.json().catch(() => ({}));
+    const scope = String(body.scope || '').toUpperCase();
+    const where: any = { action: { in: Object.keys(DELETE_ACTIONS) } };
+    let description: string;
+    if (scope === 'ONE') {
+      const id = String(body.id || '');
+      if (!id) return NextResponse.json({ error: 'Choose the entry to remove.' }, { status: 400 });
+      where.id = id;
+      description = 'one entry';
+    } else if (scope === 'ALL' || scope === 'BEFORE') {
+      if (String(body.confirm || '').trim().toUpperCase() !== CLEAR_PHRASE) {
+        return NextResponse.json({ error: `Type ${CLEAR_PHRASE} to confirm.` }, { status: 400 });
+      }
+      if (scope === 'BEFORE') {
+        const before = new Date(`${String(body.before || '')}T00:00:00`);
+        if (Number.isNaN(before.getTime())) return NextResponse.json({ error: 'Choose the date to clear before.' }, { status: 400 });
+        where.createdAt = { lt: before };
+        description = `entries before ${String(body.before)}`;
+      } else {
+        description = 'all entries';
+      }
+    } else {
+      return NextResponse.json({ error: 'Choose what to clear.' }, { status: 400 });
+    }
+    const removed = await prisma.$transaction(async (tx) => {
+      const { count } = await tx.auditLog.deleteMany({ where });
+      if (count > 0) {
+        await tx.auditLog.create({
+          data: {
+            actorId: user.id,
+            action: 'DELETION_HISTORY_CLEARED',
+            entity: 'AuditLog',
+            entityId: scope === 'ONE' ? String(body.id) : scope,
+            afterState: JSON.stringify({ scope, before: body.before || null, removed: count }),
+          },
+        });
+      }
+      return count;
+    });
+    if (scope === 'ONE' && removed === 0) return NextResponse.json({ error: 'This entry was already removed.' }, { status: 404 });
+    return NextResponse.json({ removed, message: removed ? `Deletion History: ${removed} entr${removed === 1 ? 'y' : 'ies'} cleared (${description}).` : 'Nothing to clear.' });
+  } catch (error) {
+    return errorResponse(error, 'Failed to clear the deletion history.');
+  }
+}
