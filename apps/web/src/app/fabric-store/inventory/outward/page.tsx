@@ -234,9 +234,6 @@ export default function OutwardStockPage() {
               <Send className="w-5 h-5 text-accent-700" />
               <span>Outward Fabric Dispatches</span>
             </h1>
-            <p className="text-[11px] text-neutral-500 mt-0.5">
-              Live outward tracking with verified Inward details &middot; Dispatches to Dyeing, Embroidery &amp; other units
-            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
