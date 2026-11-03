@@ -133,7 +133,9 @@ async function takeFromReworkTask(tx: Tx, cfg: WorkflowConfig, line: any, quanti
     ? (await tx.departmentWorkTransfer.count({ where: { workItemId: task.id } })) + (await tx.departmentHold.count({ where: { sourceType: 'WORK_ITEM', sourceId: task.id } }))
     : 1;
   if (untouched && history === 0) {
-    await tx.departmentWorkItem.delete({ where: { id: task.id } });
+    // Guarded like the updates: work the rework department saved meanwhile is never deleted with the task.
+    const gone = await tx.departmentWorkItem.deleteMany({ where: { id: task.id, updatedAt: task.updatedAt } });
+    if (gone.count !== 1) throw new WorkRequestError(`${dest.label} changed this rework task just now. Refresh and try again.`, 409);
     return;
   }
   const res = await tx.departmentWorkItem.updateMany({

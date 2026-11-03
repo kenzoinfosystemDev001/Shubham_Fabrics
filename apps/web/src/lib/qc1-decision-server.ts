@@ -26,7 +26,7 @@ async function loadState(id: string, db: any = prisma) {
     where: { id },
     include: {
       items: { orderBy: { createdAt: 'asc' } },
-      program: { select: { programSerialNo: true, programNumber: true } },
+      program: { select: { programSerialNo: true, programNumber: true, fabricType: true, priority: true } },
       productionLogs: { where: { departmentCode: 'QC1', operationName: INSPECTION }, orderBy: { recordedAt: 'asc' } },
       childChallans: {
         where: { fromDepartment: 'QC1', challanType: 'REWORK_RETURN', status: { notIn: ['DRAFT', 'CANCELLED', 'REJECTED'] } },
@@ -170,8 +170,12 @@ export async function changeQc1Decision(request: Request, id: string) {
           if (left <= 0) break;
           const take = round(Math.min(left, untouchedDyeingRework(o)));
           const after = round((o.receivedQuantity ?? o.requiredQuantity) - take);
-          if (after <= 0 && (o.heldQuantity || 0) <= 0) {
-            await tx.dyeingOrder.delete({ where: { id: o.id } });
+          // An order with nothing left and no HOLD history is removed; otherwise it stays (at zero), so HOLD records
+          // keep their order. Both are guarded: work Dyeing saved meanwhile is never lost.
+          const holdHistory = after <= 0 ? await tx.departmentHold.count({ where: { sourceType: 'DYEING_ORDER', sourceId: o.id } }) : 1;
+          if (after <= 0 && (o.heldQuantity || 0) <= 0 && holdHistory === 0) {
+            const gone = await tx.dyeingOrder.deleteMany({ where: { id: o.id, updatedAt: o.updatedAt } });
+            if (gone.count !== 1) throw new WorkRequestError(`Dyeing changed rework order ${o.orderNumber} just now. Refresh and try again.`, 409);
           } else {
             const res = await tx.dyeingOrder.updateMany({ where: { id: o.id, updatedAt: o.updatedAt }, data: { requiredQuantity: after, receivedQuantity: after } });
             if (res.count !== 1) throw new WorkRequestError(`Dyeing changed rework order ${o.orderNumber} just now. Refresh and try again.`, 409);

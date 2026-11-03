@@ -191,13 +191,19 @@ export default function LoginPage() {
           )}
 
           {/* SIGN IN FORM */}
-          <form onSubmit={handleLogin} className="space-y-3">
+          {/* The browser must not fill in a saved Station ID / PIN (it keeps users even after they are removed). */}
+          <form onSubmit={handleLogin} autoComplete="off" className="space-y-3">
             <div>
               <div className="relative">
                 <input
                   type="text"
                   required
-                  autoComplete="username"
+                  name="mes-station-id"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Station ID"
@@ -212,7 +218,11 @@ export default function LoginPage() {
                 <input
                   type="password"
                   required
-                  autoComplete="current-password"
+                  name="mes-station-pin"
+                  // "new-password" stops browsers from filling in a saved PIN (they ignore "off" on password fields).
+                  autoComplete="new-password"
+                  data-lpignore="true"
+                  data-1p-ignore
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   placeholder="Security PIN"

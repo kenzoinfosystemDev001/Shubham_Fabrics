@@ -132,6 +132,8 @@ export async function GET(request: Request) {
         };
       });
     }
+    // A task whose REWORK was taken back entirely (kept only for its HOLD history) has nothing to show.
+    data = data.filter((r) => r.reworkQuantity > 0 || r.forwardedQuantity > 0);
     if (openOnly) data = data.filter((r) => r.stage !== 'RECEIVED_NEXT');
     return NextResponse.json({ department, data });
   } catch (error) {

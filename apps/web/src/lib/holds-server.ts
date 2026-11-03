@@ -298,6 +298,12 @@ async function qc1Lines(ids?: string[]): Promise<HoldLine[]> {
         select: { challanNumber: true, challanType: true, createdAt: true, fabricUnit: true, items: { select: { quantity: true, uom: true } }, issuedBy: { select: { fullName: true, username: true } } },
       },
       productionLogs: { where: { departmentCode: { in: qc1 } }, select: { wasteQuantity: true, inputQuantity: true, operationName: true, unitOfMeasure: true } },
+      // REWORK sent to Dyeing without a challan (lib/rework-routing-server.ts): it has left Dyeing QC too.
+      dyeingInboundOrders: {
+        where: { origin: 'REWORK' },
+        orderBy: { createdAt: 'asc' },
+        select: { orderNumber: true, uom: true, receivedQuantity: true, requiredQuantity: true, createdAt: true, receivedBy: { select: { fullName: true, username: true } } },
+      },
     },
     orderBy: { createdAt: 'desc' },
     take: ids ? undefined : LIST_LIMIT,
@@ -316,6 +322,17 @@ async function qc1Lines(ids?: string[]): Promise<HoldLine[]> {
           reference: `Challan ${ch.challanNumber}${ch.challanType === 'REWORK_RETURN' ? ' (Rework to Dyeing)' : ''}`,
           by: userName(ch.issuedBy),
         }))
+        .concat(
+          c.dyeingInboundOrders
+            .filter((o) => (unitOf(o.uom) || 'MTR') === unit)
+            .map((o) => ({
+              at: o.createdAt,
+              quantity: round(o.receivedQuantity ?? o.requiredQuantity),
+              unit,
+              reference: `Rework to Dyeing ${o.orderNumber} (no challan)`,
+              by: userName(o.receivedBy),
+            })),
+        )
         .filter((e) => e.quantity > 0);
       // Shrinkage (fabric lost in dyeing) is recorded by the inspection and never forwarded.
       const shrinkage = c.productionLogs

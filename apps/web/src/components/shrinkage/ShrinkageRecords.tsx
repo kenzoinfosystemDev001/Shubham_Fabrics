@@ -269,11 +269,7 @@ export function ShrinkageRecords({ editable, departmentLabel }: { editable: bool
       <header className="bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <h1 className="text-xl font-bold text-neutral-900">Shrinkage</h1>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            {editable
-              ? 'Shrinkage of dyed fabric received from Dyeing. The Fabric Store sees these records.'
-              : 'Shrinkage recorded by Dyeing QC (view only). Stock is not changed by it.'}
-          </p>
+          {editable && <p className="text-xs text-neutral-500 mt-0.5">Shrinkage of dyed fabric received from Dyeing. The Fabric Store sees these records.</p>}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button

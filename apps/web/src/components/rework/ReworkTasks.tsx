@@ -84,20 +84,12 @@ export function ReworkTasks({
     }
     return out;
   }, [rows]);
-  const next = rows.find((r) => r.nextDepartment)?.nextDepartment || 'the next department';
 
   return (
     <div className="min-h-screen bg-canvas pb-16">
       <PageHeader title={title} loading={loading} onRefresh={load} />
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
-        <p className="px-4 py-3 rounded-xl border border-neutral-200 bg-white text-sm text-neutral-700">
-          REWORK decided by QC comes here straight away, with its Production Sheet, challan and fabric. No challan is needed for it. Record the
-          rework on the <Link href={workPath} className="font-semibold text-brand-700 hover:text-brand-900">work page</Link>; when it is done,
-          forward it to {next} on <Link href={forwardPath} className="font-semibold text-brand-700 hover:text-brand-900">Issue Challan</Link>. That
-          challan is the only one created for the rework. Part of it can be forwarded at a time; the rest stays here.
-        </p>
-
         <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {REWORK_STAGES.map((s) => (
             <button

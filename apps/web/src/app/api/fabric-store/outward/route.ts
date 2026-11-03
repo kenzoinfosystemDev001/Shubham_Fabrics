@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { inchargeNameOf, typedInchargeNameOf, userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import { canWriteColumns } from '@/lib/challan-item-average';
+import { unitOf } from '@/lib/challan-units.mjs';
 import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import {
@@ -120,7 +121,6 @@ export async function GET(request: Request) {
     for (const ch of storeChallans) {
       const isDyeing = ch.toDepartment.toUpperCase().includes('DYE');
       const defaultType: 'UNDYED' | 'DYED' = isDyeing ? 'UNDYED' : 'DYED';
-      const avg = ch.program?.fabricAverage ? Number(ch.program.fabricAverage) : null;
       const orderName =
         ch.program?.clientName ||
         ch.program?.buyerName ||
@@ -138,11 +138,14 @@ export async function GET(request: Request) {
 
           if (issueQty <= 0) return;
 
+          // Average and Issue PCS are entered by the Fabric Store (on the challan line, or here with Update);
+          // PCS is never worked out from meters. Not entered yet: Pending.
+          const avg = it.average != null && Number(it.average) > 0 ? Number(it.average) : null;
           const issuePcs = unit === 'PCS'
             ? issueQty
-            : avg && avg > 0 && issueQty > 0
-              ? Math.round(issueQty / avg)
-              : ch.program?.targetQuantity || null;
+            : unitOf(it.unitQuantityUom) === 'PCS' && it.unitQuantity != null
+              ? Number(it.unitQuantity)
+              : null;
 
           const matched = findMatchedInward(rawName, itemType, unit);
           const verifiedDetails = matched
@@ -152,6 +155,8 @@ export async function GET(request: Request) {
           challanOutward.push({
             id: `ch-${ch.id}-${it.id || idx}`,
             source: 'CHALLAN',
+            challanItemId: it.id,
+            pcsPending: issuePcs == null,
             date: ch.issuedDate || ch.createdAt,
             challanNumber: ch.challanNumber,
             challanId: ch.id,
@@ -183,10 +188,9 @@ export async function GET(request: Request) {
         const issueQty = Number(ch.fabricOut ?? ch.fabricIn ?? 0);
 
         if (issueQty > 0) {
-          const issuePcs =
-            avg && avg > 0 && issueQty > 0
-              ? Math.round(issueQty / avg)
-              : ch.program?.targetQuantity || null;
+          // Older challans without lines: nothing to enter PCS against, never calculated.
+          const avg = null;
+          const issuePcs = unit === 'PCS' ? issueQty : null;
 
           const matched = findMatchedInward(rawName, defaultType, unit);
           const verifiedDetails = matched
@@ -196,6 +200,8 @@ export async function GET(request: Request) {
           challanOutward.push({
             id: `ch-${ch.id}`,
             source: 'CHALLAN',
+            challanItemId: null,
+            pcsPending: issuePcs == null,
             date: ch.issuedDate || ch.createdAt,
             challanNumber: ch.challanNumber,
             challanId: ch.id,
@@ -244,7 +250,8 @@ export async function GET(request: Request) {
         issueQty: Number(item.issueQty),
         unit,
         avgPerPcs: item.avgPerPcs ? Number(item.avgPerPcs) : null,
-        issuePcsQty: item.issuePcsQty ? Number(item.issuePcsQty) : null,
+        issuePcsQty: item.issuePcsQty != null ? Number(item.issuePcsQty) : null,
+        pcsPending: unit !== 'PCS' && item.issuePcsQty == null,
         byOrderName: item.byOrderName || '—',
         remarks: userChallanRemarks(item.remarks) || '—',
         destination: item.destination || 'OUTWARD',
@@ -398,5 +405,73 @@ export async function POST(request: Request) {
     }
     console.error('Error recording outward fabric issue:', error);
     return NextResponse.json({ error: error.message || 'Failed to record outward stock' }, { status: 500 });
+  }
+}
+
+/**
+ * PATCH /api/fabric-store/outward { source: 'CHALLAN' | 'MANUAL', id, avgPerPcs, issuePcsQty } — the Fabric Store enters
+ * or updates a dispatch's Average (MTR per piece) and Issue PCS Qty by hand. Blank clears a value (PCS shows Pending).
+ * Challan dispatches are saved on the challan line itself (average / unit quantity in PCS); the MTR issued never
+ * changes and nothing is calculated. Every change is kept in the audit log.
+ */
+export async function PATCH(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
+  try {
+    const body = await request.json().catch(() => ({}));
+    const source = String(body.source || '').toUpperCase();
+    const id = String(body.id || '');
+    if (!id || (source !== 'CHALLAN' && source !== 'MANUAL')) return NextResponse.json({ error: 'Choose the dispatch to update.' }, { status: 400 });
+    const blank = (v: unknown) => v === undefined || v === null || String(v).trim() === '';
+    const avg = blank(body.avgPerPcs) ? null : Number(body.avgPerPcs);
+    if (avg !== null && (!Number.isFinite(avg) || avg <= 0)) return NextResponse.json({ error: 'Average must be more than zero (MTR per piece).' }, { status: 400 });
+    const pcs = blank(body.issuePcsQty) ? null : Number(body.issuePcsQty);
+    if (pcs !== null && (!Number.isInteger(pcs) || pcs < 0)) return NextResponse.json({ error: 'Issue PCS Qty must be a whole number, zero or more.' }, { status: 400 });
+
+    if (source === 'MANUAL') {
+      const row = await (prisma as any).fabricOutward.findUnique({ where: { id } });
+      if (!row) return NextResponse.json({ error: 'Dispatch not found.' }, { status: 404 });
+      await prisma.$transaction(async (tx) => {
+        await (tx as any).fabricOutward.update({ where: { id }, data: { avgPerPcs: avg, issuePcsQty: pcs } });
+        await tx.auditLog.create({
+          data: {
+            actorId: authUser.id,
+            action: 'OUTWARD_PCS_UPDATED',
+            entity: 'FabricOutward',
+            entityId: id,
+            beforeState: JSON.stringify({ avgPerPcs: row.avgPerPcs, issuePcsQty: row.issuePcsQty }),
+            afterState: JSON.stringify({ avgPerPcs: avg, issuePcsQty: pcs }),
+          },
+        });
+      });
+      return NextResponse.json({ message: 'Dispatch updated.' });
+    }
+
+    const item = await prisma.challanItem.findUnique({ where: { id }, include: { challan: { select: { id: true, challanNumber: true, fromDepartment: true, fabricUnit: true } } } });
+    const from = String(item?.challan?.fromDepartment || '').toUpperCase();
+    if (!item || !(from.includes('STORE') || from === 'FABRIC')) return NextResponse.json({ error: 'Dispatch not found.' }, { status: 404 });
+    if (!(await canWriteColumns('ChallanItem', ['average', 'averageUnit', 'unitQuantity', 'unitQuantityUom']))) {
+      return NextResponse.json({ error: 'Average and PCS cannot be saved until the database is updated (run the pending migrations).' }, { status: 503 });
+    }
+    const lineUnit = String(item.uom || item.challan.fabricUnit || 'MTR').toUpperCase();
+    // A PCS line is issued in pieces already: only its Average is entered.
+    const pcsFields = lineUnit === 'PCS' ? {} : { unitQuantity: pcs, unitQuantityUom: pcs === null ? null : 'PCS' };
+    await prisma.$transaction(async (tx) => {
+      await tx.challanItem.update({ where: { id }, data: { average: avg, averageUnit: avg === null ? null : 'MTR', ...pcsFields } });
+      await tx.auditLog.create({
+        data: {
+          actorId: authUser.id,
+          action: 'OUTWARD_PCS_UPDATED',
+          entity: 'ChallanItem',
+          entityId: id,
+          beforeState: JSON.stringify({ challanNumber: item.challan.challanNumber, average: item.average, averageUnit: item.averageUnit, unitQuantity: item.unitQuantity, unitQuantityUom: item.unitQuantityUom }),
+          afterState: JSON.stringify({ average: avg, issuePcsQty: lineUnit === 'PCS' ? item.quantity : pcs }),
+        },
+      });
+    });
+    return NextResponse.json({ message: `Challan ${item.challan.challanNumber}: Average and Issue PCS Qty updated.` });
+  } catch (error: any) {
+    console.error('Error updating outward PCS:', error);
+    return NextResponse.json({ error: error.message || 'Failed to update the dispatch.' }, { status: 500 });
   }
 }

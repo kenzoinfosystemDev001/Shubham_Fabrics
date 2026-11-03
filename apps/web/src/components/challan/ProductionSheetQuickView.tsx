@@ -28,7 +28,6 @@ export function ProductionSheetQuickView({
         </span>
         <div>
           <h2 className="text-sm font-bold text-neutral-900">{title}</h2>
-          <p className="text-[11px] text-neutral-500">Open the sheet while filling the challan.</p>
         </div>
       </div>
       <div className="flex flex-wrap gap-2 sm:ml-auto">

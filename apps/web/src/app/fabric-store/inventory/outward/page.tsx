@@ -31,6 +31,10 @@ interface OutwardItem {
   unit: string;
   avgPerPcs?: number | null;
   issuePcsQty?: number | null;
+  /** Issue PCS Qty not entered yet (it is entered by hand, never worked out from meters). */
+  pcsPending?: boolean;
+  /** The challan line a challan dispatch's Average / PCS are saved on. */
+  challanItemId?: string | null;
   byOrderName: string;
   remarks: string;
   destination: string;
@@ -66,6 +70,8 @@ export default function OutwardStockPage() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  // Entering / updating a dispatch's Average and Issue PCS Qty (by hand; nothing is calculated).
+  const [pcsEdit, setPcsEdit] = useState<{ id: string; avg: string; pcs: string; error: string; saving: boolean } | null>(null);
 
   // Form State for Manual Outward
   const [formData, setFormData] = useState({
@@ -84,6 +90,35 @@ export default function OutwardStockPage() {
     fabricType: 'DYED',
     remarks: '',
   });
+
+  const savePcs = async (item: OutwardItem) => {
+    if (!pcsEdit) return;
+    const pcs = pcsEdit.pcs.trim();
+    const avg = pcsEdit.avg.trim();
+    if (pcs && !/^\d+$/.test(pcs)) return setPcsEdit({ ...pcsEdit, error: 'Issue PCS Qty must be a whole number.' });
+    if (avg && !(Number(avg) > 0)) return setPcsEdit({ ...pcsEdit, error: 'Average must be more than zero.' });
+    setPcsEdit({ ...pcsEdit, saving: true, error: '' });
+    try {
+      const res = await fetch('/api/fabric-store/outward', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: item.source,
+          id: item.source === 'MANUAL' ? item.id : item.challanItemId,
+          avgPerPcs: avg,
+          issuePcsQty: item.unit === 'PCS' ? '' : pcs,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || 'Failed to update.');
+      setPcsEdit(null);
+      setSuccessMsg(json.message || 'Dispatch updated.');
+      setTimeout(() => setSuccessMsg(''), 4000);
+      await loadData();
+    } catch (e: any) {
+      setPcsEdit((prev) => (prev ? { ...prev, saving: false, error: e.message } : prev));
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -199,9 +234,6 @@ export default function OutwardStockPage() {
               <Send className="w-5 h-5 text-accent-700" />
               <span>Outward Fabric Dispatches</span>
             </h1>
-            <p className="text-[11px] text-neutral-500 mt-0.5">
-              Live outward tracking with verified Inward details &middot; Dispatches to Dyeing, Embroidery &amp; other units
-            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
@@ -310,7 +342,7 @@ export default function OutwardStockPage() {
               <span className="text-xs font-semibold text-brand-700 ml-1">PCS</span>
             </div>
             <span className="text-[10px] text-brand-700 mt-0.5 block">
-              Calculated garment component capacity
+              Dispatched in pieces
             </span>
           </div>
         </div>
@@ -500,13 +532,86 @@ export default function OutwardStockPage() {
                             {item.unit || 'MTR'}
                           </span>
                         </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-right font-bold text-neutral-700">
-                          {item.avgPerPcs ? `${Number(item.avgPerPcs).toFixed(2)} m/pc` : '—'}
-                        </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-right font-black text-sm text-brand-900">
-                          {item.issuePcsQty ? Number(item.issuePcsQty).toLocaleString('en-IN') : '—'}
-                          {item.issuePcsQty ? <span className="text-[10px] font-bold text-neutral-500 ml-0.5">PCS</span> : null}
-                        </td>
+                        {pcsEdit?.id === item.id ? (
+                          <td colSpan={2} className="border-r-[1.5px] border-neutral-200 px-2.5 py-2 bg-brand-50/40">
+                            <div className="flex items-end gap-2">
+                              <label className="block">
+                                <span className="block text-[10px] font-bold text-neutral-500 uppercase">Avg (m/pc)</span>
+                                <input
+                                  value={pcsEdit.avg}
+                                  onChange={(e) => setPcsEdit({ ...pcsEdit, avg: e.target.value, error: '' })}
+                                  inputMode="decimal"
+                                  aria-label="Average, MTR per piece"
+                                  className="mt-0.5 w-20 h-8 px-2 rounded-md border border-neutral-300 text-xs text-right"
+                                />
+                              </label>
+                              {item.unit !== 'PCS' && (
+                                <label className="block">
+                                  <span className="block text-[10px] font-bold text-neutral-500 uppercase">Issue PCS</span>
+                                  <input
+                                    value={pcsEdit.pcs}
+                                    onChange={(e) => setPcsEdit({ ...pcsEdit, pcs: e.target.value, error: '' })}
+                                    inputMode="numeric"
+                                    aria-label="Issue PCS quantity"
+                                    className="mt-0.5 w-20 h-8 px-2 rounded-md border border-neutral-300 text-xs text-right"
+                                  />
+                                </label>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => savePcs(item)}
+                                disabled={pcsEdit.saving}
+                                className="h-8 px-2.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold disabled:opacity-60"
+                              >
+                                {pcsEdit.saving ? 'Saving…' : 'Save'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPcsEdit(null)}
+                                disabled={pcsEdit.saving}
+                                className="h-8 px-2 rounded-md border border-neutral-300 text-[11px] font-bold text-neutral-700"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                            {pcsEdit.error && <p className="mt-1 text-[11px] font-semibold text-danger-700">{pcsEdit.error}</p>}
+                          </td>
+                        ) : (
+                          <>
+                            <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-right font-bold text-neutral-700">
+                              {item.avgPerPcs ? `${Number(item.avgPerPcs).toFixed(2)} m/pc` : '—'}
+                            </td>
+                            <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-right font-black text-sm text-brand-900">
+                              {item.issuePcsQty != null ? (
+                                <>
+                                  {Number(item.issuePcsQty).toLocaleString('en-IN')}
+                                  <span className="text-[10px] font-bold text-neutral-500 ml-0.5">PCS</span>
+                                </>
+                              ) : (
+                                <span className="inline-block px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-500 text-[10px] font-bold uppercase tracking-wide">
+                                  Pending
+                                </span>
+                              )}
+                              {(item.source === 'MANUAL' || item.challanItemId) && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setPcsEdit({
+                                      id: item.id,
+                                      avg: item.avgPerPcs ? String(item.avgPerPcs) : '',
+                                      pcs: item.unit !== 'PCS' && item.issuePcsQty != null ? String(item.issuePcsQty) : '',
+                                      error: '',
+                                      saving: false,
+                                    })
+                                  }
+                                  className="block ml-auto mt-0.5 text-[10px] font-bold text-brand-700 hover:text-brand-900"
+                                >
+                                  {item.issuePcsQty != null || item.avgPerPcs ? 'Update' : 'Enter'}
+                                </button>
+                              )}
+                            </td>
+                          </>
+                        )}
                         <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-semibold text-neutral-900">
                           {(() => {
                             // New entries show the incharge name typed on the form; earlier entries keep

@@ -63,7 +63,9 @@ async function challanFacts(db: Db, id: string) {
         id: true,
         itemNumber: true,
         status: true,
-        _count: { select: { transfers: true, packingAllocations: true, downstreamWorkItems: true, inspections: true } },
+        // A rework task (QC REWORK routed without a challan) shares this challan and is removed with it, so it is
+        // not a "later department line"; once forwarded, its onward challan blocks the delete below.
+        _count: { select: { transfers: true, packingAllocations: true, downstreamWorkItems: { where: { origin: { not: 'REWORK' } } }, inspections: true } },
       },
     }),
     db.dyeingOrder.findMany({ where: { inboundChallanId: id }, select: { id: true, orderNumber: true, status: true, _count: { select: { qcTransfers: true } } } }),
