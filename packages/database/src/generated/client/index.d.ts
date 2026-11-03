@@ -86890,6 +86890,9 @@ export namespace Prisma {
     programId: string | null
     inboundChallanId: string | null
     inboundChallanItemId: string | null
+    origin: string | null
+    reworkChallanItemId: string | null
+    reworkReason: string | null
     status: string | null
     priority: string | null
     fabricName: string | null
@@ -86934,6 +86937,9 @@ export namespace Prisma {
     programId: string | null
     inboundChallanId: string | null
     inboundChallanItemId: string | null
+    origin: string | null
+    reworkChallanItemId: string | null
+    reworkReason: string | null
     status: string | null
     priority: string | null
     fabricName: string | null
@@ -86978,6 +86984,9 @@ export namespace Prisma {
     programId: number
     inboundChallanId: number
     inboundChallanItemId: number
+    origin: number
+    reworkChallanItemId: number
+    reworkReason: number
     status: number
     priority: number
     fabricName: number
@@ -87046,6 +87055,9 @@ export namespace Prisma {
     programId?: true
     inboundChallanId?: true
     inboundChallanItemId?: true
+    origin?: true
+    reworkChallanItemId?: true
+    reworkReason?: true
     status?: true
     priority?: true
     fabricName?: true
@@ -87090,6 +87102,9 @@ export namespace Prisma {
     programId?: true
     inboundChallanId?: true
     inboundChallanItemId?: true
+    origin?: true
+    reworkChallanItemId?: true
+    reworkReason?: true
     status?: true
     priority?: true
     fabricName?: true
@@ -87134,6 +87149,9 @@ export namespace Prisma {
     programId?: true
     inboundChallanId?: true
     inboundChallanItemId?: true
+    origin?: true
+    reworkChallanItemId?: true
+    reworkReason?: true
     status?: true
     priority?: true
     fabricName?: true
@@ -87265,6 +87283,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId: string | null
     inboundChallanItemId: string | null
+    origin: string
+    reworkChallanItemId: string | null
+    reworkReason: string | null
     status: string
     priority: string
     fabricName: string
@@ -87328,6 +87349,9 @@ export namespace Prisma {
     programId?: boolean
     inboundChallanId?: boolean
     inboundChallanItemId?: boolean
+    origin?: boolean
+    reworkChallanItemId?: boolean
+    reworkReason?: boolean
     status?: boolean
     priority?: boolean
     fabricName?: boolean
@@ -87380,6 +87404,9 @@ export namespace Prisma {
     programId?: boolean
     inboundChallanId?: boolean
     inboundChallanItemId?: boolean
+    origin?: boolean
+    reworkChallanItemId?: boolean
+    reworkReason?: boolean
     status?: boolean
     priority?: boolean
     fabricName?: boolean
@@ -87430,6 +87457,9 @@ export namespace Prisma {
     programId?: boolean
     inboundChallanId?: boolean
     inboundChallanItemId?: boolean
+    origin?: boolean
+    reworkChallanItemId?: boolean
+    reworkReason?: boolean
     status?: boolean
     priority?: boolean
     fabricName?: boolean
@@ -87480,6 +87510,9 @@ export namespace Prisma {
     programId?: boolean
     inboundChallanId?: boolean
     inboundChallanItemId?: boolean
+    origin?: boolean
+    reworkChallanItemId?: boolean
+    reworkReason?: boolean
     status?: boolean
     priority?: boolean
     fabricName?: boolean
@@ -87518,7 +87551,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type DyeingOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "programId" | "inboundChallanId" | "inboundChallanItemId" | "status" | "priority" | "fabricName" | "fabricType" | "targetColor" | "dyedColor" | "colorCode" | "requiredQuantity" | "dyedQuantity" | "undyedQuantity" | "readyForQc1Quantity" | "sentToQc1Quantity" | "heldQuantity" | "uom" | "receivedQuantity" | "receivedUnitQuantity" | "receivedUnitQuantityUom" | "receivedAt" | "receivedById" | "receiptRemarks" | "expectedCompletionDate" | "colorMismatch" | "colorReviewNote" | "colorReviewedById" | "colorReviewedAt" | "inchargeId" | "inchargeName" | "batchNumber" | "machineNumber" | "processRemarks" | "qc1ChallanId" | "startedAt" | "completedAt" | "sentToQc1At" | "createdAt" | "updatedAt", ExtArgs["result"]["dyeingOrder"]>
+  export type DyeingOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "programId" | "inboundChallanId" | "inboundChallanItemId" | "origin" | "reworkChallanItemId" | "reworkReason" | "status" | "priority" | "fabricName" | "fabricType" | "targetColor" | "dyedColor" | "colorCode" | "requiredQuantity" | "dyedQuantity" | "undyedQuantity" | "readyForQc1Quantity" | "sentToQc1Quantity" | "heldQuantity" | "uom" | "receivedQuantity" | "receivedUnitQuantity" | "receivedUnitQuantityUom" | "receivedAt" | "receivedById" | "receiptRemarks" | "expectedCompletionDate" | "colorMismatch" | "colorReviewNote" | "colorReviewedById" | "colorReviewedAt" | "inchargeId" | "inchargeName" | "batchNumber" | "machineNumber" | "processRemarks" | "qc1ChallanId" | "startedAt" | "completedAt" | "sentToQc1At" | "createdAt" | "updatedAt", ExtArgs["result"]["dyeingOrder"]>
   export type DyeingOrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
@@ -87563,6 +87596,9 @@ export namespace Prisma {
       programId: string
       inboundChallanId: string | null
       inboundChallanItemId: string | null
+      origin: string
+      reworkChallanItemId: string | null
+      reworkReason: string | null
       status: string
       priority: string
       fabricName: string
@@ -88034,6 +88070,9 @@ export namespace Prisma {
     readonly programId: FieldRef<"DyeingOrder", 'String'>
     readonly inboundChallanId: FieldRef<"DyeingOrder", 'String'>
     readonly inboundChallanItemId: FieldRef<"DyeingOrder", 'String'>
+    readonly origin: FieldRef<"DyeingOrder", 'String'>
+    readonly reworkChallanItemId: FieldRef<"DyeingOrder", 'String'>
+    readonly reworkReason: FieldRef<"DyeingOrder", 'String'>
     readonly status: FieldRef<"DyeingOrder", 'String'>
     readonly priority: FieldRef<"DyeingOrder", 'String'>
     readonly fabricName: FieldRef<"DyeingOrder", 'String'>
@@ -89815,6 +89854,9 @@ export namespace Prisma {
     inboundChallanId: string | null
     inboundChallanItemId: string | null
     sourceDepartment: string | null
+    origin: string | null
+    reworkSourceItemId: string | null
+    reworkReason: string | null
     fabricName: string | null
     colour: string | null
     fabricProcessingStatus: string | null
@@ -89860,6 +89902,9 @@ export namespace Prisma {
     inboundChallanId: string | null
     inboundChallanItemId: string | null
     sourceDepartment: string | null
+    origin: string | null
+    reworkSourceItemId: string | null
+    reworkReason: string | null
     fabricName: string | null
     colour: string | null
     fabricProcessingStatus: string | null
@@ -89905,6 +89950,9 @@ export namespace Prisma {
     inboundChallanId: number
     inboundChallanItemId: number
     sourceDepartment: number
+    origin: number
+    reworkSourceItemId: number
+    reworkReason: number
     fabricName: number
     colour: number
     fabricProcessingStatus: number
@@ -89984,6 +90032,9 @@ export namespace Prisma {
     inboundChallanId?: true
     inboundChallanItemId?: true
     sourceDepartment?: true
+    origin?: true
+    reworkSourceItemId?: true
+    reworkReason?: true
     fabricName?: true
     colour?: true
     fabricProcessingStatus?: true
@@ -90029,6 +90080,9 @@ export namespace Prisma {
     inboundChallanId?: true
     inboundChallanItemId?: true
     sourceDepartment?: true
+    origin?: true
+    reworkSourceItemId?: true
+    reworkReason?: true
     fabricName?: true
     colour?: true
     fabricProcessingStatus?: true
@@ -90074,6 +90128,9 @@ export namespace Prisma {
     inboundChallanId?: true
     inboundChallanItemId?: true
     sourceDepartment?: true
+    origin?: true
+    reworkSourceItemId?: true
+    reworkReason?: true
     fabricName?: true
     colour?: true
     fabricProcessingStatus?: true
@@ -90206,6 +90263,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin: string
+    reworkSourceItemId: string | null
+    reworkReason: string | null
     fabricName: string
     colour: string | null
     fabricProcessingStatus: string
@@ -90270,6 +90330,9 @@ export namespace Prisma {
     inboundChallanId?: boolean
     inboundChallanItemId?: boolean
     sourceDepartment?: boolean
+    origin?: boolean
+    reworkSourceItemId?: boolean
+    reworkReason?: boolean
     fabricName?: boolean
     colour?: boolean
     fabricProcessingStatus?: boolean
@@ -90327,6 +90390,9 @@ export namespace Prisma {
     inboundChallanId?: boolean
     inboundChallanItemId?: boolean
     sourceDepartment?: boolean
+    origin?: boolean
+    reworkSourceItemId?: boolean
+    reworkReason?: boolean
     fabricName?: boolean
     colour?: boolean
     fabricProcessingStatus?: boolean
@@ -90377,6 +90443,9 @@ export namespace Prisma {
     inboundChallanId?: boolean
     inboundChallanItemId?: boolean
     sourceDepartment?: boolean
+    origin?: boolean
+    reworkSourceItemId?: boolean
+    reworkReason?: boolean
     fabricName?: boolean
     colour?: boolean
     fabricProcessingStatus?: boolean
@@ -90427,6 +90496,9 @@ export namespace Prisma {
     inboundChallanId?: boolean
     inboundChallanItemId?: boolean
     sourceDepartment?: boolean
+    origin?: boolean
+    reworkSourceItemId?: boolean
+    reworkReason?: boolean
     fabricName?: boolean
     colour?: boolean
     fabricProcessingStatus?: boolean
@@ -90464,7 +90536,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type DepartmentWorkItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "departmentCode" | "itemNumber" | "programId" | "inboundChallanId" | "inboundChallanItemId" | "sourceDepartment" | "fabricName" | "colour" | "fabricProcessingStatus" | "fabricStatusSource" | "status" | "priority" | "uom" | "expectedQuantity" | "receivedQuantity" | "receivedUnitQuantity" | "receivedUnitQuantityUom" | "processedQuantity" | "transferredQuantity" | "garmentCategory" | "styleRef" | "sourceAllocationId" | "sourceWorkItemId" | "takenQuantity" | "defectQuantity" | "passedQuantity" | "rejectedQuantity" | "reworkQuantity" | "rejectSentQuantity" | "reworkSentQuantity" | "heldQuantity" | "receivedAt" | "receivedById" | "receiptRemarks" | "expectedCompletionDate" | "startedAt" | "completedAt" | "lastTransferredAt" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["departmentWorkItem"]>
+  export type DepartmentWorkItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "departmentCode" | "itemNumber" | "programId" | "inboundChallanId" | "inboundChallanItemId" | "sourceDepartment" | "origin" | "reworkSourceItemId" | "reworkReason" | "fabricName" | "colour" | "fabricProcessingStatus" | "fabricStatusSource" | "status" | "priority" | "uom" | "expectedQuantity" | "receivedQuantity" | "receivedUnitQuantity" | "receivedUnitQuantityUom" | "processedQuantity" | "transferredQuantity" | "garmentCategory" | "styleRef" | "sourceAllocationId" | "sourceWorkItemId" | "takenQuantity" | "defectQuantity" | "passedQuantity" | "rejectedQuantity" | "reworkQuantity" | "rejectSentQuantity" | "reworkSentQuantity" | "heldQuantity" | "receivedAt" | "receivedById" | "receiptRemarks" | "expectedCompletionDate" | "startedAt" | "completedAt" | "lastTransferredAt" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["departmentWorkItem"]>
   export type DepartmentWorkItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | ChallanDefaultArgs<ExtArgs>
@@ -90517,6 +90589,9 @@ export namespace Prisma {
       inboundChallanId: string
       inboundChallanItemId: string
       sourceDepartment: string
+      origin: string
+      reworkSourceItemId: string | null
+      reworkReason: string | null
       fabricName: string
       colour: string | null
       fabricProcessingStatus: string
@@ -90993,6 +91068,9 @@ export namespace Prisma {
     readonly inboundChallanId: FieldRef<"DepartmentWorkItem", 'String'>
     readonly inboundChallanItemId: FieldRef<"DepartmentWorkItem", 'String'>
     readonly sourceDepartment: FieldRef<"DepartmentWorkItem", 'String'>
+    readonly origin: FieldRef<"DepartmentWorkItem", 'String'>
+    readonly reworkSourceItemId: FieldRef<"DepartmentWorkItem", 'String'>
+    readonly reworkReason: FieldRef<"DepartmentWorkItem", 'String'>
     readonly fabricName: FieldRef<"DepartmentWorkItem", 'String'>
     readonly colour: FieldRef<"DepartmentWorkItem", 'String'>
     readonly fabricProcessingStatus: FieldRef<"DepartmentWorkItem", 'String'>
@@ -114340,6 +114418,9 @@ export namespace Prisma {
     programId: 'programId',
     inboundChallanId: 'inboundChallanId',
     inboundChallanItemId: 'inboundChallanItemId',
+    origin: 'origin',
+    reworkChallanItemId: 'reworkChallanItemId',
+    reworkReason: 'reworkReason',
     status: 'status',
     priority: 'priority',
     fabricName: 'fabricName',
@@ -114404,6 +114485,9 @@ export namespace Prisma {
     inboundChallanId: 'inboundChallanId',
     inboundChallanItemId: 'inboundChallanItemId',
     sourceDepartment: 'sourceDepartment',
+    origin: 'origin',
+    reworkSourceItemId: 'reworkSourceItemId',
+    reworkReason: 'reworkReason',
     fabricName: 'fabricName',
     colour: 'colour',
     fabricProcessingStatus: 'fabricProcessingStatus',
@@ -121356,6 +121440,9 @@ export namespace Prisma {
     programId?: StringFilter<"DyeingOrder"> | string
     inboundChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
     inboundChallanItemId?: StringNullableFilter<"DyeingOrder"> | string | null
+    origin?: StringFilter<"DyeingOrder"> | string
+    reworkChallanItemId?: StringNullableFilter<"DyeingOrder"> | string | null
+    reworkReason?: StringNullableFilter<"DyeingOrder"> | string | null
     status?: StringFilter<"DyeingOrder"> | string
     priority?: StringFilter<"DyeingOrder"> | string
     fabricName?: StringFilter<"DyeingOrder"> | string
@@ -121407,6 +121494,9 @@ export namespace Prisma {
     programId?: SortOrder
     inboundChallanId?: SortOrderInput | SortOrder
     inboundChallanItemId?: SortOrderInput | SortOrder
+    origin?: SortOrder
+    reworkChallanItemId?: SortOrderInput | SortOrder
+    reworkReason?: SortOrderInput | SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
@@ -121461,6 +121551,9 @@ export namespace Prisma {
     NOT?: DyeingOrderWhereInput | DyeingOrderWhereInput[]
     programId?: StringFilter<"DyeingOrder"> | string
     inboundChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    origin?: StringFilter<"DyeingOrder"> | string
+    reworkChallanItemId?: StringNullableFilter<"DyeingOrder"> | string | null
+    reworkReason?: StringNullableFilter<"DyeingOrder"> | string | null
     status?: StringFilter<"DyeingOrder"> | string
     priority?: StringFilter<"DyeingOrder"> | string
     fabricName?: StringFilter<"DyeingOrder"> | string
@@ -121512,6 +121605,9 @@ export namespace Prisma {
     programId?: SortOrder
     inboundChallanId?: SortOrderInput | SortOrder
     inboundChallanItemId?: SortOrderInput | SortOrder
+    origin?: SortOrder
+    reworkChallanItemId?: SortOrderInput | SortOrder
+    reworkReason?: SortOrderInput | SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
@@ -121564,6 +121660,9 @@ export namespace Prisma {
     programId?: StringWithAggregatesFilter<"DyeingOrder"> | string
     inboundChallanId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     inboundChallanItemId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    origin?: StringWithAggregatesFilter<"DyeingOrder"> | string
+    reworkChallanItemId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    reworkReason?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     status?: StringWithAggregatesFilter<"DyeingOrder"> | string
     priority?: StringWithAggregatesFilter<"DyeingOrder"> | string
     fabricName?: StringWithAggregatesFilter<"DyeingOrder"> | string
@@ -121696,6 +121795,9 @@ export namespace Prisma {
     inboundChallanId?: StringFilter<"DepartmentWorkItem"> | string
     inboundChallanItemId?: StringFilter<"DepartmentWorkItem"> | string
     sourceDepartment?: StringFilter<"DepartmentWorkItem"> | string
+    origin?: StringFilter<"DepartmentWorkItem"> | string
+    reworkSourceItemId?: StringNullableFilter<"DepartmentWorkItem"> | string | null
+    reworkReason?: StringNullableFilter<"DepartmentWorkItem"> | string | null
     fabricName?: StringFilter<"DepartmentWorkItem"> | string
     colour?: StringNullableFilter<"DepartmentWorkItem"> | string | null
     fabricProcessingStatus?: StringFilter<"DepartmentWorkItem"> | string
@@ -121752,6 +121854,9 @@ export namespace Prisma {
     inboundChallanId?: SortOrder
     inboundChallanItemId?: SortOrder
     sourceDepartment?: SortOrder
+    origin?: SortOrder
+    reworkSourceItemId?: SortOrderInput | SortOrder
+    reworkReason?: SortOrderInput | SortOrder
     fabricName?: SortOrder
     colour?: SortOrderInput | SortOrder
     fabricProcessingStatus?: SortOrder
@@ -121812,6 +121917,9 @@ export namespace Prisma {
     inboundChallanId?: StringFilter<"DepartmentWorkItem"> | string
     inboundChallanItemId?: StringFilter<"DepartmentWorkItem"> | string
     sourceDepartment?: StringFilter<"DepartmentWorkItem"> | string
+    origin?: StringFilter<"DepartmentWorkItem"> | string
+    reworkSourceItemId?: StringNullableFilter<"DepartmentWorkItem"> | string | null
+    reworkReason?: StringNullableFilter<"DepartmentWorkItem"> | string | null
     fabricName?: StringFilter<"DepartmentWorkItem"> | string
     colour?: StringNullableFilter<"DepartmentWorkItem"> | string | null
     fabricProcessingStatus?: StringFilter<"DepartmentWorkItem"> | string
@@ -121868,6 +121976,9 @@ export namespace Prisma {
     inboundChallanId?: SortOrder
     inboundChallanItemId?: SortOrder
     sourceDepartment?: SortOrder
+    origin?: SortOrder
+    reworkSourceItemId?: SortOrderInput | SortOrder
+    reworkReason?: SortOrderInput | SortOrder
     fabricName?: SortOrder
     colour?: SortOrderInput | SortOrder
     fabricProcessingStatus?: SortOrder
@@ -121921,6 +122032,9 @@ export namespace Prisma {
     inboundChallanId?: StringWithAggregatesFilter<"DepartmentWorkItem"> | string
     inboundChallanItemId?: StringWithAggregatesFilter<"DepartmentWorkItem"> | string
     sourceDepartment?: StringWithAggregatesFilter<"DepartmentWorkItem"> | string
+    origin?: StringWithAggregatesFilter<"DepartmentWorkItem"> | string
+    reworkSourceItemId?: StringNullableWithAggregatesFilter<"DepartmentWorkItem"> | string | null
+    reworkReason?: StringNullableWithAggregatesFilter<"DepartmentWorkItem"> | string | null
     fabricName?: StringWithAggregatesFilter<"DepartmentWorkItem"> | string
     colour?: StringNullableWithAggregatesFilter<"DepartmentWorkItem"> | string | null
     fabricProcessingStatus?: StringWithAggregatesFilter<"DepartmentWorkItem"> | string
@@ -131017,6 +131131,9 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -131064,6 +131181,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -131107,6 +131227,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -131154,6 +131277,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -131199,6 +131325,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -131241,6 +131370,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -131281,6 +131413,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -131406,6 +131541,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -131459,6 +131597,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -131508,6 +131649,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -131561,6 +131705,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -131612,6 +131759,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -131655,6 +131805,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -131697,6 +131850,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -138740,6 +138896,9 @@ export namespace Prisma {
     programId?: SortOrder
     inboundChallanId?: SortOrder
     inboundChallanItemId?: SortOrder
+    origin?: SortOrder
+    reworkChallanItemId?: SortOrder
+    reworkReason?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
@@ -138795,6 +138954,9 @@ export namespace Prisma {
     programId?: SortOrder
     inboundChallanId?: SortOrder
     inboundChallanItemId?: SortOrder
+    origin?: SortOrder
+    reworkChallanItemId?: SortOrder
+    reworkReason?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
@@ -138839,6 +139001,9 @@ export namespace Prisma {
     programId?: SortOrder
     inboundChallanId?: SortOrder
     inboundChallanItemId?: SortOrder
+    origin?: SortOrder
+    reworkChallanItemId?: SortOrder
+    reworkReason?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
@@ -138960,6 +139125,9 @@ export namespace Prisma {
     inboundChallanId?: SortOrder
     inboundChallanItemId?: SortOrder
     sourceDepartment?: SortOrder
+    origin?: SortOrder
+    reworkSourceItemId?: SortOrder
+    reworkReason?: SortOrder
     fabricName?: SortOrder
     colour?: SortOrder
     fabricProcessingStatus?: SortOrder
@@ -139021,6 +139189,9 @@ export namespace Prisma {
     inboundChallanId?: SortOrder
     inboundChallanItemId?: SortOrder
     sourceDepartment?: SortOrder
+    origin?: SortOrder
+    reworkSourceItemId?: SortOrder
+    reworkReason?: SortOrder
     fabricName?: SortOrder
     colour?: SortOrder
     fabricProcessingStatus?: SortOrder
@@ -139066,6 +139237,9 @@ export namespace Prisma {
     inboundChallanId?: SortOrder
     inboundChallanItemId?: SortOrder
     sourceDepartment?: SortOrder
+    origin?: SortOrder
+    reworkSourceItemId?: SortOrder
+    reworkReason?: SortOrder
     fabricName?: SortOrder
     colour?: SortOrder
     fabricProcessingStatus?: SortOrder
@@ -151076,6 +151250,9 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -151122,6 +151299,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -151174,6 +151354,9 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -151220,6 +151403,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -151272,6 +151458,9 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -151318,6 +151507,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -151404,6 +151596,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -151456,6 +151651,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -153000,6 +153198,9 @@ export namespace Prisma {
     programId?: StringFilter<"DyeingOrder"> | string
     inboundChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
     inboundChallanItemId?: StringNullableFilter<"DyeingOrder"> | string | null
+    origin?: StringFilter<"DyeingOrder"> | string
+    reworkChallanItemId?: StringNullableFilter<"DyeingOrder"> | string | null
+    reworkReason?: StringNullableFilter<"DyeingOrder"> | string | null
     status?: StringFilter<"DyeingOrder"> | string
     priority?: StringFilter<"DyeingOrder"> | string
     fabricName?: StringFilter<"DyeingOrder"> | string
@@ -153128,6 +153329,9 @@ export namespace Prisma {
     inboundChallanId?: StringFilter<"DepartmentWorkItem"> | string
     inboundChallanItemId?: StringFilter<"DepartmentWorkItem"> | string
     sourceDepartment?: StringFilter<"DepartmentWorkItem"> | string
+    origin?: StringFilter<"DepartmentWorkItem"> | string
+    reworkSourceItemId?: StringNullableFilter<"DepartmentWorkItem"> | string | null
+    reworkReason?: StringNullableFilter<"DepartmentWorkItem"> | string | null
     fabricName?: StringFilter<"DepartmentWorkItem"> | string
     colour?: StringNullableFilter<"DepartmentWorkItem"> | string | null
     fabricProcessingStatus?: StringFilter<"DepartmentWorkItem"> | string
@@ -157892,6 +158096,9 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -157937,6 +158144,9 @@ export namespace Prisma {
     orderNumber: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -158060,6 +158270,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -158111,6 +158324,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -164176,6 +164392,9 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -164221,6 +164440,9 @@ export namespace Prisma {
     orderNumber: string
     programId: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -164274,6 +164496,9 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -164320,6 +164545,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -164406,6 +164634,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -164457,6 +164688,9 @@ export namespace Prisma {
     programId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -180943,6 +181177,9 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -180989,6 +181226,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -181259,6 +181499,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -181305,6 +181548,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -181890,6 +182136,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -181942,6 +182191,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -181995,6 +182247,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -182047,6 +182302,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -182778,6 +183036,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -182830,6 +183091,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -183095,6 +183359,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -183147,6 +183414,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -183472,6 +183742,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -183524,6 +183797,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -183851,6 +184127,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -183903,6 +184182,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -184107,6 +184389,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -184159,6 +184444,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -184228,6 +184516,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -184280,6 +184571,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -184481,6 +184775,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -184533,6 +184830,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -184712,6 +185012,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -184764,6 +185067,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -186799,6 +187105,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -186851,6 +187160,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -187030,6 +187342,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -187082,6 +187397,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -188006,6 +188324,9 @@ export namespace Prisma {
     itemNumber: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -188058,6 +188379,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -188414,6 +188738,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -188466,6 +188793,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -190725,6 +191055,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -190768,6 +191101,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -190811,6 +191147,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -190867,6 +191206,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -193116,6 +193458,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -193162,6 +193507,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -193206,6 +193554,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -193247,6 +193598,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -193293,6 +193647,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -193337,6 +193694,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -193378,6 +193738,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -193424,6 +193787,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -193468,6 +193834,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -193544,6 +193913,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -193596,6 +193968,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -193646,6 +194021,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -196654,6 +197032,9 @@ export namespace Prisma {
     orderNumber: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -196727,6 +197108,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -197989,6 +198373,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -198034,6 +198421,9 @@ export namespace Prisma {
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -198078,6 +198468,9 @@ export namespace Prisma {
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -198208,6 +198601,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -198259,6 +198655,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -198309,6 +198708,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -198741,6 +199143,9 @@ export namespace Prisma {
     orderNumber: string
     programId: string
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -198785,6 +199190,9 @@ export namespace Prisma {
     programId: string
     inboundChallanId?: string | null
     inboundChallanItemId?: string | null
+    origin?: string
+    reworkChallanItemId?: string | null
+    reworkReason?: string | null
     status?: string
     priority?: string
     fabricName: string
@@ -198840,6 +199248,9 @@ export namespace Prisma {
     programId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -199465,6 +199876,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -199510,6 +199924,9 @@ export namespace Prisma {
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -199554,6 +199971,9 @@ export namespace Prisma {
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -199596,6 +200016,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -199642,6 +200065,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -199686,6 +200112,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
@@ -199762,6 +200191,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -199813,6 +200245,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -199863,6 +200298,9 @@ export namespace Prisma {
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -201575,6 +202013,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -201696,6 +202137,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -201748,6 +202192,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -201798,6 +202245,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -202096,6 +202546,9 @@ export namespace Prisma {
     inboundChallanId: string
     inboundChallanItemId: string
     sourceDepartment: string
+    origin?: string
+    reworkSourceItemId?: string | null
+    reworkReason?: string | null
     fabricName: string
     colour?: string | null
     fabricProcessingStatus: string
@@ -202177,6 +202630,9 @@ export namespace Prisma {
     itemNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -202229,6 +202685,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string
@@ -202279,6 +202738,9 @@ export namespace Prisma {
     inboundChallanId?: StringFieldUpdateOperationsInput | string
     inboundChallanItemId?: StringFieldUpdateOperationsInput | string
     sourceDepartment?: StringFieldUpdateOperationsInput | string
+    origin?: StringFieldUpdateOperationsInput | string
+    reworkSourceItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    reworkReason?: NullableStringFieldUpdateOperationsInput | string | null
     fabricName?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     fabricProcessingStatus?: StringFieldUpdateOperationsInput | string

@@ -1533,6 +1533,11 @@ model DyeingOrder {
   inboundChallan       Challan?   @relation("DyeingInboundChallan", fields: [inboundChallanId], references: [id])
   // One order per Store -> Dyeing challan line (null on orders created before per-line tracking).
   inboundChallanItemId String?    @unique
+  // CHALLAN: came in on a challan to Dyeing. REWORK: a Dyeing QC REWORK decision, routed here without a challan;
+  // inboundChallanId is then the Dyeing QC challan the decision was made on, and reworkChallanItemId its line.
+  origin               String     @default("CHALLAN")
+  reworkChallanItemId  String?
+  reworkReason         String?
 
   // AWAITING_RECEIPT, RECEIVED, IN_DYEING, PARTIALLY_DYED, DYED, READY_FOR_QC1, PARTIALLY_SENT_TO_QC1, SENT_TO_QC1
   status               String     @default("RECEIVED")
@@ -1630,6 +1635,12 @@ model DepartmentWorkItem {
   inboundChallan         Challan   @relation("WorkItemInboundChallan", fields: [inboundChallanId], references: [id])
   inboundChallanItemId   String
   sourceDepartment       String    // department that sent the line (STORE, QC1 ...)
+  // CHALLAN: came in on a challan to this department. REWORK: a QC REWORK decision routed here without a challan
+  // (lib/rework-routing-server.ts); the inbound challan and line are then the ones the QC line came in on, and
+  // reworkSourceItemId is that QC line. A rework task is received as soon as it is decided.
+  origin                 String    @default("CHALLAN")
+  reworkSourceItemId     String?
+  reworkReason           String?
 
   fabricName             String
   colour                 String?
@@ -1660,7 +1671,8 @@ model DepartmentWorkItem {
   // (kept apart from good processedQuantity; recorded as DefectRecord).
   takenQuantity          Float     @default(0)
   defectQuantity         Float     @default(0)
-  // QC departments only: inspection outcomes, and how much of each has left on a challan.
+  // QC departments only: inspection outcomes, and how much of each has been routed: REJECT to the Defective Shelf,
+  // REWORK to the rework department. Both are routed when decided (no challan); older ones left on challans.
   passedQuantity         Float     @default(0)
   rejectedQuantity       Float     @default(0)
   reworkQuantity         Float     @default(0)
@@ -1691,6 +1703,7 @@ model DepartmentWorkItem {
   @@index([departmentCode, status])
   @@index([programId])
   @@index([inboundChallanId])
+  @@index([reworkSourceItemId])
 }
 
 // A quantity of a work item sent to the next department on one outgoing challan line.

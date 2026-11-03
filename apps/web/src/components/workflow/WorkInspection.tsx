@@ -402,6 +402,11 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
                   <input value={reworkReason} onChange={(e) => setReworkReason(e.target.value)} maxLength={300} required className={`${FIELD} mt-1`} />
                 </label>
               )}
+              {(n(reject) > 0 || n(rework) > 0) && (
+                <p className="text-[11px] text-neutral-500">
+                  No challan is needed: {[n(reject) > 0 ? 'REJECT goes onto the Defective Shelf' : null, n(rework) > 0 ? `REWORK goes to ${flow.qc?.reworkTo || 'the rework department'}` : null].filter(Boolean).join(' and ')} when you save.
+                </p>
+              )}
               {flow.checkpoints && (
                 <div>
                   <span className="text-xs font-semibold text-neutral-600">Checkpoints</span>
@@ -467,8 +472,8 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
                         item={item}
                         from={decisionEdit.from}
                         batch={x}
-                        // Only what has not yet left on a challan can change.
-                        max={round(Math.min(decisionEdit.from === 'REJECT' ? x.rejectQuantity : x.reworkQuantity, decisionEdit.from === 'REJECT' ? pendingReject(item) : pendingRework(item)))}
+                        // The batch's quantity; the server refuses rework the rework department has already started on.
+                        max={round(decisionEdit.from === 'REJECT' ? x.rejectQuantity : x.reworkQuantity)}
                         onCancel={() => setDecisionEdit(null)}
                         onSaved={decisionSaved}
                       />
@@ -490,8 +495,8 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
 
         <div className="px-5 py-4 border-t border-neutral-200 flex flex-wrap justify-end gap-2 sticky bottom-0 bg-white">
           {readyToTransfer(item) > 0 && <Link href={transferPath(flow, 'PASS')} className={BTN_QUIET}>Send passed to {flow.next}</Link>}
-          {pendingReject(item) > 0 && <Link href={transferPath(flow, 'REJECT')} className={BTN_QUIET}>Rejected Material</Link>}
-          {pendingRework(item) > 0 && <Link href={transferPath(flow, 'REWORK')} className={BTN_QUIET}>Rework Material</Link>}
+          {(item.rejectedQuantity > 0 || pendingReject(item) > 0) && <Link href={transferPath(flow, 'REJECT')} className={BTN_QUIET}>Rejected Material</Link>}
+          {(item.reworkQuantity > 0 || pendingRework(item) > 0) && <Link href={transferPath(flow, 'REWORK')} className={BTN_QUIET}>Rework Material</Link>}
           {open > 0 && (
             <button type="submit" disabled={saving} className={BTN_PRIMARY}>
               {saving ? 'Saving…' : 'Record Inspection'}

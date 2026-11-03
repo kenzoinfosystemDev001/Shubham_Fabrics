@@ -189,6 +189,7 @@ export function DyeingNavigation() {
                 { href: '/dyeing/my-work/incoming', label: 'Incoming Challans' },
                 { href: '/dyeing/my-work/received', label: 'Received Fabric' },
                 { href: '/dyeing/my-work/process', label: 'Dyeing Process' },
+                { href: '/dyeing/my-work/rework', label: 'Rework from Dyeing QC' },
                 { href: '/dyeing/my-work/issue-challan', label: 'Issue Challan to Dyeing QC' },
               ].map((item) => {
                 const active = pathname === item.href || pathname.startsWith(item.href + '/');

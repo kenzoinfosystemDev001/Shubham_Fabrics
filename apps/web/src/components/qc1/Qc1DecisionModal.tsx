@@ -21,7 +21,6 @@ export function Qc1DecisionModal({ challanId, onClose, onSaved }: { challanId: s
   const [reworkReason, setReworkReason] = useState('');
   const [holdReason, setHoldReason] = useState('');
   const [holdReasonOther, setHoldReasonOther] = useState('');
-  const [reworkChallanNumber, setReworkChallanNumber] = useState('');
   const [correctionReason, setCorrectionReason] = useState('');
   const [remarks, setRemarks] = useState('');
   const [confirming, setConfirming] = useState(false);
@@ -67,7 +66,6 @@ export function Qc1DecisionModal({ challanId, onClose, onSaved }: { challanId: s
     if (to === 'HOLD' && !holdReason) return 'Select the Hold Reason.';
     if (to === 'HOLD' && holdReason === 'OTHER' && !holdReasonOther.trim()) return 'Enter the reason for Other.';
     if (to === 'REWORK' && !reworkReason.trim()) return 'Enter the rework reason.';
-    if (to === 'REWORK' && row?.needsReworkChallan && !reworkChallanNumber.trim()) return 'Enter the number of the new rework challan to Dyeing.';
     if (!correctionReason.trim()) return 'Enter the reason for this correction.';
     return null;
   };
@@ -79,7 +77,7 @@ export function Qc1DecisionModal({ challanId, onClose, onSaved }: { challanId: s
       const body = await fetchJson(`/api/qc1/challans/${challanId}/decision`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ unit, from, to, quantity, correctionReason, remarks, reworkReason, holdReason, holdReasonOther, reworkChallanNumber }),
+        body: JSON.stringify({ unit, from, to, quantity, correctionReason, remarks, reworkReason, holdReason, holdReasonOther }),
       });
       onSaved(body.message);
     } catch (e: any) {
@@ -177,12 +175,7 @@ export function Qc1DecisionModal({ challanId, onClose, onSaved }: { challanId: s
                         <span className="text-[11px] font-semibold text-neutral-600">Rework reason *</span>
                         <input value={reworkReason} onChange={(e) => setReworkReason(e.target.value)} maxLength={300} className={`${FIELD} mt-0.5`} />
                       </label>
-                      {row?.needsReworkChallan && (
-                        <label className="block">
-                          <span className="text-[11px] font-semibold text-neutral-600">New rework challan number (to Dyeing) *</span>
-                          <input value={reworkChallanNumber} onChange={(e) => setReworkChallanNumber(e.target.value)} maxLength={60} className={`${FIELD} mt-0.5 font-mono`} />
-                        </label>
-                      )}
+                      <p className="text-[11px] text-neutral-500">The quantity goes to Dyeing for rework straight away; no challan is needed.</p>
                     </>
                   )}
                   <label className="block">
@@ -232,7 +225,7 @@ export function Qc1DecisionModal({ challanId, onClose, onSaved }: { challanId: s
                           <span className="font-semibold">{fmtQty(h.quantity, h.unit)} {h.from} → {h.to}</span>
                           <span className="text-neutral-500">{fmtDate(h.at, true)} · {h.by || '—'}</span>
                         </div>
-                        <p className="text-neutral-700">Reason: {h.correctionReason}{h.returnChallans?.length ? ` · Return challan ${h.returnChallans.join(', ')}` : ''}</p>
+                        <p className="text-neutral-700">Reason: {h.correctionReason}{h.returnChallans?.length ? ` · Return challan ${h.returnChallans.join(', ')}` : ''}{h.reworkRecords?.length ? ` · ${h.reworkRecords.join(', ')}` : ''}</p>
                       </li>
                     ))}
                   </ul>

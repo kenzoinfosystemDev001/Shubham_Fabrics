@@ -1,19 +1,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
-import { assertChallanNumbersAvailable, challanNumberErrorResponse, requireChallanNumber } from '@/lib/challan-number-server';
+import { challanNumberErrorResponse } from '@/lib/challan-number-server';
 import { unitOf, totalsByUnit } from '@/lib/challan-units.mjs';
 import { ACTIVE_HOLD_STATUSES, HOLD_REASONS } from '@/lib/holds.mjs';
 import { addToHold, loadLines, lockSource, takeFromHold } from '@/lib/holds-server';
 import { TX, WorkRequestError, errorResponse, round, textOf } from '@/lib/work-items-server';
+import { REWORK_ORIGIN, routeDyeingRework, untouchedDyeingRework } from '@/lib/rework-routing-server';
 
 // Changing a Dyeing QC decision. Dyeing QC decides PASS or REWORK per unit (it never rejects: lost fabric is
 // shrinkage), and keeps quantity back on HOLD. REWORK and HOLD can be swapped, in whole or in part:
-// - REWORK -> HOLD: the rework already sits on a return challan to Dyeing, so that challan line is reduced (only
-//   while Dyeing has not received it); the inspection's rework and inspected quantities go down and the quantity is
-//   held on the Dyeing QC challan, to be inspected again once released.
-// - HOLD -> REWORK: the held quantity is added to the return challan Dyeing has not received yet, or goes on a new
-//   return challan (its number typed by the incharge); the inspection records it as rework.
+// - REWORK -> HOLD: the rework is taken back off its Dyeing rework order (only while Dyeing has not started on it;
+//   older rework that went on a return challan: only while Dyeing has not received it); the inspection's rework and
+//   inspected quantities go down and the quantity is held on the Dyeing QC challan, to be inspected again once released.
+// - HOLD -> REWORK: the held quantity goes to Dyeing as a new rework order, without a challan; the inspection records
+//   it as rework.
 // Every change is kept in the audit log with its reason. PASS (already on its way to Embroidery) is not changed here.
 
 const NOT_YET_RECEIVED = ['ISSUED', 'SUBMITTED', 'IN_TRANSIT'];
@@ -35,11 +36,20 @@ async function loadState(id: string, db: any = prisma) {
     },
   });
   if (!challan || unitKey(challan.toDepartment) !== 'QC1') throw new WorkRequestError('Dyeing QC challan not found.', 404);
-  const holds = await db.departmentHold.findMany({ where: { sourceType: 'QC1_CHALLAN', sourceId: id, status: { in: ACTIVE_HOLD_STATUSES } } });
-  return { challan, holds };
+  const [holds, reworkOrders] = await Promise.all([
+    db.departmentHold.findMany({ where: { sourceType: 'QC1_CHALLAN', sourceId: id, status: { in: ACTIVE_HOLD_STATUSES } } }),
+    // REWORK routed to Dyeing without a challan (lib/rework-routing-server.ts).
+    db.dyeingOrder.findMany({ where: { inboundChallanId: id, origin: REWORK_ORIGIN }, orderBy: { createdAt: 'asc' } }),
+  ]);
+  return { challan: { ...challan, reworkOrders }, holds };
 }
 
-/** Rework lines of a unit Dyeing has not received yet (they can still change), newest first. */
+/** Rework orders of a unit Dyeing has not started on (they can still change), newest first. */
+function openReworkOrders(challan: any, unit: string) {
+  return (challan.reworkOrders as any[]).filter((o) => unitKey(o.uom) === unit && untouchedDyeingRework(o) > 0).reverse();
+}
+
+/** Older rework on return challans: lines of a unit Dyeing has not received yet (they can still change), newest first. */
 function openReworkLines(challan: any, unit: string) {
   const out: Array<{ returnChallan: any; item: any; order: any | null }> = [];
   for (const rc of challan.childChallans) {
@@ -59,15 +69,19 @@ function summaryOf(challan: any, holds: any[]) {
   return units.map((unit) => {
     const logs = challan.productionLogs.filter((l: any) => unitKey(l.unitOfMeasure) === unit);
     const open = openReworkLines(challan, unit);
+    const orders = openReworkOrders(challan, unit);
     return {
       unit,
       rework: round(logs.reduce((s: number, l: any) => s + (l.reworkQuantity || 0), 0)),
-      // Rework that can still change: on return challans Dyeing has not received.
-      reworkChangeable: round(open.reduce((s, l) => s + l.item.quantity, 0)),
+      // Rework that can still change: rework orders Dyeing has not started, and older return challans not received.
+      reworkChangeable: round(orders.reduce((s, o) => s + untouchedDyeingRework(o), 0) + open.reduce((s, l) => s + l.item.quantity, 0)),
       held: round(holds.filter((h) => unitKey(h.unit) === unit).reduce((s, h) => s + h.remainingQuantity, 0)),
       inspections: logs.map((l: any) => ({ id: l.id, at: l.recordedAt, inspected: l.inputQuantity, passed: l.goodQuantity, rework: l.reworkQuantity, shrinkage: l.wasteQuantity, reason: l.reworkReason })),
-      // HOLD -> REWORK needs a new return challan (and its number) when none is still open for this unit.
-      needsReworkChallan: open.length === 0,
+      // REWORK goes to Dyeing without a challan.
+      needsReworkChallan: false,
+      reworkOrders: (challan.reworkOrders as any[])
+        .filter((o) => unitKey(o.uom) === unit)
+        .map((o) => ({ id: o.id, orderNumber: o.orderNumber, status: o.status, quantity: o.receivedQuantity ?? o.requiredQuantity })),
       reworkChallans: challan.childChallans.filter((rc: any) => rc.items.some((i: any) => unitKey(i.uom) === unit)).map((rc: any) => ({ id: rc.id, challanNumber: rc.challanNumber, status: rc.status })),
     };
   });
@@ -131,14 +145,6 @@ export async function changeQc1Decision(request: Request, id: string) {
     const reworkReason = to === 'REWORK' ? textOf(body.reworkReason, 300) : null;
     if (to === 'REWORK' && !reworkReason) throw new WorkRequestError('Enter the rework reason.');
 
-    // A new return challan's number is checked before anything changes.
-    const pre = await loadState(id);
-    let newNumber: string | null = null;
-    if (to === 'REWORK' && openReworkLines(pre.challan, unit).length === 0) {
-      newNumber = requireChallanNumber(body.reworkChallanNumber, 'Rework challan number', 'reworkChallanNumber');
-      await assertChallanNumbersAvailable(prisma, 'QC1', [{ field: 'reworkChallanNumber', value: newNumber }]);
-    }
-
     const message = await prisma.$transaction(async (tx) => {
       await lockSource(tx, 'QC1_CHALLAN', id);
       const { challan, holds } = await loadState(id, tx);
@@ -150,15 +156,29 @@ export async function changeQc1Decision(request: Request, id: string) {
         const pt = logs.find((l: any) => l.id === body.inspectionId) || [...logs].reverse().find((l: any) => l.reworkQuantity > 0);
         if (!pt) throw new WorkRequestError(`No rework is recorded in ${unit} on this challan.`);
         if (quantity > round(pt.reworkQuantity)) throw new WorkRequestError(`This inspection recorded ${round(pt.reworkQuantity)} ${unit} as REWORK; no more can change.`);
+        const orders = openReworkOrders(challan, unit);
         const open = openReworkLines(challan, unit);
-        const changeable = round(open.reduce((s, l) => s + l.item.quantity, 0));
+        const changeable = round(orders.reduce((s, o) => s + untouchedDyeingRework(o), 0) + open.reduce((s, l) => s + l.item.quantity, 0));
         if (quantity > changeable) {
           throw new WorkRequestError(
-            `Only ${changeable} ${unit} of the rework is still on a return challan Dyeing has not received; the rest is already with Dyeing and must come back through Dyeing QC before its decision can change.`,
+            `Only ${changeable} ${unit} of the rework is not yet started in Dyeing; the rest is already being re-dyed and must come back through Dyeing QC before its decision can change.`,
           );
         }
-        // Take the quantity off the open return lines, newest first.
+        // Take the quantity off the rework orders Dyeing has not started, newest first, then older return lines.
         let left = quantity;
+        for (const o of orders) {
+          if (left <= 0) break;
+          const take = round(Math.min(left, untouchedDyeingRework(o)));
+          const after = round((o.receivedQuantity ?? o.requiredQuantity) - take);
+          if (after <= 0 && (o.heldQuantity || 0) <= 0) {
+            await tx.dyeingOrder.delete({ where: { id: o.id } });
+          } else {
+            const res = await tx.dyeingOrder.updateMany({ where: { id: o.id, updatedAt: o.updatedAt }, data: { requiredQuantity: after, receivedQuantity: after } });
+            if (res.count !== 1) throw new WorkRequestError(`Dyeing changed rework order ${o.orderNumber} just now. Refresh and try again.`, 409);
+          }
+          touched.push(o.orderNumber);
+          left = round(left - take);
+        }
         for (const l of open) {
           if (left <= 0) break;
           const take = round(Math.min(left, l.item.quantity));
@@ -202,57 +222,11 @@ export async function changeQc1Decision(request: Request, id: string) {
         await addToHold(tx, 'QC1', { ...line, forwarded: round(Math.max(0, line.forwarded - quantity)) }, holdCheck!, user, note);
         await tx.challan.update({ where: { id }, data: { status: 'ON_HOLD' } });
       } else {
-        // HOLD -> REWORK
+        // HOLD -> REWORK: to Dyeing as a rework order, without a challan.
         await takeFromHold(tx, 'QC1', `QC1_CHALLAN:${id}:${unit}`, quantity, user, note);
-        const open = openReworkLines(challan, unit);
-        if (open.length > 0) {
-          const l = open[0];
-          await tx.challanItem.update({ where: { id: l.item.id }, data: { quantity: round(l.item.quantity + quantity) } });
-          if (l.order) await tx.dyeingOrder.update({ where: { id: l.order.id }, data: { requiredQuantity: round(l.order.requiredQuantity + quantity) } });
-          const lines = await tx.challanItem.findMany({ where: { challanId: l.returnChallan.id }, select: { quantity: true, uom: true } });
-          const totals = totalsByUnit(lines, l.returnChallan.fabricUnit);
-          const totalUnits = Object.keys(totals);
-          await tx.challan.update({ where: { id: l.returnChallan.id }, data: { fabricOut: totalUnits.length === 1 ? totals[totalUnits[0]] : null } });
-          await tx.challanEvent.create({
-            data: { challanId: l.returnChallan.id, fromStatus: l.returnChallan.status, toStatus: l.returnChallan.status, action: 'QC', actorId: user.id, notes: `${quantity} ${unit} added from HOLD. ${note}` },
-          });
-          touched.push(l.returnChallan.challanNumber);
-        } else {
-          const src = challan.items.find((i: any) => unitKey(i.uom) === unit) || challan.items[0];
-          const rc = await tx.challan.create({
-            data: {
-              challanNumber: newNumber!,
-              challanType: 'REWORK_RETURN',
-              programId: challan.programId,
-              parentChallanId: challan.id,
-              fromDepartment: 'QC1',
-              toDepartment: 'DYEING',
-              status: 'ISSUED',
-              priority: challan.priority || 'HIGH',
-              createdById: user.id,
-              issuedById: user.id,
-              issuedDate: new Date(),
-              fabricOut: quantity,
-              fabricUnit: unit,
-              remarks: `Dyeing QC Rework/Alter Return for Sheet ${challan.program?.programSerialNo || challan.program?.programNumber || ''}. Reason: ${reworkReason}. From HOLD (${correctionReason}). Must go through Dyeing QC again before Embroidery.`,
-            },
-          });
-          await tx.challanItem.create({
-            data: {
-              challanId: rc.id,
-              itemDescription: `${src?.itemDescription || 'Dyed Fabric'} - Dyeing QC Rework Return`,
-              fabricCode: src?.fabricCode || null,
-              colour: src?.colour || null,
-              shade: src?.shade || null,
-              unitType: unit === 'PCS' ? 'PCS' : 'ROLL',
-              quantity,
-              uom: unit,
-              remarks: `Returned for rework/alteration. Must go through Dyeing QC again: ${reworkReason}`,
-            },
-          });
-          await tx.challanEvent.create({ data: { challanId: rc.id, fromStatus: 'DRAFT', toStatus: 'ISSUED', action: 'ISSUE', actorId: user.id, notes: note } });
-          touched.push(rc.challanNumber);
-        }
+        const src = challan.items.find((i: any) => unitKey(i.uom) === unit) || challan.items[0];
+        const order = await routeDyeingRework(tx, challan, { ...src, uom: unit }, quantity, `${reworkReason} (from HOLD: ${correctionReason})`, user);
+        touched.push(order.orderNumber);
         // The inspection records the quantity as inspected and REWORK.
         const pt = [...logs].reverse()[0];
         if (pt) {
@@ -291,10 +265,10 @@ export async function changeQc1Decision(request: Request, id: string) {
           entity: 'Challan',
           entityId: id,
           beforeState: JSON.stringify({ status: challan.status, units: summaryOf(challan, holds) }),
-          afterState: JSON.stringify({ from, to, quantity, unit, correctionReason, remarks, reworkReason, holdReason: holdCheck?.reason || null, returnChallans: touched }),
+          afterState: JSON.stringify({ from, to, quantity, unit, correctionReason, remarks, reworkReason, holdReason: holdCheck?.reason || null, reworkRecords: touched }),
         },
       });
-      return `${quantity} ${unit} changed from ${from} to ${to}${touched.length ? ` (return challan ${touched.join(', ')})` : ''}.`;
+      return `${quantity} ${unit} changed from ${from} to ${to}${touched.length ? ` (${touched.join(', ')})` : ''}. No challan was needed.`;
     }, TX);
     return NextResponse.json({ message });
   } catch (error) {

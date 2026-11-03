@@ -32,6 +32,7 @@ import { garmentName } from '@/lib/finished-garments.mjs';
 import { ITEMS_WITH_SHEET, lineSheetId } from '@/lib/challan-sheets.mjs';
 import { MIXED_UNIT, secondUnitOf } from '@/lib/challan-units.mjs';
 import { lineExtrasOf, lineExtrasWriter } from '@/lib/challan-item-average';
+import { routeQcDecisions } from '@/lib/rework-routing-server';
 
 /** How a department receives and passes on work. Add an entry to bring a new department online. */
 export interface WorkflowConfig {
@@ -70,6 +71,8 @@ export interface WorkflowConfig {
 }
 
 export type TransferKind = 'PASS' | 'REJECT' | 'REWORK';
+/** QC decisions routed when they are recorded (lib/rework-routing-server.ts): no challan carries them any more. */
+const ROUTED_WHEN_DECIDED: TransferKind[] = ['REJECT', 'REWORK'];
 
 /** Where a transfer of this kind goes. */
 function destinationOf(cfg: WorkflowConfig, kind: TransferKind) {
@@ -841,13 +844,15 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         rejectedQuantity: round(item.rejectedQuantity + check.reject),
         reworkQuantity: round(item.reworkQuantity + check.rework),
       };
-      const status = qcStatusOf(after);
       const fullyInspected = availableToProcess(after) <= 0;
       const now = new Date();
       const outcome = check.pass === check.inspected ? 'PASS' : check.reject === check.inspected ? 'REJECT' : check.rework === check.inspected ? 'REWORK' : 'PARTIAL';
 
       try {
         const saved = await prisma.$transaction(async (tx) => {
+          // REJECT goes onto the Defective Shelf and REWORK to the rework department as decided: no challan.
+          const routed = await routeQcDecisions(tx, cfg, item, after, user, reworkReason);
+          const status = qcStatusOf({ ...after, ...routed });
           // The guard on the inspected total means two inspectors can never count the same quantity.
           const res = await tx.departmentWorkItem.updateMany({
             where: { id, processedQuantity: item.processedQuantity, updatedAt: item.updatedAt },
@@ -856,6 +861,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
               passedQuantity: after.passedQuantity,
               rejectedQuantity: after.rejectedQuantity,
               reworkQuantity: after.reworkQuantity,
+              ...routed,
               status,
               startedAt: item.startedAt ?? now,
               completedAt: fullyInspected ? item.completedAt ?? now : null,
@@ -1035,6 +1041,14 @@ export function workflowHandlers(cfg: WorkflowConfig) {
       let challanNumber = '';
       try {
         const kind = kindOf(body.kind);
+        // REJECT and REWORK are routed when they are decided; they never leave on a challan.
+        if (ROUTED_WHEN_DECIDED.includes(kind)) {
+          throw new WorkRequestError(
+            kind === 'REJECT'
+              ? 'Rejected quantity goes to the Defective Shelf when it is recorded; no challan is needed.'
+              : `Rework goes to ${cfg.qc?.reworkTo.label || 'the rework department'} when it is recorded; no challan is needed.`,
+          );
+        }
         const to = destinationOf(cfg, kind);
         challanNumber = requireChallanNumber(body.challanNumber);
         let lines: Array<{ workItemId: string; quantity: unknown; remarks?: unknown; average?: unknown; averageUnit?: unknown; unitQuantity?: unknown; unitQuantityUom?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
@@ -1276,8 +1290,11 @@ export function workflowHandlers(cfg: WorkflowConfig) {
             // QC departments
             pendingInspection: open.filter((i) => i.status !== 'AWAITING_RECEIPT' && i.processedQuantity <= 0 && availableToProcess(i) > 0).length,
             inspectionInProgress: open.filter((i) => i.processedQuantity > 0 && availableToProcess(i) > 0).length,
+            // REJECT / REWORK are routed when decided; "pending" is only older decisions still waiting for a challan.
             rejectedPending: open.filter((i) => pendingReject(i) > 0).length,
             reworkPending: open.filter((i) => pendingRework(i) > 0).length,
+            rejectedLines: open.filter((i) => i.rejectedQuantity > 0).length,
+            reworkLines: open.filter((i) => i.reworkQuantity > 0).length,
             completed: open.filter((i) => i.status === 'COMPLETED').length,
             partiallyCompleted: open.filter((i) => i.status === 'IN_PROGRESS' && i.processedQuantity > 0).length,
           },
@@ -1480,8 +1497,8 @@ export function workflowHandlers(cfg: WorkflowConfig) {
   /**
    * PATCH inspections/:inspectionId  { inspectedQuantity?, passQuantity, rejectQuantity, reworkQuantity, rejectReason?, reworkReason?, remarks?, editReason? }
    * Corrects one inspection batch. The line's inspected, passed, rejected and rework totals are recalculated from
-   * it; a correction can never go below what has already left on challans (passed, rejected or reworked) nor
-   * inspect more than was received, so routing and stock stay as they are.
+   * it; PASS can never go below what has already left on challans, nor inspect more than was received. The
+   * Defective Shelf and the rework task follow the corrected REJECT and REWORK (lib/rework-routing-server.ts).
    */
   const editInspection = (request: Request, inspectionId: string) =>
     guarded(request, cfg, async (user) => {
@@ -1525,16 +1542,13 @@ export function workflowHandlers(cfg: WorkflowConfig) {
       if (after.passedQuantity < round(item.transferredQuantity)) {
         throw new WorkRequestError(`${round(item.transferredQuantity)} ${item.uom} passed has already been sent on; PASS cannot go below that.`);
       }
-      if (after.rejectedQuantity < round(item.rejectSentQuantity)) {
-        throw new WorkRequestError(`${round(item.rejectSentQuantity)} ${item.uom} rejected has already gone to the Defective Shelf; REJECT cannot go below that.`);
-      }
-      if (after.reworkQuantity < round(item.reworkSentQuantity)) {
-        throw new WorkRequestError(`${round(item.reworkSentQuantity)} ${item.uom} rework has already been returned; REWORK cannot go below that.`);
-      }
-      const status = qcStatusOf(after);
       const remarks = body.remarks !== undefined ? textOf(body.remarks) : batch.remarks;
 
       await prisma.$transaction(async (tx) => {
+        // The Defective Shelf and the rework task follow the corrected totals (refused when the rework department
+        // has already started on quantity this correction takes away, or it left on a challan earlier).
+        const routed = await routeQcDecisions(tx, cfg, item, after, user, reworkReason);
+        const status = qcStatusOf({ ...after, ...routed });
         const res = await tx.departmentWorkItem.updateMany({
           where: { id: item.id, updatedAt: item.updatedAt },
           data: {
@@ -1542,6 +1556,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
             passedQuantity: after.passedQuantity,
             rejectedQuantity: after.rejectedQuantity,
             reworkQuantity: after.reworkQuantity,
+            ...routed,
             status,
             completedAt: availableToProcess(after) <= 0 ? item.completedAt ?? new Date() : null,
           },
@@ -1566,7 +1581,44 @@ export function workflowHandlers(cfg: WorkflowConfig) {
       return NextResponse.json({ data, message: `Inspection corrected: ${inspected} ${item.uom} (PASS ${pass}, REJECT ${reject}, REWORK ${rework}).` });
     }, 'Failed to correct the inspection.');
 
+  /**
+   * POST items/:id/route — QC lines decided before REJECT / REWORK were routed when recorded, whose quantity is still
+   * waiting for the challan that is no longer used: REJECT goes onto the Defective Shelf and REWORK to the rework
+   * department now, without a challan.
+   */
+  const routePending = (request: Request, id: string) =>
+    guarded(request, cfg, async (user) => {
+      if (!cfg.qc) throw new WorkRequestError(`${cfg.label} does not inspect.`, 404);
+      const item = await prisma.departmentWorkItem.findFirst({ where: { id, ...dept }, include: { inspections: { select: { reworkReason: true }, orderBy: { createdAt: 'desc' } } } });
+      if (!item) throw new WorkRequestError('Work item not found.', 404);
+      const reject = pendingReject(item);
+      const rework = pendingRework(item);
+      if (reject <= 0 && rework <= 0) throw new WorkRequestError(`${item.fabricName} has no REJECT or REWORK waiting to be routed.`, 409);
+      const reason = item.inspections.find((x) => x.reworkReason)?.reworkReason || null;
+      await prisma.$transaction(async (tx) => {
+        const routed = await routeQcDecisions(tx, cfg, item, item, user, reason);
+        const res = await tx.departmentWorkItem.updateMany({
+          where: { id, updatedAt: item.updatedAt },
+          data: { ...routed, status: qcStatusOf({ ...item, ...routed }) },
+        });
+        if (res.count !== 1) throw new WorkRequestError(`${item.fabricName} changed just now. Refresh and try again.`, 409);
+        await tx.auditLog.create({
+          data: {
+            actorId: user.id,
+            action: `${cfg.code}_DECISIONS_ROUTED`,
+            entity: 'DepartmentWorkItem',
+            entityId: id,
+            beforeState: JSON.stringify({ rejectSent: item.rejectSentQuantity, reworkSent: item.reworkSentQuantity }),
+            afterState: JSON.stringify({ ...routed, rejectToShelf: reject, reworkTo: rework ? cfg.qc!.reworkTo.code : null, rework }),
+          },
+        });
+      }, TX);
+      const parts = [reject > 0 ? `${reject} ${item.uom} moved to the Defective Shelf` : null, rework > 0 ? `${rework} ${item.uom} sent to ${cfg.qc.reworkTo.label} for rework` : null];
+      return NextResponse.json({ message: `${item.fabricName}: ${parts.filter(Boolean).join('; ')}. No challan was needed.` });
+    }, 'Failed to route the REJECT / REWORK.');
+
   return {
+    routePending,
     listChallans,
     receiveChallan,
     listItems,

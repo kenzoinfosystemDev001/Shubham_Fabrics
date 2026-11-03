@@ -99,6 +99,8 @@ export function IncomingChallanPicker({
             {shown.map((o) => {
               const checked = selected.includes(o.id);
               const legacy = o.id === NO_INCOMING_CHALLAN;
+              // A QC REWORK decision routed here without a challan: listed under the challan it was decided on.
+              const rework = (o.lines as any[]).find((l) => l.origin === 'REWORK');
               return (
                 <tr key={o.id} onClick={() => toggle(o.id)} className={`cursor-pointer ${checked ? 'bg-brand-50/70' : 'hover:bg-neutral-50/60'}`}>
                   <td className="py-2.5 px-4">
@@ -113,9 +115,10 @@ export function IncomingChallanPicker({
                   </td>
                   <td className="py-2.5 px-3 font-mono text-xs font-bold text-brand-800">
                     {legacy ? <span className="font-sans font-semibold text-neutral-500">Not recorded (older lines)</span> : o.challan?.challanNumber || '—'}
+                    {rework && <span className="ml-2 inline-flex px-1.5 py-0.5 rounded bg-accent-100 text-accent-800 font-sans text-[10px] font-bold uppercase">Rework</span>}
                   </td>
                   <td className="py-2.5 px-3 text-xs text-neutral-600 whitespace-nowrap">{fmtDate(o.challan?.issuedDate || o.challan?.createdAt)}</td>
-                  <td className="py-2.5 px-3 text-xs text-neutral-700">{deptName(o.challan?.fromDepartment)}</td>
+                  <td className="py-2.5 px-3 text-xs text-neutral-700">{rework ? `REWORK from ${deptName(rework.sourceDepartment || 'QC1')}` : deptName(o.challan?.fromDepartment)}</td>
                   <td className="py-2.5 px-3 font-mono text-xs">
                     {o.sheets.map((s) => sheetDesignLabel(s)).join(', ') || '—'}
                   </td>

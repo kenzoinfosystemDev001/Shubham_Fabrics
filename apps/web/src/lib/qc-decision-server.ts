@@ -4,13 +4,15 @@ import { TX, WORK_ITEM_INCLUDE, WorkRequestError, guarded, round, textOf, type W
 import { availableToProcess, heldOf, qcStatusOf, receivedBasis } from '@/lib/work-items.mjs';
 import { HOLD_REASONS } from '@/lib/holds.mjs';
 import { addToHold, loadLines, lockSource, takeFromHold } from '@/lib/holds-server';
+import { routeQcDecisions } from '@/lib/rework-routing-server';
 
 // Changing a QC decision (Threadcut QC, Washing QC, Final QC): quantity recorded as REJECT, REWORK or HOLD is moved
 // to another of the three, in whole or in part, without a new inspection. The inspection batch is corrected in
 // place (REJECT <-> REWORK), quantity put on HOLD is taken off its batch and held on the line, and held quantity
-// given REJECT / REWORK is recorded as that decision. Quantity that has already left on a challan (Defective Shelf,
-// rework return) can no longer change here. Every change is kept in the audit log, with its reason.
-// Dyeing QC is not covered: its REWORK leaves on a challan the moment it is decided.
+// given REJECT / REWORK is recorded as that decision. The Defective Shelf and the rework task follow without a
+// challan (lib/rework-routing-server.ts); REWORK the rework department has already started on, and quantity that
+// left on a challan before decisions were routed directly, can no longer change. Every change is audited.
+// Dyeing QC has its own (lib/qc1-decision-server.ts).
 
 export type Decision = 'REJECT' | 'REWORK' | 'HOLD';
 const DECISIONS: Decision[] = ['REJECT', 'REWORK', 'HOLD'];
@@ -77,14 +79,6 @@ export function changeDecision(request: Request, cfg: WorkflowConfig, itemId: st
         if (from === 'REJECT' || from === 'REWORK') {
           const inBatch = round(batch![field(from)]);
           if (quantity > inBatch) throw new WorkRequestError(`This inspection recorded ${inBatch} ${item.uom} as ${LABEL[from]}; no more can change.`);
-          const sentField = from === 'REJECT' ? 'rejectSentQuantity' : 'reworkSentQuantity';
-          const notSent = round(item[itemField(from)] - item[sentField]);
-          if (quantity > notSent) {
-            const where = from === 'REJECT' ? 'gone to the Defective Shelf' : 'been returned for rework';
-            throw new WorkRequestError(
-              `${round(item[sentField])} ${item.uom} of the ${LABEL[from]} has already ${where} on a challan; only ${Math.max(0, notSent)} ${item.uom} can still change. Material already sent must be returned before its decision can change.`,
-            );
-          }
         } else if (quantity > heldOf(item)) {
           throw new WorkRequestError(`Only ${heldOf(item)} ${item.uom} of this line is on HOLD.`);
         }
@@ -163,6 +157,9 @@ export function changeDecision(request: Request, cfg: WorkflowConfig, itemId: st
           after[itemField(to)] = round(item[itemField(to)] + quantity);
         }
 
+        // The Defective Shelf and the rework task follow the new totals (no challan either way).
+        const reason = newReason || (to === 'REWORK' ? batch?.reworkReason ?? null : null);
+        const routed = await routeQcDecisions(tx, cfg, item, after, user, reason);
         // Line totals and status; the line's row is locked by this transaction.
         await tx.departmentWorkItem.update({
           where: { id: item.id },
@@ -171,7 +168,8 @@ export function changeDecision(request: Request, cfg: WorkflowConfig, itemId: st
             passedQuantity: after.passedQuantity,
             rejectedQuantity: after.rejectedQuantity,
             reworkQuantity: after.reworkQuantity,
-            status: qcStatusOf(after),
+            ...routed,
+            status: qcStatusOf({ ...after, ...routed }),
             completedAt: availableToProcess(after) <= 0 ? item.completedAt ?? new Date() : null,
           },
         });
@@ -181,9 +179,17 @@ export function changeDecision(request: Request, cfg: WorkflowConfig, itemId: st
         const note = `QC decision changed from ${LABEL[from]} to ${LABEL[to]}: ${correctionReason}`;
         if (to === 'HOLD') {
           if (!line) throw new WorkRequestError('This line cannot be placed on HOLD.');
-          // The line was read as it was before this change: the quantity taken off its decision is free to hold now.
-          const pendingBefore = round(line.writtenOff);
-          await addToHold(tx, cfg.code, { ...line, writtenOff: round(Math.max(0, pendingBefore - quantity)) }, holdCheck!, user, note);
+          // The line was read as it was before this change: the quantity taken off its decision (still waiting, or
+          // already routed to the shelf / rework task) is free to hold now.
+          const fromWaiting = Math.min(round(line.writtenOff), quantity);
+          await addToHold(
+            tx,
+            cfg.code,
+            { ...line, writtenOff: round(line.writtenOff - fromWaiting), forwarded: round(Math.max(0, line.forwarded - (quantity - fromWaiting))) },
+            holdCheck!,
+            user,
+            note,
+          );
         }
         if (from === 'HOLD') {
           await takeFromHold(tx, cfg.code, `WORK_ITEM:${item.id}:${line?.unit || item.uom}`, quantity, user, note);

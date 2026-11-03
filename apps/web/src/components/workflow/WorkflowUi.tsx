@@ -5,6 +5,7 @@ import { FileText, RefreshCw } from 'lucide-react';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { qcStatusLabel, workStatusLabel } from '@/lib/work-items.mjs';
 import { generateRawBarcodeSvg } from '@/lib/barcode';
+import { departmentName } from '@/lib/workflow-views';
 
 // Shared building blocks for department workflow screens (Dyeing, Embroidery, Thread Cutting ...).
 
@@ -27,7 +28,8 @@ export function fmtDate(value: string | Date | null | undefined, withTime = fals
 /** The challan a work line came in on, as typed on that challan (e.g. "Challan 100"); '' when unknown. */
 export function challanRef(item: any) {
   const n = item?.inboundChallan?.challanNumber;
-  return n ? `Challan ${n}` : '';
+  // A rework task (QC REWORK routed without a challan) is listed under the challan its REWORK was decided on.
+  return n ? `Challan ${n}${item?.origin === 'REWORK' ? ` · REWORK from ${departmentName(item.sourceDepartment)}` : ''}` : '';
 }
 
 export function sheetRef(program: any) {

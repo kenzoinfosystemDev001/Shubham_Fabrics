@@ -297,8 +297,8 @@ function HistoryContent({ flow }: { flow: WorkflowView }) {
                     <span className="text-xs font-semibold text-neutral-600">Rework status</span>
                     <select value={filters.reworkStatus} onChange={set('reworkStatus')} className={`${FIELD} mt-1`}>
                       <option value="">Any</option>
-                      <option value="PENDING">Awaiting return to {flow.qc?.reworkTo}</option>
-                      <option value="RETURNED">Returned to {flow.qc?.reworkTo}</option>
+                      <option value="PENDING">Not yet sent to {flow.qc?.reworkTo} (older decisions)</option>
+                      <option value="RETURNED">Sent to {flow.qc?.reworkTo}</option>
                     </select>
                   </label>
                   <label className="block">

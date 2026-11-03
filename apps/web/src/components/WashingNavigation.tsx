@@ -193,6 +193,7 @@ export function WashingNavigation() {
                   { href: '/washing/my-work/incoming', label: 'Incoming Challans' },
                   { href: '/washing/my-work/received', label: 'Received Material' },
                   { href: '/washing/my-work/process', label: 'Washing Process' },
+                  { href: '/washing/my-work/rework', label: 'Rework from Washing QC' },
                   { href: '/washing/my-work/issue-challan', label: 'Issue Challan to Washing QC' },
                 ].map((item) => {
                   const active = pathname === item.href || pathname.startsWith(item.href + '/');

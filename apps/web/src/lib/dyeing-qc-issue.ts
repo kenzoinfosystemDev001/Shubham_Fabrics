@@ -187,7 +187,8 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
             colour: p.actual,
             requiredColour: p.order.targetColor || null,
             programId: p.order.programId,
-            sourceChallanItemId: p.order.inboundChallanItemId,
+            // Rework orders link back to the Dyeing QC challan line their REWORK was decided on.
+            sourceChallanItemId: p.order.inboundChallanItemId ?? p.order.reworkChallanItemId,
             unitType: 'ROLL',
             quantity: p.quantity,
             uom: p.order.uom,
