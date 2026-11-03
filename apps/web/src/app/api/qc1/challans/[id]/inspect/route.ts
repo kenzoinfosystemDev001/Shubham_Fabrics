@@ -13,6 +13,7 @@ import { canWriteColumns } from '@/lib/challan-item-average';
 import { ConflictError, claimChallan } from '@/lib/record-claim';
 import { ACTIVE_HOLD_STATUSES } from '@/lib/holds.mjs';
 import { SHRINKAGE_NOT_SET_UP, ShrinkageError, saveShrinkageForLine, shrinkageTableExists } from '@/lib/shrinkage-server';
+import { routeDyeingRework } from '@/lib/rework-routing-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -190,9 +191,9 @@ export async function POST(
       }
     }
 
-    // 3b. Manual challan numbers for every challan this inspection creates
+    // 3b. Manual challan number for the PASS challan. REWORK is a QC decision, not a transfer: it goes to Dyeing
+    // without a challan (lib/rework-routing-server.ts).
     const numberEntries: Array<{ field: string; label: string; value: unknown }> = [];
-    if (qRework > 0) numberEntries.push({ field: 'reworkChallanNumber', label: 'Rework challan number', value: body.reworkChallanNumber });
     if (normalizedResult === 'PASS' && qPassed > 0) numberEntries.push({ field: 'passChallanNumber', label: 'Embroidery challan number', value: body.passChallanNumber });
     const typedNumbers = requireChallanNumberSet(numberEntries);
     // Every challan this inspection creates is issued by Dyeing QC (QC1).
@@ -360,47 +361,22 @@ export async function POST(
         }
         const prodTx = productionTransactions[0];
 
-        // E. Return Rework yardage to Dyeing Department if rework quantity > 0 (Rule 5)
-        let reworkReturnChallan = null;
+        // E. Rework yardage goes to Dyeing as a rework order per line, received there straight away: no challan.
+        // Each order keeps this challan, its line, Production Sheet, fabric and colour; Dyeing re-dyes it and sends it
+        // back to Dyeing QC on its normal challan.
+        const reworkReturnChallan = null;
+        const reworkOrders: Array<{ orderNumber: string; quantity: number; unit: string }> = [];
         if (qRework > 0) {
-          const returnChallanNumber = typedNumbers.reworkChallanNumber;
-          const rework = outgoing('rework');
-
-          reworkReturnChallan = await tx.challan.create({
-            data: {
-              challanNumber: returnChallanNumber,
-              challanType: 'REWORK_RETURN',
-              programId: challan.programId,
-              parentChallanId: challan.id, // Direct genealogy back to Dyeing -> QC1 Challan!
-              fromDepartment: 'QC1',
-              toDepartment: 'DYEING',
-              status: 'ISSUED',
-              priority: challan.priority || 'HIGH',
-              createdById: actorId,
-              issuedById: actorId,
-              issuedDate: new Date(),
-              fabricOut: rework.quantity,
-              fabricUnit: rework.unit,
-              remarks: `Dyeing QC Rework/Alter Return for Sheet ${challan.program.programSerialNo || challan.program.programNumber}. Reason: ${reworkReason || effectiveRemark}. Must go through Dyeing QC again before Embroidery.${inchargeNote}`,
-              ...inchargeFields,
-            },
-          });
-
-          for (const r of rework.rows) {
-            const src = r.item;
-            await tx.challanItem.create({
-              data: {
-                challanId: reworkReturnChallan.id,
-                itemDescription: `${src?.itemDescription || 'Dyed Fabric'} - Dyeing QC Rework Return`,
-                fabricCode: src?.fabricCode || 'KNIT',
-                colour: colourOf(r),
-                unitType: r.unit === 'PCS' ? 'PCS' : 'ROLL',
-                quantity: r.rework,
-                uom: r.unit,
-                ...lineSource(r),
-                remarks: `Returned for rework/alteration. Must go through Dyeing QC again: ${reworkReason || effectiveRemark}`,
-              },
-            });
+          for (const r of inspectedLines.filter((x) => x.rework > 0)) {
+            const order = await routeDyeingRework(
+              tx,
+              challan,
+              { ...r.item, colour: colourOf(r) },
+              r.rework,
+              reworkReason || effectiveRemark,
+              authUser,
+            );
+            reworkOrders.push({ orderNumber: order.orderNumber, quantity: r.rework, unit: r.unit });
           }
         }
 
@@ -491,7 +467,7 @@ export async function POST(
               challan.remarks,
               `Dyeing QC Result: ${normalizedResult} (Pass: ${breakdownText('passed')} → Embroidery | Rework: ${breakdownText('rework')} → Dyeing | Shrinkage: ${breakdownText('shrinkage')}) | QC Remark: ${effectiveRemark}`,
               passForwardChallan ? `Embroidery Challan: ${passForwardChallan.challanNumber}` : null,
-              reworkReturnChallan ? `Rework Challan (Dyeing): ${reworkReturnChallan.challanNumber}` : null,
+              reworkOrders.length ? `Rework to Dyeing (no challan): ${reworkOrders.map((o) => o.orderNumber).join(', ')}` : null,
             ]
               .filter(Boolean)
               .join(' | '),
@@ -515,7 +491,7 @@ export async function POST(
               result: normalizedResult,
               byUnit,
               byLine: lineSummary,
-              reworkReturnChallanNumber: reworkReturnChallan?.challanNumber || null,
+              reworkOrders,
               passForwardChallanNumber: passForwardChallan?.challanNumber || null,
             }),
           },
@@ -534,7 +510,7 @@ export async function POST(
               byUnit,
               byLine: lineSummary,
               qcRemark: effectiveRemark,
-              reworkReturnChallan: reworkReturnChallan?.challanNumber || null,
+              reworkOrders,
               passForwardChallan: passForwardChallan?.challanNumber || null,
               inspector: actorUser?.fullName || actorUser?.username,
             }),
@@ -549,6 +525,7 @@ export async function POST(
           byLine: lineSummary,
           passForwardChallan,
           reworkReturnChallan,
+          reworkOrders,
           challan: updatedChallan,
         };
       },

@@ -70,8 +70,9 @@ export function WorkDashboard({ flow }: { flow: WorkflowView }) {
     { label: 'Pending Inspection', value: c?.pendingInspection, href: `${workPath(flow)}?inspection=pending` },
     { label: 'Inspection In Progress', value: c?.inspectionInProgress, href: `${workPath(flow)}?inspection=progress` },
     { label: `Passed, Ready for ${flow.next}`, value: c?.readyForNext, href: transferPath(flow, 'PASS') },
-    { label: 'Rejected Material', value: c?.rejectedPending, href: transferPath(flow, 'REJECT'), danger: (c?.rejectedPending || 0) > 0 },
-    { label: 'Rework Pending', value: c?.reworkPending, href: transferPath(flow, 'REWORK') },
+    // REJECT and REWORK are routed when decided (no challan); danger only for older decisions still waiting.
+    { label: 'Rejected Material', value: c?.rejectedLines, href: transferPath(flow, 'REJECT'), danger: (c?.rejectedPending || 0) > 0 },
+    { label: `Sent for Rework (${flow.qc?.reworkTo || 'rework'})`, value: c?.reworkLines, href: transferPath(flow, 'REWORK'), danger: (c?.reworkPending || 0) > 0 },
     ...alertCards,
   ];
   const qty = data?.quantities;

@@ -191,6 +191,7 @@ export function ThreadCuttingNavigation() {
                 { href: '/thread-cutting/my-work/incoming', label: 'Incoming Challans' },
                 { href: '/thread-cutting/my-work/received', label: 'Received Fabric' },
                 { href: '/thread-cutting/my-work/process', label: 'Thread Cutting Process' },
+                { href: '/thread-cutting/my-work/rework', label: 'Rework from Threadcut QC' },
                 { href: '/thread-cutting/my-work/issue-challan', label: 'Issue Challan to Threadcut QC' },
               ].map((item) => {
                 const active = pathname === item.href || pathname.startsWith(item.href + '/');

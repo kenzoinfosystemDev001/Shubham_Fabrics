@@ -209,6 +209,15 @@ export function SteamPressNavigation() {
             <span>Steam Press Processing</span>
           </Link>
 
+          {/* Rework from Final QC (no challan) */}
+          <Link
+            href="/steam-press/my-work/rework"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/my-work/rework', false)}
+          >
+            <span>Rework from Final QC</span>
+          </Link>
+
           {/* 5. Ready for Final QC */}
           <Link
             href="/steam-press/my-work/issue-challan"

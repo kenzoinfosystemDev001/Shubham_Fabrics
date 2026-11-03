@@ -232,6 +232,12 @@ function ReceivedContent({ flow, only }: { flow: WorkflowView; only?: 'defective
 
         {tab === 'stock' && !flow.noStockTab && <DepartmentStockView department={flow.code as StockDepartment} title={`${flow.label} Department Stock`} />}
 
+        {tab === 'defective' && flow.qc && (
+          <p className="px-4 py-3 rounded-xl border border-neutral-200 bg-white text-sm text-neutral-700">
+            REJECT decided in {flow.label} goes onto the Defective Shelf without a challan; see{' '}
+            <Link href={`${flow.base}/defective-shelf`} className="font-semibold text-brand-700 hover:text-brand-900">{flow.label} Defective Shelf</Link>. Below: older rejections that left on challans.
+          </p>
+        )}
         {tab === 'defective' && (
           <Panel title="Defective Shelf" count={defects.length}>
             <div className="overflow-x-auto">

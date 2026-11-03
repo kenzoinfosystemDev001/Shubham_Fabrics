@@ -64,7 +64,12 @@ async function workItemImpact(id: string, user: AuthenticatedUser) {
   if (!w) throw new WorkRequestError('Received line not found.', 404);
   const holds = await prisma.departmentHold.count({ where: { sourceType: 'WORK_ITEM', sourceId: id } });
   const blockers = [...accessBlocker(user, w.departmentCode)];
-  if (w.status === 'AWAITING_RECEIPT') {
+  if (w.origin === 'REWORK') {
+    // A rework task was never received from a challan: it is the QC department's REWORK decision.
+    blockers.push(
+      `${w.itemNumber} is a rework task from ${departmentName(departmentKeyFor(w.sourceDepartment) || w.sourceDepartment)}'s REWORK decision; there is no receipt to delete. Change that decision in ${departmentName(departmentKeyFor(w.sourceDepartment) || w.sourceDepartment)} (it is taken back here while nothing has been worked on).`,
+    );
+  } else if (w.status === 'AWAITING_RECEIPT') {
     blockers.push(`This line has not been received yet, so there is no receipt to delete. Challan ${w.inboundChallan?.challanNumber || ''} can be deleted by ${departmentName(departmentKeyFor(w.inboundChallan?.fromDepartment) || w.inboundChallan?.fromDepartment)} (Floor Board > Issued Challans) or an administrator.`);
   }
   const done: string[] = [];
@@ -176,7 +181,9 @@ async function dyeingOrderImpact(id: string, user: AuthenticatedUser) {
   if (!o) throw new WorkRequestError('Received line not found.', 404);
   const holds = await prisma.departmentHold.count({ where: { sourceType: 'DYEING_ORDER', sourceId: id } });
   const blockers = [...accessBlocker(user, 'DYEING')];
-  if (o.status === 'AWAITING_RECEIPT') {
+  if (o.origin === 'REWORK') {
+    blockers.push(`${o.orderNumber} is rework from Dyeing QC's REWORK decision; there is no receipt to delete. Change that decision in Dyeing QC (it is taken back here while Dyeing has not started on it).`);
+  } else if (o.status === 'AWAITING_RECEIPT') {
     blockers.push(`This line has not been received yet, so there is no receipt to delete. Challan ${o.inboundChallan?.challanNumber || ''} can be deleted by ${departmentName(departmentKeyFor(o.inboundChallan?.fromDepartment) || o.inboundChallan?.fromDepartment || 'STORE')} (Floor Board > Issued Challans) or an administrator.`);
   }
   const done: string[] = [];

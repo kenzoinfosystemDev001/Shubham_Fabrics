@@ -97,11 +97,13 @@ const defectUnitOf = (c: any): string =>
 const outcomeText = (result: any, key: 'passed' | 'rework' | 'shrinkage') =>
   formatTotals(Object.fromEntries((result?.byUnit || []).map((r: any) => [r.unit, r[key]])));
 
-/** Challans the QC1 inspect route will create for these quantities (mirrors the server rule). */
+/**
+ * Challans the QC1 inspect route will create for these quantities (mirrors the server rule): the PASS challan only.
+ * REWORK is a QC decision, not a transfer: it goes to Dyeing without a challan.
+ */
 function qc1NeededChallanNumbers(form: { result: string; quantityPassed: string; quantityRework: string }) {
   const needed: Array<{ field: Qc1ChallanNumberField; label: string }> = [];
   if (form.result === 'PASS' && Number(form.quantityPassed || 0) > 0) needed.push({ field: 'passChallanNumber', label: 'Embroidery challan number' });
-  if (Number(form.quantityRework || 0) > 0) needed.push({ field: 'reworkChallanNumber', label: 'Rework challan number' });
   return needed;
 }
 
@@ -1618,28 +1620,20 @@ export default function QC1MyWorkPage() {
                         </div>
                       )}
 
-                      {/* REWORK ROUTING CONFIRMATION (TO DYEING) */}
-                      {inspectionSuccess.reworkReturnChallan && (
+                      {/* REWORK ROUTING CONFIRMATION (TO DYEING, no challan) */}
+                      {(inspectionSuccess.reworkOrders || []).length > 0 && (
                         <div className="p-3 bg-brand-50 border border-brand-300 rounded-lg text-brand-900 text-xs">
                           <div className="flex items-center justify-between">
                             <span className="font-bold flex items-center gap-1.5 text-brand-900">
                               <RotateCcw className="w-4 h-4 text-brand-700" />
-                              Rework Return Challan Generated → Dispatched to Dyeing Department
+                              Rework sent to Dyeing (no challan needed)
                             </span>
-                            <Link
-                              href={`/challans/${inspectionSuccess.reworkReturnChallan.id}`}
-                              target="_blank"
-                              className="text-[11px] underline font-bold text-brand-800 hover:text-brand-900 flex items-center gap-1"
-                            >
-                              <span>Print Challan</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </Link>
                           </div>
                           <span className="font-mono font-bold text-sm text-brand-900 block mt-1">
-                            {inspectionSuccess.reworkReturnChallan.challanNumber}
+                            {inspectionSuccess.reworkOrders.map((o: any) => o.orderNumber).join(', ')}
                           </span>
                           <p className="text-[11px] text-brand-700 mt-0.5">
-                            Rework Yardage: <strong>{outcomeText(inspectionSuccess, 'rework')}</strong>. This Challan is routed back to the <strong>Dyeing Department</strong> for re-dyeing and shade alteration.
+                            Rework Yardage: <strong>{outcomeText(inspectionSuccess, 'rework')}</strong>. It is in Dyeing &gt; My Work &gt; Rework from Dyeing QC with this challan&apos;s Production Sheet and fabric; Dyeing re-dyes it and sends it back on its own challan.
                           </p>
                         </div>
                       )}

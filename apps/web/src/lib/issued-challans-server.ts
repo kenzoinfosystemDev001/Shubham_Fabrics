@@ -72,7 +72,8 @@ async function receiptsFor(challans: Array<{ id: string; toDepartment: string; s
   const [workItems, orders] = itemIds.length
     ? await Promise.all([
         prisma.departmentWorkItem.findMany({
-          where: { inboundChallanItemId: { in: itemIds } },
+          // Rework tasks share the line they were decided on but were never received from this challan.
+          where: { inboundChallanItemId: { in: itemIds }, origin: { not: 'REWORK' } },
           select: { id: true, itemNumber: true, departmentCode: true, inboundChallanItemId: true, status: true, expectedQuantity: true, receivedQuantity: true, receivedAt: true, receiptRemarks: true, receivedBy: { select: { fullName: true, username: true } } },
         }),
         prisma.dyeingOrder.findMany({

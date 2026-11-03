@@ -7,11 +7,14 @@ import { unitOf } from '@/lib/challan-units.mjs';
 import { HOLD_STATUS_LABEL } from '@/lib/holds.mjs';
 import { holdDetail, listHolds, HOLD_DEPARTMENTS } from '@/lib/holds-server';
 import { departmentName } from '@/lib/workflow-views';
+import { REWORK_STAGE_LABEL, dyeingTaskStage, reworkRemaining, workTaskStage } from '@/lib/rework.mjs';
 
 // Admin monitoring of REJECTED, REWORK and HOLD quantities across the floor. Read-only: every record is built
 // from the existing transactions and nothing here changes production, QC or stock quantities.
-// - REJECT: QC inspection batches (Threadcut QC, Washing QC, Final QC) and department defect records.
-// - REWORK: QC inspection batches, and Dyeing QC rework (its production transactions and rework challans).
+// - REJECT: QC inspection batches (Threadcut QC, Washing QC, Final QC) and department defect records. A REJECT is on
+//   the Defective Shelf as soon as it is decided (no challan); older ones went there on DEFECT_RETURN challans.
+// - REWORK: QC inspection batches, and Dyeing QC rework (its production transactions). REWORK goes to the rework
+//   department as a rework task when decided (no challan); older rework went back on REWORK_RETURN challans.
 // - HOLD:   DepartmentHold (lib/holds-server.ts), refreshed against its line as the department pages do.
 // Quantities stay in their own unit (MTR or PCS) and are never added across units.
 
@@ -162,7 +165,16 @@ async function qcInspectionRecords(): Promise<MonitorRecord[]> {
     },
   });
 
-  // Where rework went: the receiving department's work item for each REWORK challan line.
+  // REWORK routed without a challan: the rework department's task for each QC line, and where it was forwarded.
+  const tasks = items.length
+    ? await prisma.departmentWorkItem.findMany({
+        where: { origin: 'REWORK', reworkSourceItemId: { in: items.map((i) => i.id) } },
+        include: { transfers: { include: { challan: { select: { challanNumber: true, status: true } } } } },
+      })
+    : [];
+  const taskOf = new Map(tasks.map((t) => [t.reworkSourceItemId, t]));
+
+  // Where older rework went: the receiving department's work item for each REWORK challan line.
   const reworkLineIds = items.flatMap((i) => i.transfers.filter((t) => t.kind === 'REWORK').map((t) => t.challanItemId));
   const downstream = reworkLineIds.length
     ? await prisma.departmentWorkItem.findMany({
@@ -198,15 +210,22 @@ async function qcInspectionRecords(): Promise<MonitorRecord[]> {
     };
     const rejectTransfers = item.transfers.filter((t) => t.kind === 'REJECT');
     const reworkTransfers = item.transfers.filter((t) => t.kind === 'REWORK');
-    const rejectSlices = allocate(item.inspections.map((x) => x.rejectQuantity), rejectTransfers);
-    const reworkSlices = allocate(item.inspections.map((x) => x.reworkQuantity), reworkTransfers);
+    // Quantity routed when decided has no challan: a supply after the older challans, oldest decisions first.
+    const direct = (sent: number, onChallans: typeof rejectTransfers) =>
+      ({ quantity: round(Math.max(0, sent - onChallans.reduce((s, t) => s + t.quantity, 0))), challan: null, challanItemId: null }) as unknown as (typeof rejectTransfers)[number];
+    const rejectSlices = allocate(item.inspections.map((x) => x.rejectQuantity), [...rejectTransfers, direct(item.rejectSentQuantity, rejectTransfers)]);
+    const reworkSlices = allocate(item.inspections.map((x) => x.reworkQuantity), [...reworkTransfers, direct(item.reworkSentQuantity, reworkTransfers)]);
+    const task = taskOf.get(item.id);
+    const taskStage = task ? workTaskStage(task, task.transfers.map((t) => t.challan.status)) : null;
+    const shelf = `Defective Shelf: ${qcName} · Fabric Store (central)`;
 
     item.inspections.forEach((insp, index) => {
       const inboundRef = `Inbound challan ${item.inboundChallan.challanNumber}`;
       if (insp.rejectQuantity > EPS) {
         const slices = rejectSlices[index];
         const sent = round(slices.reduce((s, x) => s + x.quantity, 0));
-        const inTransit = slices.some((s) => NOT_YET_RECEIVED.includes(s.supply.challan.status));
+        const inTransit = slices.some((s) => s.supply.challan && NOT_YET_RECEIVED.includes(s.supply.challan.status));
+        const onChallan = slices.some((s) => s.supply.challan);
         let status: string, statusLabel: string, location: string;
         if (sent <= EPS) {
           status = 'AT_DEPARTMENT';
@@ -223,7 +242,7 @@ async function qcInspectionRecords(): Promise<MonitorRecord[]> {
         } else {
           status = 'ON_SHELF';
           statusLabel = 'On Defective Shelf';
-          location = STORE_SHELF;
+          location = onChallan ? STORE_SHELF : shelf;
         }
         records.push({
           ...base,
@@ -240,7 +259,7 @@ async function qcInspectionRecords(): Promise<MonitorRecord[]> {
           statusLabel,
           active: status !== 'ON_SHELF',
           location,
-          references: [item.itemNumber, inboundRef, ...slices.map((s) => `Defect challan ${s.supply.challan.challanNumber}`)],
+          references: [item.itemNumber, inboundRef, ...slices.map((s) => (s.supply.challan ? `Defect challan ${s.supply.challan.challanNumber}` : 'On the shelf when rejected (no challan)'))],
           recordedBy: userName(insp.inspector),
           releasedAt: null,
         });
@@ -248,10 +267,19 @@ async function qcInspectionRecords(): Promise<MonitorRecord[]> {
       if (insp.reworkQuantity > EPS) {
         const slices = reworkSlices[index];
         const sent = round(slices.reduce((s, x) => s + x.quantity, 0));
-        const downs = slices.map((s) => downstreamOf.get(s.supply.challanItemId));
+        const legacy = slices.filter((s) => s.supply.challan);
+        const downs = legacy.map((s) => downstreamOf.get(s.supply.challanItemId));
         const notReceived = downs.some((d) => !d || d.status === 'AWAITING_RECEIPT');
         let status: string, statusLabel: string, location: string;
-        if (sent <= EPS) {
+        if (legacy.length === 0 && sent > EPS) {
+          // Routed when decided: the rework task's own stage.
+          const stage = taskStage || 'PENDING';
+          status = stage === 'RECEIVED_NEXT' || stage === 'FORWARDED' ? 'COMPLETED' : stage === 'PENDING' ? 'PENDING' : 'IN_PROGRESS';
+          statusLabel = (REWORK_STAGE_LABEL as Record<string, string>)[stage];
+          location = stage === 'RECEIVED_NEXT' || stage === 'FORWARDED'
+            ? `Reworked at ${reworkTo.label}; forwarded to ${cfg.label}`
+            : `${reworkTo.label} (${statusLabel.toLowerCase()})`;
+        } else if (sent <= EPS) {
           status = 'PENDING';
           statusLabel = 'Pending';
           location = `${qcName} (awaiting return to ${reworkTo.label})`;
@@ -276,7 +304,7 @@ async function qcInspectionRecords(): Promise<MonitorRecord[]> {
           reworkToCode: deptKey(reworkTo.code),
           quantity: round(insp.reworkQuantity),
           sentQuantity: sent,
-          remainingQuantity: null,
+          remainingQuantity: task && legacy.length < slices.length ? reworkRemaining(task) : null,
           reason: insp.reworkReason || '—',
           remarks: insp.remarks,
           status,
@@ -286,7 +314,8 @@ async function qcInspectionRecords(): Promise<MonitorRecord[]> {
           references: [
             item.itemNumber,
             inboundRef,
-            ...slices.map((s, i) => `Rework challan ${s.supply.challan.challanNumber}${downs[i] ? ` → ${downs[i]!.itemNumber}` : ''}`),
+            ...legacy.map((s, i) => `Rework challan ${s.supply.challan.challanNumber}${downs[i] ? ` → ${downs[i]!.itemNumber}` : ''}`),
+            ...(task && legacy.length < slices.length ? [`Rework task ${task.itemNumber} (no challan)`, ...task.transfers.map((t) => `Forwarded on ${t.challan.challanNumber}`)] : []),
           ],
           recordedBy: userName(insp.inspector),
           releasedAt: null,
@@ -317,6 +346,26 @@ async function dyeingQcReworkRecords(): Promise<MonitorRecord[]> {
     orderBy: { recordedAt: 'desc' },
   });
   if (txs.length === 0) return [];
+  // Routed when decided: Dyeing rework orders on the Dyeing QC challan (no challan of their own).
+  const reworkOrders = await prisma.dyeingOrder.findMany({
+    where: { origin: 'REWORK', inboundChallanId: { in: Array.from(new Set(txs.map((t) => t.challanId))) } },
+    include: { qcTransfers: { include: { challan: { select: { challanNumber: true, status: true } } } } },
+    orderBy: { createdAt: 'asc' },
+  });
+  // Each challan's rework orders, per unit, split over its rework inspections oldest first.
+  const routedOf = new Map<string, Array<(typeof reworkOrders)[number]>>();
+  const groups = new Map<string, typeof txs>();
+  for (const t of txs) {
+    const k = `${t.challanId}|${unitKey(t.unitOfMeasure)}`;
+    groups.set(k, [...(groups.get(k) || []), t]);
+  }
+  groups.forEach((group, k) => {
+    const supplies = reworkOrders
+      .filter((o) => `${o.inboundChallanId}|${unitKey(o.uom)}` === k)
+      .map((o) => ({ order: o, quantity: o.receivedQuantity ?? o.requiredQuantity }));
+    const oldest = [...group].sort((a, b) => a.recordedAt.getTime() - b.recordedAt.getTime());
+    allocate(oldest.map((t) => t.reworkQuantity), supplies).forEach((slices, i) => routedOf.set(oldest[i].id, slices.map((x) => x.supply.order)));
+  });
   const returns = await prisma.challan.findMany({
     where: { parentChallanId: { in: Array.from(new Set(txs.map((t) => t.challanId))) }, challanType: 'REWORK_RETURN' },
     select: {
@@ -335,8 +384,16 @@ async function dyeingQcReworkRecords(): Promise<MonitorRecord[]> {
     const back = returns.filter((r) => r.parentChallanId === t.challanId);
     const lines = back.flatMap((r) => r.items.filter((it) => unitKey(it.uom) === unit).map((it) => ({ challan: r, item: it })));
     const orders = lines.flatMap(({ challan, item }) => challan.dyeingInboundOrders.filter((o) => o.inboundChallanItemId === item.id));
+    const routed = routedOf.get(t.id) || [];
     let status: string, statusLabel: string, location: string;
-    if (lines.length === 0) {
+    if (routed.length > 0) {
+      const stages = routed.map((o) => dyeingTaskStage(o, o.qcTransfers.map((q) => q.challan.status)));
+      const order = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'READY', 'PARTLY_FORWARDED', 'FORWARDED', 'RECEIVED_NEXT'];
+      const stage = stages.reduce((a, b) => (order.indexOf(b) < order.indexOf(a) ? b : a));
+      status = stage === 'RECEIVED_NEXT' || stage === 'FORWARDED' ? 'COMPLETED' : stage === 'PENDING' ? 'PENDING' : 'IN_PROGRESS';
+      statusLabel = (REWORK_STAGE_LABEL as Record<string, string>)[stage];
+      location = status === 'COMPLETED' ? 'Re-dyed at Dyeing; sent back to Dyeing QC' : `Dyeing (${statusLabel.toLowerCase()})`;
+    } else if (lines.length === 0) {
       status = 'PENDING';
       statusLabel = 'Pending';
       location = 'Dyeing QC (awaiting return to Dyeing)';
@@ -370,7 +427,7 @@ async function dyeingQcReworkRecords(): Promise<MonitorRecord[]> {
       shade: returnLine?.colour || line?.shade || null,
       quantity: round(t.reworkQuantity),
       unit,
-      sentQuantity: lines.length ? round(t.reworkQuantity) : 0,
+      sentQuantity: lines.length || routed.length ? round(t.reworkQuantity) : 0,
       remainingQuantity: null,
       reason: t.reworkReason || t.notes || '—',
       remarks: t.notes,
@@ -382,6 +439,8 @@ async function dyeingQcReworkRecords(): Promise<MonitorRecord[]> {
         `QC challan ${t.challan.challanNumber}`,
         ...back.map((r) => `Rework challan ${r.challanNumber}`),
         ...orders.map((o) => `Dyeing order ${o.orderNumber}`),
+        ...routed.map((o) => `Dyeing rework order ${o.orderNumber} (no challan)`),
+        ...routed.flatMap((o) => o.qcTransfers.map((q) => `Sent back on ${q.challan.challanNumber}`)),
       ],
       challanId: t.challanId,
       recordedBy: userName(t.operator),
@@ -519,6 +578,12 @@ async function holdRecords(): Promise<MonitorRecord[]> {
 export async function loadRejectRecords(): Promise<MonitorRecord[]> {
   const parts = await Promise.all([qcInspectionRecords(), defectRecords()]);
   return parts.flat().filter((r) => r.kind === 'REJECT').sort((a, b) => b.date.localeCompare(a.date));
+}
+
+/** Every REWORK record (QC inspection batches and Dyeing QC), newest first: the QC departments' Rework pages. */
+export async function loadReworkRecords(): Promise<MonitorRecord[]> {
+  const parts = await Promise.all([qcInspectionRecords(), dyeingQcReworkRecords()]);
+  return parts.flat().filter((r) => r.kind === 'REWORK').sort((a, b) => b.date.localeCompare(a.date));
 }
 
 /** Every REJECT, REWORK and HOLD record, newest first. */
@@ -791,6 +856,20 @@ export async function monitorRecordDetail(id: string, user: AuthenticatedUser) {
             history.push({ at: iso(t.createdAt)!, department: dept, action: 'Reworked and forwarded', detail: `${dept} → ${departmentName(deptKey(t.challan.toDepartment))}`, quantity: t.quantity, unit: t.uom, reference: t.challan.challanNumber, by: null });
           }
         }
+        // REWORK routed when decided: the rework department's task (no challan), and the challans it was forwarded on.
+        const tasks = await prisma.departmentWorkItem.findMany({
+          where: { origin: 'REWORK', reworkSourceItemId: h.lineItem.id },
+          include: { transfers: { include: { challan: { select: challanBrief } } } },
+        });
+        for (const task of tasks) {
+          const dept = departmentName(task.departmentCode);
+          history.push({ at: iso(task.createdAt)!, department: dept, action: 'Sent for rework (no challan)', detail: `${task.itemNumber} · ${(REWORK_STAGE_LABEL as Record<string, string>)[workTaskStage(task, task.transfers.map((t) => t.challan.status))]}${task.reworkReason ? ` · ${task.reworkReason}` : ''}`, quantity: task.receivedQuantity, unit: task.uom, reference: task.itemNumber, by: null });
+          for (const t of task.transfers) {
+            challans.push(t.challan);
+            history.push({ at: iso(t.createdAt)!, department: dept, action: 'Reworked and forwarded', detail: `${dept} → ${departmentName(deptKey(t.challan.toDepartment))}`, quantity: t.quantity, unit: t.uom, reference: t.challan.challanNumber, by: null });
+            if (t.challan.receivedDate) history.push({ at: iso(t.challan.receivedDate)!, department: departmentName(deptKey(t.challan.toDepartment)), action: 'Received by next department', detail: t.challan.challanNumber, quantity: null, unit: null, reference: t.challan.challanNumber, by: null });
+          }
+        }
       }
     }
   } else if (prefix === 'rwk-qc1') {
@@ -807,6 +886,20 @@ export async function monitorRecordDetail(id: string, user: AuthenticatedUser) {
         where: { parentChallanId: t.challanId },
         select: { ...challanBrief, items: { select: { quantity: true, uom: true } }, dyeingInboundOrders: { include: { qcTransfers: { include: { challan: { select: challanBrief } } } } } },
       });
+      // REWORK routed when decided: Dyeing rework orders on this challan (no challan), and what Dyeing sent back.
+      const orders = await prisma.dyeingOrder.findMany({
+        where: { origin: 'REWORK', inboundChallanId: t.challanId },
+        include: { qcTransfers: { include: { challan: { select: challanBrief } } } },
+        orderBy: { createdAt: 'asc' },
+      });
+      for (const o of orders.filter((x) => unitKey(x.uom) === unit)) {
+        history.push({ at: iso(o.createdAt)!, department: 'Dyeing', action: 'Sent for rework (no challan)', detail: `${o.orderNumber} · ${(REWORK_STAGE_LABEL as Record<string, string>)[dyeingTaskStage(o, o.qcTransfers.map((q) => q.challan.status))]}${o.reworkReason ? ` · ${o.reworkReason}` : ''}`, quantity: o.receivedQuantity, unit: o.uom, reference: o.orderNumber, by: null });
+        for (const q of o.qcTransfers) {
+          challans.push(q.challan);
+          history.push({ at: iso(q.createdAt)!, department: 'Dyeing', action: 'Re-dyed and sent to Dyeing QC', detail: o.orderNumber, quantity: q.quantity, unit: q.uom, reference: q.challan.challanNumber, by: null });
+          if (q.challan.receivedDate) history.push({ at: iso(q.challan.receivedDate)!, department: 'Dyeing QC', action: 'Received by next department', detail: q.challan.challanNumber, quantity: null, unit: null, reference: q.challan.challanNumber, by: null });
+        }
+      }
       for (const r of returns) {
         challans.push(r);
         const qty = round(r.items.filter((i) => unitKey(i.uom) === unit).reduce((s, i) => s + i.quantity, 0));
