@@ -63,6 +63,7 @@ const MIGRATIONS = [
   '20261103_hold_releases.sql',
   '20261103_remove_orphans_of_deleted_challans.sql',
   '20261104_rework_without_challan.sql',
+  '20261104_outward_avg_pcs.sql',
   // Keep last: it deletes every role, including any an earlier file adds when re-applied.
   '20261102_remove_roles.sql',
 ];

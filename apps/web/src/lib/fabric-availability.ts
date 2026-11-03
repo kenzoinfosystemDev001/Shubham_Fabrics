@@ -1,6 +1,6 @@
 import { prisma } from '@shubham/database';
-import { isFabricStoreDepartment } from '@/lib/fabric-stock';
 import { unitOf } from '@/lib/challan-units.mjs';
+import { loadStockBook } from '@/lib/fabric-stock-ledger';
 
 export interface FabricAvailabilityStatus {
   programId: string;
@@ -168,65 +168,20 @@ export async function checkFabricStoreAvailability(
     const pieceInwardEntries = inwardEntries.filter((it: any) => unitOf(it.unit) === 'PCS');
     inwardEntriesCount = inwardEntries.length;
     matchingInwardEntryCount = requiredUnit === 'PCS' ? pieceInwardEntries.length : meterInwardEntries.length;
-    const totalInwardMeters = meterInwardEntries.reduce(
-      (sum: number, it: any) => sum + (Number(it.billQty) || 0),
-      0
-    );
-    const totalInwardPcs = pieceInwardEntries.reduce(
-      (sum: number, it: any) => sum + (Number(it.billQty) || 0),
-      0
-    );
 
-    // Subtract any manual outward or dispatched challans for this fabric
-    const outwardEntries = await (prisma as any).fabricOutward.findMany({
-      where: {
-        ...(fabricName ? { itemName: { contains: fabricName, mode: 'insensitive' } } : {}),
-      },
-    });
-    const totalManualOutwardMeters = outwardEntries
-      .filter((it: any) => (unitOf(it.unit) || 'MTR') === 'MTR')
-      .reduce(
-      (sum: number, it: any) => sum + (Number(it.issueQty) || 0),
-      0
-    );
-    const totalManualOutwardPcs = outwardEntries
-      .filter((it: any) => unitOf(it.unit) === 'PCS')
-      .reduce(
-        (sum: number, it: any) => sum + (Number(it.issueQty) || 0),
-        0
-      );
-
-    const issuedChallans = (await prisma.challan.findMany({
-      where: {
-        programId: program.id,
-        status: { notIn: ['DRAFT', 'CANCELLED'] },
-        NOT: { toDepartment: { equals: 'STORE', mode: 'insensitive' } },
-        OR: [
-          { fromDepartment: { contains: 'STORE', mode: 'insensitive' } },
-          { fromDepartment: { equals: 'FABRIC', mode: 'insensitive' } },
-        ],
-      },
-      include: { items: true },
-    })).filter((challan) => isFabricStoreDepartment(challan.fromDepartment));
-
-    const challanOutwardByUnit = issuedChallans.reduce((totals, challan) => {
-      if (challan.items.length > 0) {
-        for (const item of challan.items) {
-          const unit = unitOf(item.uom) || unitOf(challan.fabricUnit) || 'MTR';
-          if (unit === 'PCS') totals.pcs += Number(item.quantity) || 0;
-          else if (unit === 'MTR') totals.meters += Number(item.quantity) || 0;
-        }
-        return totals;
-      }
-      const unit = unitOf(challan.fabricUnit);
-      const quantity = Number(challan.fabricOut ?? challan.fabricIn) || 0;
-      if (unit === 'PCS') totals.pcs += quantity;
-      else if (unit === 'MTR') totals.meters += quantity;
-      return totals;
-    }, { meters: 0, pcs: 0 });
-
-    inwardStockMeters = Math.max(0, totalInwardMeters - totalManualOutwardMeters - challanOutwardByUnit.meters);
-    inwardStockPcs = Math.max(0, totalInwardPcs - totalManualOutwardPcs - challanOutwardByUnit.pcs);
+    // What is left is read from the Fabric Store stock ledger (the same book Total Stock uses): every issued challan of
+    // every Production Sheet, and every manual outward, is taken off the inward it was issued from. A sheet's own
+    // challans alone are not enough: another sheet's challans of the same fabric use the same stock.
+    const { book } = await loadStockBook(prisma);
+    const wanted = fabricName.toLowerCase();
+    const left = { MTR: 0, PCS: 0 };
+    for (const bucket of book.buckets.values()) {
+      if (wanted && !String(bucket.itemName || '').toLowerCase().includes(wanted)) continue;
+      if (bucket.unit !== 'MTR' && bucket.unit !== 'PCS') continue;
+      left[bucket.unit as 'MTR' | 'PCS'] += Math.max(0, bucket.totalInward - bucket.totalOutward);
+    }
+    inwardStockMeters = Math.round(left.MTR * 1000) / 1000;
+    inwardStockPcs = Math.round(left.PCS * 1000) / 1000;
   } catch (err) {
     console.warn('Error reading FabricInward balance:', err);
   }

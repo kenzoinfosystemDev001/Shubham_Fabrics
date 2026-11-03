@@ -633,6 +633,8 @@ exports.Prisma.ChallanItemScalarFieldEnum = {
   averageUnit: 'averageUnit',
   unitQuantity: 'unitQuantity',
   unitQuantityUom: 'unitQuantityUom',
+  outwardAverage: 'outwardAverage',
+  outwardPcs: 'outwardPcs',
   width: 'width',
   remarks: 'remarks',
   sourceLotId: 'sourceLotId',
