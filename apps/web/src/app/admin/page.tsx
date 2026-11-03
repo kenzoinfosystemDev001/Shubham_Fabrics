@@ -24,7 +24,6 @@ import {
   KeyRound,
   UserPlus,
   Pencil,
-  Image as ImageIcon,
   Palette,
   ShieldAlert,
   RotateCcw,
@@ -33,7 +32,7 @@ import {
 import { api } from '@/lib/api';
 import { getCurrentUser, isAdminUser } from '@/lib/rbac';
 import { ShubhamLogo } from '@/components/ShubhamLogo';
-import { AppearancePanel, SidebarImagePanel } from '@/components/admin/LoginAppearancePanel';
+import { AppearancePanel } from '@/components/admin/LoginAppearancePanel';
 import { AdminDepartmentMenu } from '@/components/admin/AdminDepartmentMenu';
 import { AdminDeleteDialog, type AdminDeleteTarget } from '@/components/admin/AdminDeleteDialog';
 import { DeletionHistoryPanel } from '@/components/admin/DeletionHistoryPanel';
@@ -84,7 +83,7 @@ interface EditableUser {
 export default function AdminConsolePage() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabrics' | 'stocks' | 'rejected' | 'rework' | 'hold' | 'deletions' | 'sidebar-image' | 'login-appearance'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabrics' | 'stocks' | 'rejected' | 'rework' | 'hold' | 'deletions' | 'login-appearance'>('users');
   const [loading, setLoading] = useState(true);
 
   // Data states
@@ -480,50 +479,81 @@ export default function AdminConsolePage() {
             </Link>
           </div>
 
-        {/* TABS */}
-        <div className="flex items-center gap-6 mt-5 overflow-x-auto -mb-px">
-          {[
-            { id: 'users', label: 'Users', icon: Users, count: users.length },
-            { id: 'programs', label: 'Program Sheets', icon: FileText, count: programs.length },
-            { id: 'challans', label: 'Challans', icon: Truck, count: challans.length },
-            { id: 'suppliers', label: 'Suppliers', icon: Building, count: suppliers.length },
-            { id: 'fabrics', label: 'Fabrics Master', icon: Layers, count: fabrics.length },
-            { id: 'stocks', label: 'Stocks & Inventory', icon: Boxes, count: stocksData?.summary?.totalRolls },
-            { id: 'rejected', label: 'Rejected Fabric', icon: ShieldAlert, count: qualityCounts?.REJECT },
-            { id: 'rework', label: 'Rework Fabric', icon: RotateCcw, count: qualityCounts?.REWORK },
-            { id: 'hold', label: 'Hold Fabric', icon: PauseCircle, count: qualityCounts?.HOLD },
-            { id: 'deletions', label: 'Deletion History', icon: Trash2, count: undefined },
-            { id: 'sidebar-image', label: 'Sidebar Image', icon: ImageIcon, count: undefined },
-            { id: 'login-appearance', label: 'Appearance', icon: Palette, count: undefined },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                aria-current={active ? 'page' : undefined}
-                className={`flex items-center gap-2 pb-3 pt-1 border-b-2 text-[13px] font-medium transition shrink-0 ${
-                  active
-                    ? 'border-brand-600 text-neutral-900'
-                    : 'border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300'
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${active ? 'text-brand-600' : 'text-neutral-400'}`} />
-                <span>{tab.label}</span>
-                {tab.count !== undefined && (
-                  <span
-                    className={`text-[11px] min-w-5 px-1.5 rounded-full tabular-nums text-center ${
-                      active ? 'bg-brand-50 text-brand-700' : 'bg-neutral-100 text-neutral-500'
-                    }`}
-                  >
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        {/* SECTIONS: grouped navigation. Wraps by group on wide screens, scrolls sideways on small ones. */}
+        <nav aria-label="Administration sections" className="mt-5 -mx-4 px-4 md:mx-0 md:px-0 overflow-x-auto lg:overflow-visible">
+          <div className="flex items-start gap-x-8 gap-y-4 pb-4 w-max lg:w-auto lg:flex-wrap">
+            {[
+              {
+                label: 'General Management',
+                tabs: [
+                  { id: 'users', label: 'Users', icon: Users, count: users.length },
+                  { id: 'programs', label: 'Program Sheets', icon: FileText, count: programs.length },
+                  { id: 'challans', label: 'Challans', icon: Truck, count: challans.length },
+                  { id: 'suppliers', label: 'Suppliers', icon: Building, count: suppliers.length },
+                ],
+              },
+              {
+                label: 'Master Data & Inventory',
+                tabs: [
+                  { id: 'fabrics', label: 'Fabrics Master', icon: Layers, count: fabrics.length },
+                  { id: 'stocks', label: 'Stocks & Inventory', icon: Boxes, count: stocksData?.summary?.totalRolls },
+                ],
+              },
+              {
+                label: 'Production Monitoring',
+                tabs: [
+                  { id: 'rejected', label: 'Rejected Fabric', icon: ShieldAlert, count: qualityCounts?.REJECT },
+                  { id: 'rework', label: 'Rework Fabric', icon: RotateCcw, count: qualityCounts?.REWORK },
+                  { id: 'hold', label: 'Hold Fabric', icon: PauseCircle, count: qualityCounts?.HOLD },
+                ],
+              },
+              {
+                label: 'System Administration',
+                tabs: [
+                  { id: 'deletions', label: 'Deletion History', icon: Trash2, count: undefined },
+                  // Sidebar image, department background and login background all live in Appearance.
+                  { id: 'login-appearance', label: 'Appearance', icon: Palette, count: undefined },
+                ],
+              },
+            ].map((group) => (
+              <div key={group.label} role="group" aria-label={group.label} className="shrink-0">
+                <p className="px-2.5 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-neutral-400">{group.label}</p>
+                <div className="flex items-center gap-1 p-1 rounded-xl bg-neutral-50 ring-1 ring-inset ring-neutral-200/70">
+                  {group.tabs.map((tab) => {
+                    const Icon = tab.icon;
+                    const active = activeTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setActiveTab(tab.id as any)}
+                        aria-current={active ? 'page' : undefined}
+                        title={tab.label}
+                        className={`inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 ${
+                          active
+                            ? 'bg-white text-neutral-900 shadow-xs ring-1 ring-inset ring-neutral-200'
+                            : 'text-neutral-600 hover:text-neutral-900 hover:bg-white/70'
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-brand-600' : 'text-neutral-400'}`} />
+                        <span>{tab.label}</span>
+                        {tab.count !== undefined && tab.count !== null && (
+                          <span
+                            className={`text-[11px] leading-[18px] min-w-[20px] px-1.5 rounded-md tabular-nums text-center font-semibold ${
+                              active ? 'bg-brand-50 text-brand-700' : 'bg-neutral-200/60 text-neutral-500'
+                            }`}
+                          >
+                            {tab.count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </nav>
         </div>
       </div>
 
@@ -538,7 +568,6 @@ export default function AdminConsolePage() {
           <>
             {/* DEPARTMENT SIDEBAR IMAGES */}
             {activeTab === 'deletions' && <DeletionHistoryPanel />}
-            {activeTab === 'sidebar-image' && <SidebarImagePanel onNotify={showNotification} />}
             {activeTab === 'login-appearance' && <AppearancePanel onNotify={showNotification} />}
 
             {/* REJECTED / REWORK / HOLD FABRIC MONITORING */}

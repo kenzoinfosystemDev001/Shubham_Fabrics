@@ -222,7 +222,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       const first = programs.find((p) => p.id === next[0]);
       if (first) {
         setSerialNumber(first.programSerialNo || first.programNumber || '');
-        setDesignNumber(first.designNumber || first.wilcomDesignNumber || first.styleCode || '');
+        setDesignNumber(String(first.designNumber || first.wilcomDesignNumber || '').trim());
       }
     }
   };
@@ -233,7 +233,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     if (!prog) return;
     setSelectedProgramId(prog.id);
     setSerialNumber(prog.programSerialNo || prog.programNumber || '');
-    setDesignNumber(prog.designNumber || prog.wilcomDesignNumber || prog.styleCode || '');
+    setDesignNumber(String(prog.designNumber || prog.wilcomDesignNumber || '').trim());
     setPriority(prog.priority || 'NORMAL');
 
     if (prog.deliveryDate) {
@@ -275,6 +275,15 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   const sheetOf = (id: string) => programs.find((p) => p.id === id);
   // Sheets are picked and named by Design No. (then Serial No.) on this screen.
   const sheetName = (p: any) => sheetDesignLabel(p);
+  // The Design Number is the search key: the dropdown lists every eligible sheet with exactly that Design No.,
+  // each on its own (several sheets, e.g. TOP / BOTTOM / DUPATTA, may share one). The Serial No. is the chosen
+  // sheet's own identifier, never a filter; the sheet itself is linked by its unique ID.
+  const designOf = (p: any) => String(p?.designNumber || p?.wilcomDesignNumber || '').trim();
+  const serialOf = (p: any) => String(p?.programSerialNo || p?.programNumber || '').trim();
+  const designOptions = Array.from(new Set(programs.map(designOf).filter(Boolean))).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  const designKey = designNumber.trim().toLowerCase();
+  const matchingSheets = designKey ? programs.filter((p) => designOf(p).toLowerCase() === designKey && !sheetIds.includes(p.id)) : [];
+  const challanSerials = sheetIds.map((id) => serialOf(sheetOf(id))).filter(Boolean);
   // Lines with details, per sheet on the challan (only measured rows are material leaving the store).
   const sheetLines = sheetIds.map((id) => ({
     id,
@@ -783,25 +792,46 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 </div>
               </div>
 
-              {/* 7. DESIGN NUMBER */}
+              {/* 7. DESIGN NUMBER: the key the Production Sheet dropdown is filtered by */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
-                  Production Design Number
+                <label htmlFor="fs-design-number" className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
+                  Production Design Number <span className="text-danger-600">*</span>
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
                   <input
+                    id="fs-design-number"
                     type="text"
+                    list="fs-design-numbers"
                     value={designNumber}
                     onChange={(e) => setDesignNumber(e.target.value)}
+                    placeholder="Enter or pick the Design Number"
+                    autoComplete="off"
                     className="w-full text-xs font-mono font-medium text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                   />
+                  <datalist id="fs-design-numbers">
+                    {designOptions.map((d) => (
+                      <option key={d} value={d} />
+                    ))}
+                  </datalist>
                 </div>
               </div>
 
-              {/* 8. SERIAL NUMBER (Production Sheet Selector) */}
+              {/* 8. SERIAL NUMBER: the chosen sheet's own identifier (not a filter) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
+                  Production Serial Number
+                </label>
+                <div className="sm:col-span-2 max-w-lg">
+                  <div className="w-full text-xs font-mono font-medium text-neutral-900 border border-neutral-200 rounded-lg px-3 py-2 bg-neutral-50 min-h-[34px]" aria-live="polite">
+                    {challanSerials.length ? challanSerials.join(', ') : <span className="font-sans text-neutral-400">Filled from the Production Sheet you select</span>}
+                  </div>
+                </div>
+              </div>
+
+              {/* 9. PRODUCTION SHEET: every eligible sheet with exactly this Design Number, each on its own */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
                 <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4 sm:self-start sm:pt-2">
-                  Production Sheet (Design No.) <span className="text-danger-600">*</span>
+                  Production Sheet <span className="text-danger-600">*</span>
                 </label>
                 <div className="sm:col-span-2 max-w-lg space-y-2">
                   {sheetIds.length > 0 && (
@@ -841,16 +871,38 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                       if (prog) addSheet(prog);
                     }}
                     required={sheetIds.length === 0}
+                    disabled={!designKey || matchingSheets.length === 0}
                     aria-label="Add a Production Sheet to this challan"
-                    className="w-full text-xs font-mono font-bold text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition cursor-pointer"
+                    className="w-full text-xs font-mono font-bold text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition cursor-pointer disabled:bg-neutral-50 disabled:text-neutral-400 disabled:cursor-not-allowed"
                   >
-                    <option value="">{sheetIds.length ? 'Add another Production Sheet to this challan' : 'Select Production Sheet by Design No.'}</option>
-                    {programs.filter((p) => !sheetIds.includes(p.id)).map((p) => (
+                    <option value="">
+                      {!designKey
+                        ? 'Enter the Production Design Number first'
+                        : matchingSheets.length === 0
+                          ? `No ${sheetIds.length ? 'other ' : ''}Production Sheet with Design No. ${designNumber.trim()}`
+                          : sheetIds.length
+                            ? `Add another sheet of Design No. ${designNumber.trim()} (${matchingSheets.length})`
+                            : `Select the Production Sheet of Design No. ${designNumber.trim()} (${matchingSheets.length})`}
+                    </option>
+                    {matchingSheets.map((p) => (
                       <option key={p.id} value={p.id}>
-                        {sheetDesignLabel(p)} — {p.clientName || p.buyerName || 'Buyer'} ({p.mainStyle || p.styleCode || 'Style'})
+                        {[
+                          p.programNumber,
+                          `Serial ${serialOf(p) || '—'}`,
+                          p.mainStyle || p.productCategory || null,
+                          [p.fabricName, p.fabricColor].filter(Boolean).join(' / ') || null,
+                          p.clientName || p.buyerName || null,
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
                       </option>
                     ))}
                   </select>
+                  {designKey && matchingSheets.length === 0 && sheetIds.length === 0 && (
+                    <p className="text-[11px] text-danger-700">
+                      No Production Sheet received in the Fabric Store has Design No. {designNumber.trim()}. Check the number, or pick one from the suggestions.
+                    </p>
+                  )}
                   {sheetIds.length > 1 && (
                     <p className="text-[11px] text-neutral-500">
                       The lines below belong to the highlighted sheet. Each line keeps its own sheet on the challan and in every department after it.
@@ -859,7 +911,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 </div>
               </div>
 
-              {/* 9. COLOR / FABRIC / MEASUREMENT (Universal Challan Item Component with In/Cut/Out Tracking) */}
+              {/* 10. COLOR / FABRIC / MEASUREMENT (Universal Challan Item Component with In/Cut/Out Tracking) */}
               <div className="pt-3 border-t border-neutral-200 space-y-3">
                 {selectedProgram ? (
                   <>
@@ -886,7 +938,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 )}
               </div>
 
-              {/* 10. STORE INCHARGE (Name / Contact) */}
+              {/* 11. STORE INCHARGE (Name / Contact) */}
               <div className="pt-3 border-t border-neutral-200">
                 <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
                   <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
@@ -912,7 +964,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               </div>
             </div>
 
-            {/* 11. SUBMIT BUTTON */}
+            {/* 12. SUBMIT BUTTON */}
             <div className="pt-4 border-t border-neutral-200 flex items-center justify-between gap-4 flex-wrap">
               <div className="text-xs">
                 {fabricAvailability && !fabricAvailability.isAvailable ? (
