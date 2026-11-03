@@ -92,7 +92,8 @@ function StitchingChallanContent() {
   const load = async () => {
     setLoading(true);
     try {
-      const body = await fetchJson('/api/recutting/allocations?ready=1');
+      // Every open allocation: the ones with cut quantity to issue fill the form; the rest say why nothing is ready.
+      const body = await fetchJson('/api/recutting/allocations?open=1');
       setAllocations(body.data || []);
     } catch (e: any) {
       setError(e.message);
@@ -228,11 +229,20 @@ function StitchingChallanContent() {
           </Notice>
         )}
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
-        {!loading && allocations.length === 0 && (
-          <Notice kind="error">
-            Nothing is ready for Stitching. Record the cut quantity on an allocation first.{' '}
-            <Link href="/recutting/my-work/allocation-history?open=1" className="font-semibold underline">Open allocations</Link>
-          </Notice>
+        {!loading && !error && !allocations.some((a) => readyForStitching(a) > 0) && (
+          allocations.length > 0 ? (
+            <Notice kind="error">
+              Nothing is ready for Stitching: {allocations.length} open allocation{allocations.length === 1 ? ' has' : 's have'} no cut quantity waiting to be issued. Record the cut quantity first.{' '}
+              <Link href="/recutting/my-work/allocation-history?open=1" className="font-semibold underline">Open allocations</Link>
+            </Notice>
+          ) : (
+            <Notice kind="success">
+              Everything cut so far has been issued to Stitching; nothing is waiting.{' '}
+              <Link href="/recutting/my-work/issued-challans" className="font-semibold underline">View Issued Challans</Link>
+              {' · '}
+              <Link href="/recutting/my-work/allocation" className="font-semibold underline">Allocate more fabric</Link>
+            </Notice>
+          )
         )}
 
         <IncomingChallanPicker options={options} selected={sourceIds} onChange={chooseSources} loading={loading} availableLabel="Cut, not issued" />

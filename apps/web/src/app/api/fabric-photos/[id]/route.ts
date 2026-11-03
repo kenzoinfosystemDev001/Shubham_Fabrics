@@ -1,4 +1,4 @@
-import { serveFabricPhoto } from '@/lib/fabric-photos-server';
+import { deleteFabricPhoto, serveFabricPhoto } from '@/lib/fabric-photos-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -6,4 +6,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return serveFabricPhoto(request, id);
+}
+
+// DELETE /api/fabric-photos/:id?workItemId=   a photo taken or uploaded by mistake (its own department or admin)
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return deleteFabricPhoto(request, id);
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Camera, ImagePlus, Loader2, Upload, X } from 'lucide-react';
+import { Camera, ImagePlus, Loader2, Trash2, Upload, X } from 'lucide-react';
 
 // Fabric photos of a work line's Production Sheet: the ones this department may see (its own and those of the
 // departments before it), and, for Embroidery, Threadcut QC and Stitching, an upload. Used in the work-line
@@ -15,6 +15,8 @@ interface Photo {
   colour: string | null;
   uploadedBy: string;
   createdAt: string;
+  /** Its own department (or an administrator) may delete it. */
+  canDelete?: boolean;
 }
 interface LineInfo {
   designNumber: string;
@@ -89,6 +91,8 @@ export function FabricPhotos({ workItemId }: { workItemId: string }) {
   const [pending, setPending] = useState<{ file: File; url: string } | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [viewing, setViewing] = useState<Photo | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Photo | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
@@ -154,6 +158,26 @@ export function FabricPhotos({ workItemId }: { workItemId: string }) {
       setError(e.message || 'Failed to upload the photo.');
     } finally {
       setProgress(null);
+    }
+  };
+
+  const remove = async (p: Photo) => {
+    try {
+      setDeleting(true);
+      setError(null);
+      setNotice(null);
+      const res = await fetch(`/api/fabric-photos/${p.id}?workItemId=${encodeURIComponent(workItemId)}`, { method: 'DELETE' });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || 'Failed to delete the photo.');
+      setConfirmDelete(null);
+      setViewing(null);
+      setNotice('Photo deleted.');
+      await load();
+    } catch (e: any) {
+      setError(e.message || 'Failed to delete the photo.');
+      setConfirmDelete(null);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -236,10 +260,44 @@ export function FabricPhotos({ workItemId }: { workItemId: string }) {
                 </span>
                 <p className="text-[10px] text-neutral-700 truncate">{p.uploadedBy || '—'}</p>
                 <p className="text-[10px] text-neutral-500">{dateTime(p.createdAt)}</p>
+                {p.canDelete && (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(p)}
+                    className="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-danger-700 hover:text-danger-800"
+                  >
+                    <Trash2 className="w-3 h-3" /> Delete
+                  </button>
+                )}
               </div>
             </li>
           ))}
         </ul>
+      )}
+
+      {/* Delete confirmation */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-[70] bg-neutral-900/60 flex items-center justify-center p-4" onClick={() => !deleting && setConfirmDelete(null)}>
+          <div role="alertdialog" aria-modal="true" className="bg-white rounded-xl shadow-lg max-w-sm w-full p-4 space-y-3" onClick={(e) => e.stopPropagation()}>
+            <p className="text-sm font-bold text-neutral-900">Delete this photo?</p>
+            <div className="flex gap-3">
+              <img src={src(confirmDelete)} alt="" className="w-20 h-20 object-cover rounded-lg border border-neutral-200" />
+              <p className="text-xs text-neutral-600">
+                {confirmDelete.departmentLabel} photo by {confirmDelete.uploadedBy || '—'}, {dateTime(confirmDelete.createdAt)}. It is removed for every
+                department and cannot be undone.
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setConfirmDelete(null)} disabled={deleting} className="px-3 py-1.5 rounded-lg border border-neutral-300 text-xs font-semibold text-neutral-700 disabled:opacity-60">
+                Cancel
+              </button>
+              <button type="button" onClick={() => remove(confirmDelete)} disabled={deleting} className="px-3 py-1.5 rounded-lg bg-danger-600 hover:bg-danger-700 text-white text-xs font-semibold flex items-center gap-1.5 disabled:opacity-60">
+                {deleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                {deleting ? 'Deleting…' : 'Yes, Delete Photo'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Full-size view */}
@@ -258,9 +316,16 @@ export function FabricPhotos({ workItemId }: { workItemId: string }) {
                   {viewing.uploadedBy || '—'} · {dateTime(viewing.createdAt)}
                 </p>
               </div>
-              <button type="button" onClick={() => setViewing(null)} className="p-1.5 rounded-lg hover:bg-white/10" aria-label="Close">
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                {viewing.canDelete && (
+                  <button type="button" onClick={() => setConfirmDelete(viewing)} className="px-2.5 py-1.5 rounded-lg hover:bg-white/10 text-xs font-semibold flex items-center gap-1.5">
+                    <Trash2 className="w-4 h-4" /> Delete
+                  </button>
+                )}
+                <button type="button" onClick={() => setViewing(null)} className="p-1.5 rounded-lg hover:bg-white/10" aria-label="Close">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             <img src={src(viewing)} alt={`${viewing.departmentLabel} photo`} className="w-full max-h-[80vh] object-contain rounded-lg bg-black" />
           </div>
