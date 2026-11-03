@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { inchargeNameOf, typedInchargeNameOf, userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import { canWriteColumns } from '@/lib/challan-item-average';
-import { unitOf } from '@/lib/challan-units.mjs';
 import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import {
@@ -138,14 +137,11 @@ export async function GET(request: Request) {
 
           if (issueQty <= 0) return;
 
-          // Average and Issue PCS are entered by the Fabric Store (on the challan line, or here with Update);
-          // PCS is never worked out from meters. Not entered yet: Pending.
-          const avg = it.average != null && Number(it.average) > 0 ? Number(it.average) : null;
-          const issuePcs = unit === 'PCS'
-            ? issueQty
-            : unitOf(it.unitQuantityUom) === 'PCS' && it.unitQuantity != null
-              ? Number(it.unitQuantity)
-              : null;
+          // Average and Issue PCS are filled in on this screen by the department itself (saved on the line's own
+          // outward fields): never worked out from meters, never taken from the issuing form. Not filled: Pending.
+          // A line issued in pieces already carries its PCS.
+          const avg = it.outwardAverage != null && Number(it.outwardAverage) > 0 ? Number(it.outwardAverage) : null;
+          const issuePcs = unit === 'PCS' ? issueQty : it.outwardPcs != null ? Number(it.outwardPcs) : null;
 
           const matched = findMatchedInward(rawName, itemType, unit);
           const verifiedDetails = matched
@@ -411,8 +407,8 @@ export async function POST(request: Request) {
 /**
  * PATCH /api/fabric-store/outward { source: 'CHALLAN' | 'MANUAL', id, avgPerPcs, issuePcsQty } — the Fabric Store enters
  * or updates a dispatch's Average (MTR per piece) and Issue PCS Qty by hand. Blank clears a value (PCS shows Pending).
- * Challan dispatches are saved on the challan line itself (average / unit quantity in PCS); the MTR issued never
- * changes and nothing is calculated. Every change is kept in the audit log.
+ * Challan dispatches are saved on the challan line's own outward fields (outwardAverage / outwardPcs), apart from what
+ * the issuing form recorded; the MTR issued never changes and nothing is calculated. Every change is audited.
  */
 export async function PATCH(request: Request) {
   const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
@@ -450,22 +446,21 @@ export async function PATCH(request: Request) {
     const item = await prisma.challanItem.findUnique({ where: { id }, include: { challan: { select: { id: true, challanNumber: true, fromDepartment: true, fabricUnit: true } } } });
     const from = String(item?.challan?.fromDepartment || '').toUpperCase();
     if (!item || !(from.includes('STORE') || from === 'FABRIC')) return NextResponse.json({ error: 'Dispatch not found.' }, { status: 404 });
-    if (!(await canWriteColumns('ChallanItem', ['average', 'averageUnit', 'unitQuantity', 'unitQuantityUom']))) {
+    if (!(await canWriteColumns('ChallanItem', ['outwardAverage', 'outwardPcs']))) {
       return NextResponse.json({ error: 'Average and PCS cannot be saved until the database is updated (run the pending migrations).' }, { status: 503 });
     }
     const lineUnit = String(item.uom || item.challan.fabricUnit || 'MTR').toUpperCase();
-    // A PCS line is issued in pieces already: only its Average is entered.
-    const pcsFields = lineUnit === 'PCS' ? {} : { unitQuantity: pcs, unitQuantityUom: pcs === null ? null : 'PCS' };
+    // A PCS line is issued in pieces already: only its Average is filled in.
     await prisma.$transaction(async (tx) => {
-      await tx.challanItem.update({ where: { id }, data: { average: avg, averageUnit: avg === null ? null : 'MTR', ...pcsFields } });
+      await tx.challanItem.update({ where: { id }, data: { outwardAverage: avg, ...(lineUnit === 'PCS' ? {} : { outwardPcs: pcs }) } });
       await tx.auditLog.create({
         data: {
           actorId: authUser.id,
           action: 'OUTWARD_PCS_UPDATED',
           entity: 'ChallanItem',
           entityId: id,
-          beforeState: JSON.stringify({ challanNumber: item.challan.challanNumber, average: item.average, averageUnit: item.averageUnit, unitQuantity: item.unitQuantity, unitQuantityUom: item.unitQuantityUom }),
-          afterState: JSON.stringify({ average: avg, issuePcsQty: lineUnit === 'PCS' ? item.quantity : pcs }),
+          beforeState: JSON.stringify({ challanNumber: item.challan.challanNumber, outwardAverage: item.outwardAverage, outwardPcs: item.outwardPcs }),
+          afterState: JSON.stringify({ outwardAverage: avg, issuePcsQty: lineUnit === 'PCS' ? item.quantity : pcs }),
         },
       });
     });

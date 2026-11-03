@@ -52265,6 +52265,8 @@ export namespace Prisma {
     netWeightKg: number | null
     average: number | null
     unitQuantity: number | null
+    outwardAverage: number | null
+    outwardPcs: number | null
   }
 
   export type ChallanItemSumAggregateOutputType = {
@@ -52274,6 +52276,8 @@ export namespace Prisma {
     netWeightKg: number | null
     average: number | null
     unitQuantity: number | null
+    outwardAverage: number | null
+    outwardPcs: number | null
   }
 
   export type ChallanItemMinAggregateOutputType = {
@@ -52302,6 +52306,8 @@ export namespace Prisma {
     averageUnit: string | null
     unitQuantity: number | null
     unitQuantityUom: string | null
+    outwardAverage: number | null
+    outwardPcs: number | null
     width: string | null
     remarks: string | null
     sourceLotId: string | null
@@ -52338,6 +52344,8 @@ export namespace Prisma {
     averageUnit: string | null
     unitQuantity: number | null
     unitQuantityUom: string | null
+    outwardAverage: number | null
+    outwardPcs: number | null
     width: string | null
     remarks: string | null
     sourceLotId: string | null
@@ -52374,6 +52382,8 @@ export namespace Prisma {
     averageUnit: number
     unitQuantity: number
     unitQuantityUom: number
+    outwardAverage: number
+    outwardPcs: number
     width: number
     remarks: number
     sourceLotId: number
@@ -52393,6 +52403,8 @@ export namespace Prisma {
     netWeightKg?: true
     average?: true
     unitQuantity?: true
+    outwardAverage?: true
+    outwardPcs?: true
   }
 
   export type ChallanItemSumAggregateInputType = {
@@ -52402,6 +52414,8 @@ export namespace Prisma {
     netWeightKg?: true
     average?: true
     unitQuantity?: true
+    outwardAverage?: true
+    outwardPcs?: true
   }
 
   export type ChallanItemMinAggregateInputType = {
@@ -52430,6 +52444,8 @@ export namespace Prisma {
     averageUnit?: true
     unitQuantity?: true
     unitQuantityUom?: true
+    outwardAverage?: true
+    outwardPcs?: true
     width?: true
     remarks?: true
     sourceLotId?: true
@@ -52466,6 +52482,8 @@ export namespace Prisma {
     averageUnit?: true
     unitQuantity?: true
     unitQuantityUom?: true
+    outwardAverage?: true
+    outwardPcs?: true
     width?: true
     remarks?: true
     sourceLotId?: true
@@ -52502,6 +52520,8 @@ export namespace Prisma {
     averageUnit?: true
     unitQuantity?: true
     unitQuantityUom?: true
+    outwardAverage?: true
+    outwardPcs?: true
     width?: true
     remarks?: true
     sourceLotId?: true
@@ -52625,6 +52645,8 @@ export namespace Prisma {
     averageUnit: string | null
     unitQuantity: number | null
     unitQuantityUom: string | null
+    outwardAverage: number | null
+    outwardPcs: number | null
     width: string | null
     remarks: string | null
     sourceLotId: string | null
@@ -52680,6 +52702,8 @@ export namespace Prisma {
     averageUnit?: boolean
     unitQuantity?: boolean
     unitQuantityUom?: boolean
+    outwardAverage?: boolean
+    outwardPcs?: boolean
     width?: boolean
     remarks?: boolean
     sourceLotId?: boolean
@@ -52722,6 +52746,8 @@ export namespace Prisma {
     averageUnit?: boolean
     unitQuantity?: boolean
     unitQuantityUom?: boolean
+    outwardAverage?: boolean
+    outwardPcs?: boolean
     width?: boolean
     remarks?: boolean
     sourceLotId?: boolean
@@ -52761,6 +52787,8 @@ export namespace Prisma {
     averageUnit?: boolean
     unitQuantity?: boolean
     unitQuantityUom?: boolean
+    outwardAverage?: boolean
+    outwardPcs?: boolean
     width?: boolean
     remarks?: boolean
     sourceLotId?: boolean
@@ -52800,6 +52828,8 @@ export namespace Prisma {
     averageUnit?: boolean
     unitQuantity?: boolean
     unitQuantityUom?: boolean
+    outwardAverage?: boolean
+    outwardPcs?: boolean
     width?: boolean
     remarks?: boolean
     sourceLotId?: boolean
@@ -52810,7 +52840,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "requiredColour" | "requiredQuantity" | "fabricProcessingStatus" | "garmentCategory" | "styleRef" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "average" | "averageUnit" | "unitQuantity" | "unitQuantityUom" | "width" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "programId" | "sourceChallanItemId" | "createdAt", ExtArgs["result"]["challanItem"]>
+  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "requiredColour" | "requiredQuantity" | "fabricProcessingStatus" | "garmentCategory" | "styleRef" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "average" | "averageUnit" | "unitQuantity" | "unitQuantityUom" | "outwardAverage" | "outwardPcs" | "width" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "programId" | "sourceChallanItemId" | "createdAt", ExtArgs["result"]["challanItem"]>
   export type ChallanItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
     program?: boolean | ChallanItem$programArgs<ExtArgs>
@@ -52865,6 +52895,8 @@ export namespace Prisma {
       averageUnit: string | null
       unitQuantity: number | null
       unitQuantityUom: string | null
+      outwardAverage: number | null
+      outwardPcs: number | null
       width: string | null
       remarks: string | null
       sourceLotId: string | null
@@ -53326,6 +53358,8 @@ export namespace Prisma {
     readonly averageUnit: FieldRef<"ChallanItem", 'String'>
     readonly unitQuantity: FieldRef<"ChallanItem", 'Float'>
     readonly unitQuantityUom: FieldRef<"ChallanItem", 'String'>
+    readonly outwardAverage: FieldRef<"ChallanItem", 'Float'>
+    readonly outwardPcs: FieldRef<"ChallanItem", 'Float'>
     readonly width: FieldRef<"ChallanItem", 'String'>
     readonly remarks: FieldRef<"ChallanItem", 'String'>
     readonly sourceLotId: FieldRef<"ChallanItem", 'String'>
@@ -113900,6 +113934,8 @@ export namespace Prisma {
     averageUnit: 'averageUnit',
     unitQuantity: 'unitQuantity',
     unitQuantityUom: 'unitQuantityUom',
+    outwardAverage: 'outwardAverage',
+    outwardPcs: 'outwardPcs',
     width: 'width',
     remarks: 'remarks',
     sourceLotId: 'sourceLotId',
@@ -118549,6 +118585,8 @@ export namespace Prisma {
     averageUnit?: StringNullableFilter<"ChallanItem"> | string | null
     unitQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
     unitQuantityUom?: StringNullableFilter<"ChallanItem"> | string | null
+    outwardAverage?: FloatNullableFilter<"ChallanItem"> | number | null
+    outwardPcs?: FloatNullableFilter<"ChallanItem"> | number | null
     width?: StringNullableFilter<"ChallanItem"> | string | null
     remarks?: StringNullableFilter<"ChallanItem"> | string | null
     sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
@@ -118590,6 +118628,8 @@ export namespace Prisma {
     averageUnit?: SortOrderInput | SortOrder
     unitQuantity?: SortOrderInput | SortOrder
     unitQuantityUom?: SortOrderInput | SortOrder
+    outwardAverage?: SortOrderInput | SortOrder
+    outwardPcs?: SortOrderInput | SortOrder
     width?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
     sourceLotId?: SortOrderInput | SortOrder
@@ -118634,6 +118674,8 @@ export namespace Prisma {
     averageUnit?: StringNullableFilter<"ChallanItem"> | string | null
     unitQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
     unitQuantityUom?: StringNullableFilter<"ChallanItem"> | string | null
+    outwardAverage?: FloatNullableFilter<"ChallanItem"> | number | null
+    outwardPcs?: FloatNullableFilter<"ChallanItem"> | number | null
     width?: StringNullableFilter<"ChallanItem"> | string | null
     remarks?: StringNullableFilter<"ChallanItem"> | string | null
     sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
@@ -118675,6 +118717,8 @@ export namespace Prisma {
     averageUnit?: SortOrderInput | SortOrder
     unitQuantity?: SortOrderInput | SortOrder
     unitQuantityUom?: SortOrderInput | SortOrder
+    outwardAverage?: SortOrderInput | SortOrder
+    outwardPcs?: SortOrderInput | SortOrder
     width?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
     sourceLotId?: SortOrderInput | SortOrder
@@ -118719,6 +118763,8 @@ export namespace Prisma {
     averageUnit?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     unitQuantity?: FloatNullableWithAggregatesFilter<"ChallanItem"> | number | null
     unitQuantityUom?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
+    outwardAverage?: FloatNullableWithAggregatesFilter<"ChallanItem"> | number | null
+    outwardPcs?: FloatNullableWithAggregatesFilter<"ChallanItem"> | number | null
     width?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     remarks?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     sourceLotId?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
@@ -127940,6 +127986,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -127979,6 +128027,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -128016,6 +128066,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -128055,6 +128107,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -128093,6 +128147,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -128128,6 +128184,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -128162,6 +128220,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -136958,6 +137018,8 @@ export namespace Prisma {
     averageUnit?: SortOrder
     unitQuantity?: SortOrder
     unitQuantityUom?: SortOrder
+    outwardAverage?: SortOrder
+    outwardPcs?: SortOrder
     width?: SortOrder
     remarks?: SortOrder
     sourceLotId?: SortOrder
@@ -136975,6 +137037,8 @@ export namespace Prisma {
     netWeightKg?: SortOrder
     average?: SortOrder
     unitQuantity?: SortOrder
+    outwardAverage?: SortOrder
+    outwardPcs?: SortOrder
   }
 
   export type ChallanItemMaxOrderByAggregateInput = {
@@ -137003,6 +137067,8 @@ export namespace Prisma {
     averageUnit?: SortOrder
     unitQuantity?: SortOrder
     unitQuantityUom?: SortOrder
+    outwardAverage?: SortOrder
+    outwardPcs?: SortOrder
     width?: SortOrder
     remarks?: SortOrder
     sourceLotId?: SortOrder
@@ -137039,6 +137105,8 @@ export namespace Prisma {
     averageUnit?: SortOrder
     unitQuantity?: SortOrder
     unitQuantityUom?: SortOrder
+    outwardAverage?: SortOrder
+    outwardPcs?: SortOrder
     width?: SortOrder
     remarks?: SortOrder
     sourceLotId?: SortOrder
@@ -137056,6 +137124,8 @@ export namespace Prisma {
     netWeightKg?: SortOrder
     average?: SortOrder
     unitQuantity?: SortOrder
+    outwardAverage?: SortOrder
+    outwardPcs?: SortOrder
   }
 
   export type ChallanItemScalarRelationFilter = {
@@ -157435,6 +157505,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -157473,6 +157545,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -159018,6 +159092,8 @@ export namespace Prisma {
     averageUnit?: StringNullableFilter<"ChallanItem"> | string | null
     unitQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
     unitQuantityUom?: StringNullableFilter<"ChallanItem"> | string | null
+    outwardAverage?: FloatNullableFilter<"ChallanItem"> | number | null
+    outwardPcs?: FloatNullableFilter<"ChallanItem"> | number | null
     width?: StringNullableFilter<"ChallanItem"> | string | null
     remarks?: StringNullableFilter<"ChallanItem"> | string | null
     sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
@@ -164093,6 +164169,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -164130,6 +164208,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -166358,6 +166438,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -166396,6 +166478,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -166437,6 +166521,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -166475,6 +166561,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -166851,6 +166939,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166889,6 +166979,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -167083,6 +167175,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -167121,6 +167215,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -167677,6 +167773,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -167715,6 +167813,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -196794,6 +196894,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -197583,6 +197685,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -197621,6 +197725,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -197658,6 +197764,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -199043,6 +199151,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -199517,6 +199627,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -199554,6 +199666,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -199591,6 +199705,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -200609,6 +200725,8 @@ export namespace Prisma {
     averageUnit?: string | null
     unitQuantity?: number | null
     unitQuantityUom?: string | null
+    outwardAverage?: number | null
+    outwardPcs?: number | null
     width?: string | null
     remarks?: string | null
     sourceLotId?: string | null
@@ -200643,6 +200761,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -200681,6 +200801,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -200718,6 +200840,8 @@ export namespace Prisma {
     averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     unitQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     unitQuantityUom?: NullableStringFieldUpdateOperationsInput | string | null
+    outwardAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    outwardPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     width?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
