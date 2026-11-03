@@ -11,7 +11,8 @@ import { WorkRequestError, errorResponse } from '@/lib/work-items-server';
  * Fabric photos taken along the line (table "FabricPhoto", manual-migrations/20261028_fabric_photos.sql).
  *
  * - Embroidery, Threadcut QC (QC2) and Stitching upload photos on their own work lines. A department may add
- *   several photos; a photo is never replaced or deleted by a later one.
+ *   several photos; a photo is never replaced by a later one. A photo taken or uploaded by mistake can be deleted
+ *   by its own department (or an administrator); the delete is kept in the audit log.
  * - A photo belongs to its Production Sheet (Design No + Serial No) and to the work line it was taken on.
  * - A department sees the photos of a Production Sheet it holds a line of, taken by its own department or any
  *   department before it in the route (Embroidery -> ... -> Inventory). So Threadcut QC sees Embroidery's,
@@ -170,6 +171,8 @@ export async function listFabricPhotos(request: Request) {
         ...r,
         departmentLabel: PHOTO_DEPARTMENTS[departmentKeyFor(r.departmentCode) as DepartmentKey] || r.departmentCode,
         createdAt: new Date(r.createdAt).toISOString(),
+        // Only the department that took a photo (or an administrator) may delete it.
+        canDelete: user.isAdmin || r.departmentCode === uploaderKey,
       })),
       line: {
         workItemId: item.id,
@@ -236,6 +239,54 @@ export async function uploadFabricPhoto(request: Request) {
     return NextResponse.json({ data: { id } }, { status: 201 });
   } catch (error) {
     return errorResponse(error, 'Failed to upload the photo.');
+  }
+}
+
+/**
+ * DELETE /api/fabric-photos/:id?workItemId= — removes a photo taken or uploaded by mistake. Allowed for the
+ * department that took it (from a line of that department on the same Production Sheet) and administrators.
+ * The audit log keeps who deleted it, when, and the photo's details (not the image).
+ */
+export async function deleteFabricPhoto(request: Request, id: string) {
+  const { user, response } = await requireUser(request);
+  if (!user) return response;
+  try {
+    const item = await workLineFor(user, new URL(request.url).searchParams.get('workItemId') || '');
+    await ensureTable();
+    const rows = await prisma.$queryRaw<any[]>`
+      SELECT "id", "programId", "workItemId", "departmentCode", "fabricName", "colour", "fileName", "fileSize", "uploadedById", "createdAt"
+      FROM "FabricPhoto" WHERE "id" = ${id}`;
+    const photo = rows[0];
+    if (!photo || photo.programId !== item.programId || !visibleUploaderCodes(item.departmentCode).includes(photo.departmentCode)) {
+      throw new WorkRequestError('Photo not found.', 404);
+    }
+    if (!user.isAdmin && photo.departmentCode !== departmentKeyFor(item.departmentCode)) {
+      throw new WorkRequestError(`Only ${PHOTO_DEPARTMENTS[photo.departmentCode as DepartmentKey] || photo.departmentCode} or an administrator can delete this photo.`, 403);
+    }
+    const removed = await prisma.$executeRaw`DELETE FROM "FabricPhoto" WHERE "id" = ${id}`;
+    if (removed === 0) throw new WorkRequestError('This photo was already deleted.', 409);
+    await prisma.auditLog.create({
+      data: {
+        actorId: user.id,
+        action: 'FABRIC_PHOTO_DELETED',
+        entity: 'FabricPhoto',
+        entityId: id,
+        beforeState: JSON.stringify({
+          programId: photo.programId,
+          workItemId: photo.workItemId,
+          department: photo.departmentCode,
+          fabricName: photo.fabricName,
+          colour: photo.colour,
+          fileName: photo.fileName,
+          fileSize: photo.fileSize,
+          uploadedById: photo.uploadedById,
+          uploadedAt: new Date(photo.createdAt).toISOString(),
+        }),
+      },
+    });
+    return NextResponse.json({ message: 'Photo deleted.' });
+  } catch (error) {
+    return errorResponse(error, 'Failed to delete the photo.');
   }
 }
 
