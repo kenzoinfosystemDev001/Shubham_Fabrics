@@ -413,6 +413,11 @@ export type DepartmentHold = $Result.DefaultSelection<Prisma.$DepartmentHoldPayl
  * 
  */
 export type DepartmentHoldEvent = $Result.DefaultSelection<Prisma.$DepartmentHoldEventPayload>
+/**
+ * Model DepartmentHoldRelease
+ * 
+ */
+export type DepartmentHoldRelease = $Result.DefaultSelection<Prisma.$DepartmentHoldReleasePayload>
 
 /**
  * Enums
@@ -1457,6 +1462,16 @@ export class PrismaClient<
     * ```
     */
   get departmentHoldEvent(): Prisma.DepartmentHoldEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.departmentHoldRelease`: Exposes CRUD operations for the **DepartmentHoldRelease** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DepartmentHoldReleases
+    * const departmentHoldReleases = await prisma.departmentHoldRelease.findMany()
+    * ```
+    */
+  get departmentHoldRelease(): Prisma.DepartmentHoldReleaseDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1977,7 +1992,8 @@ export namespace Prisma {
     ManualMigration: 'ManualMigration',
     FabricPhoto: 'FabricPhoto',
     DepartmentHold: 'DepartmentHold',
-    DepartmentHoldEvent: 'DepartmentHoldEvent'
+    DepartmentHoldEvent: 'DepartmentHoldEvent',
+    DepartmentHoldRelease: 'DepartmentHoldRelease'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1996,7 +2012,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "departmentImage" | "brandingAsset" | "appSetting" | "auditLog" | "challan" | "challanItem" | "shrinkageRecord" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder" | "dyeingQcTransfer" | "departmentWorkItem" | "departmentWorkTransfer" | "workItemAllocation" | "workItemInspection" | "fabricInward" | "fabricOutward" | "fabricStockImport" | "fabricStockImportDocument" | "deadlineAlert" | "deadlineAlertDismissal" | "packingAllocation" | "garmentImage" | "stockImport" | "manualMigration" | "fabricPhoto" | "departmentHold" | "departmentHoldEvent"
+      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "departmentImage" | "brandingAsset" | "appSetting" | "auditLog" | "challan" | "challanItem" | "shrinkageRecord" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder" | "dyeingQcTransfer" | "departmentWorkItem" | "departmentWorkTransfer" | "workItemAllocation" | "workItemInspection" | "fabricInward" | "fabricOutward" | "fabricStockImport" | "fabricStockImportDocument" | "deadlineAlert" | "deadlineAlertDismissal" | "packingAllocation" | "garmentImage" | "stockImport" | "manualMigration" | "fabricPhoto" | "departmentHold" | "departmentHoldEvent" | "departmentHoldRelease"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -7920,6 +7936,80 @@ export namespace Prisma {
           }
         }
       }
+      DepartmentHoldRelease: {
+        payload: Prisma.$DepartmentHoldReleasePayload<ExtArgs>
+        fields: Prisma.DepartmentHoldReleaseFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DepartmentHoldReleaseFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DepartmentHoldReleaseFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload>
+          }
+          findFirst: {
+            args: Prisma.DepartmentHoldReleaseFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DepartmentHoldReleaseFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload>
+          }
+          findMany: {
+            args: Prisma.DepartmentHoldReleaseFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload>[]
+          }
+          create: {
+            args: Prisma.DepartmentHoldReleaseCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload>
+          }
+          createMany: {
+            args: Prisma.DepartmentHoldReleaseCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DepartmentHoldReleaseCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload>[]
+          }
+          delete: {
+            args: Prisma.DepartmentHoldReleaseDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload>
+          }
+          update: {
+            args: Prisma.DepartmentHoldReleaseUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload>
+          }
+          deleteMany: {
+            args: Prisma.DepartmentHoldReleaseDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DepartmentHoldReleaseUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DepartmentHoldReleaseUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload>[]
+          }
+          upsert: {
+            args: Prisma.DepartmentHoldReleaseUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DepartmentHoldReleasePayload>
+          }
+          aggregate: {
+            args: Prisma.DepartmentHoldReleaseAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDepartmentHoldRelease>
+          }
+          groupBy: {
+            args: Prisma.DepartmentHoldReleaseGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DepartmentHoldReleaseGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DepartmentHoldReleaseCountArgs<ExtArgs>
+            result: $Utils.Optional<DepartmentHoldReleaseCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -8096,6 +8186,7 @@ export namespace Prisma {
     fabricPhoto?: FabricPhotoOmit
     departmentHold?: DepartmentHoldOmit
     departmentHoldEvent?: DepartmentHoldEventOmit
+    departmentHoldRelease?: DepartmentHoldReleaseOmit
   }
 
   /* Types for Logging */
@@ -9366,6 +9457,7 @@ export namespace Prisma {
     workTransfers: number
     deadlineAlerts: number
     shrinkageRecords: number
+    holdReleases: number
   }
 
   export type ChallanCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9383,6 +9475,7 @@ export namespace Prisma {
     workTransfers?: boolean | ChallanCountOutputTypeCountWorkTransfersArgs
     deadlineAlerts?: boolean | ChallanCountOutputTypeCountDeadlineAlertsArgs
     shrinkageRecords?: boolean | ChallanCountOutputTypeCountShrinkageRecordsArgs
+    holdReleases?: boolean | ChallanCountOutputTypeCountHoldReleasesArgs
   }
 
   // Custom InputTypes
@@ -9492,6 +9585,13 @@ export namespace Prisma {
    */
   export type ChallanCountOutputTypeCountShrinkageRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ShrinkageRecordWhereInput
+  }
+
+  /**
+   * ChallanCountOutputType without action
+   */
+  export type ChallanCountOutputTypeCountHoldReleasesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DepartmentHoldReleaseWhereInput
   }
 
 
@@ -10168,10 +10268,12 @@ export namespace Prisma {
 
   export type DepartmentHoldCountOutputType = {
     events: number
+    releases: number
   }
 
   export type DepartmentHoldCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     events?: boolean | DepartmentHoldCountOutputTypeCountEventsArgs
+    releases?: boolean | DepartmentHoldCountOutputTypeCountReleasesArgs
   }
 
   // Custom InputTypes
@@ -10190,6 +10292,13 @@ export namespace Prisma {
    */
   export type DepartmentHoldCountOutputTypeCountEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DepartmentHoldEventWhereInput
+  }
+
+  /**
+   * DepartmentHoldCountOutputType without action
+   */
+  export type DepartmentHoldCountOutputTypeCountReleasesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DepartmentHoldReleaseWhereInput
   }
 
 
@@ -50591,6 +50700,7 @@ export namespace Prisma {
     workTransfers?: boolean | Challan$workTransfersArgs<ExtArgs>
     deadlineAlerts?: boolean | Challan$deadlineAlertsArgs<ExtArgs>
     shrinkageRecords?: boolean | Challan$shrinkageRecordsArgs<ExtArgs>
+    holdReleases?: boolean | Challan$holdReleasesArgs<ExtArgs>
     _count?: boolean | ChallanCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["challan"]>
 
@@ -50730,6 +50840,7 @@ export namespace Prisma {
     workTransfers?: boolean | Challan$workTransfersArgs<ExtArgs>
     deadlineAlerts?: boolean | Challan$deadlineAlertsArgs<ExtArgs>
     shrinkageRecords?: boolean | Challan$shrinkageRecordsArgs<ExtArgs>
+    holdReleases?: boolean | Challan$holdReleasesArgs<ExtArgs>
     _count?: boolean | ChallanCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ChallanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -50778,6 +50889,7 @@ export namespace Prisma {
       workTransfers: Prisma.$DepartmentWorkTransferPayload<ExtArgs>[]
       deadlineAlerts: Prisma.$DeadlineAlertPayload<ExtArgs>[]
       shrinkageRecords: Prisma.$ShrinkageRecordPayload<ExtArgs>[]
+      holdReleases: Prisma.$DepartmentHoldReleasePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -51225,6 +51337,7 @@ export namespace Prisma {
     workTransfers<T extends Challan$workTransfersArgs<ExtArgs> = {}>(args?: Subset<T, Challan$workTransfersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentWorkTransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     deadlineAlerts<T extends Challan$deadlineAlertsArgs<ExtArgs> = {}>(args?: Subset<T, Challan$deadlineAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     shrinkageRecords<T extends Challan$shrinkageRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Challan$shrinkageRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ShrinkageRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    holdReleases<T extends Challan$holdReleasesArgs<ExtArgs> = {}>(args?: Subset<T, Challan$holdReleasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -52088,6 +52201,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ShrinkageRecordScalarFieldEnum | ShrinkageRecordScalarFieldEnum[]
+  }
+
+  /**
+   * Challan.holdReleases
+   */
+  export type Challan$holdReleasesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    where?: DepartmentHoldReleaseWhereInput
+    orderBy?: DepartmentHoldReleaseOrderByWithRelationInput | DepartmentHoldReleaseOrderByWithRelationInput[]
+    cursor?: DepartmentHoldReleaseWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DepartmentHoldReleaseScalarFieldEnum | DepartmentHoldReleaseScalarFieldEnum[]
   }
 
   /**
@@ -109400,6 +109537,7 @@ export namespace Prisma {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     heldBy?: boolean | DepartmentHold$heldByArgs<ExtArgs>
     events?: boolean | DepartmentHold$eventsArgs<ExtArgs>
+    releases?: boolean | DepartmentHold$releasesArgs<ExtArgs>
     _count?: boolean | DepartmentHoldCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["departmentHold"]>
 
@@ -109535,6 +109673,7 @@ export namespace Prisma {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     heldBy?: boolean | DepartmentHold$heldByArgs<ExtArgs>
     events?: boolean | DepartmentHold$eventsArgs<ExtArgs>
+    releases?: boolean | DepartmentHold$releasesArgs<ExtArgs>
     _count?: boolean | DepartmentHoldCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type DepartmentHoldIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -109552,6 +109691,7 @@ export namespace Prisma {
       program: Prisma.$ProgramPayload<ExtArgs>
       heldBy: Prisma.$UserPayload<ExtArgs> | null
       events: Prisma.$DepartmentHoldEventPayload<ExtArgs>[]
+      releases: Prisma.$DepartmentHoldReleasePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -109989,6 +110129,7 @@ export namespace Prisma {
     program<T extends ProgramDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProgramDefaultArgs<ExtArgs>>): Prisma__ProgramClient<$Result.GetResult<Prisma.$ProgramPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     heldBy<T extends DepartmentHold$heldByArgs<ExtArgs> = {}>(args?: Subset<T, DepartmentHold$heldByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     events<T extends DepartmentHold$eventsArgs<ExtArgs> = {}>(args?: Subset<T, DepartmentHold$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentHoldEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    releases<T extends DepartmentHold$releasesArgs<ExtArgs> = {}>(args?: Subset<T, DepartmentHold$releasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -110492,6 +110633,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DepartmentHoldEventScalarFieldEnum | DepartmentHoldEventScalarFieldEnum[]
+  }
+
+  /**
+   * DepartmentHold.releases
+   */
+  export type DepartmentHold$releasesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    where?: DepartmentHoldReleaseWhereInput
+    orderBy?: DepartmentHoldReleaseOrderByWithRelationInput | DepartmentHoldReleaseOrderByWithRelationInput[]
+    cursor?: DepartmentHoldReleaseWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DepartmentHoldReleaseScalarFieldEnum | DepartmentHoldReleaseScalarFieldEnum[]
   }
 
   /**
@@ -111698,6 +111863,1337 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: DepartmentHoldEventInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DepartmentHoldRelease
+   */
+
+  export type AggregateDepartmentHoldRelease = {
+    _count: DepartmentHoldReleaseCountAggregateOutputType | null
+    _avg: DepartmentHoldReleaseAvgAggregateOutputType | null
+    _sum: DepartmentHoldReleaseSumAggregateOutputType | null
+    _min: DepartmentHoldReleaseMinAggregateOutputType | null
+    _max: DepartmentHoldReleaseMaxAggregateOutputType | null
+  }
+
+  export type DepartmentHoldReleaseAvgAggregateOutputType = {
+    quantity: number | null
+    remainingAfter: number | null
+  }
+
+  export type DepartmentHoldReleaseSumAggregateOutputType = {
+    quantity: number | null
+    remainingAfter: number | null
+  }
+
+  export type DepartmentHoldReleaseMinAggregateOutputType = {
+    id: string | null
+    holdId: string | null
+    departmentCode: string | null
+    mode: string | null
+    quantity: number | null
+    unit: string | null
+    remainingAfter: number | null
+    programId: string | null
+    originalChallanId: string | null
+    originalChallanNumber: string | null
+    originalChallanItemId: string | null
+    newChallanId: string | null
+    newChallanNumber: string | null
+    newChallanItemId: string | null
+    destinationDepartment: string | null
+    eventId: string | null
+    idempotencyKey: string | null
+    remarks: string | null
+    releasedById: string | null
+    releasedByName: string | null
+    createdAt: Date | null
+  }
+
+  export type DepartmentHoldReleaseMaxAggregateOutputType = {
+    id: string | null
+    holdId: string | null
+    departmentCode: string | null
+    mode: string | null
+    quantity: number | null
+    unit: string | null
+    remainingAfter: number | null
+    programId: string | null
+    originalChallanId: string | null
+    originalChallanNumber: string | null
+    originalChallanItemId: string | null
+    newChallanId: string | null
+    newChallanNumber: string | null
+    newChallanItemId: string | null
+    destinationDepartment: string | null
+    eventId: string | null
+    idempotencyKey: string | null
+    remarks: string | null
+    releasedById: string | null
+    releasedByName: string | null
+    createdAt: Date | null
+  }
+
+  export type DepartmentHoldReleaseCountAggregateOutputType = {
+    id: number
+    holdId: number
+    departmentCode: number
+    mode: number
+    quantity: number
+    unit: number
+    remainingAfter: number
+    programId: number
+    originalChallanId: number
+    originalChallanNumber: number
+    originalChallanItemId: number
+    newChallanId: number
+    newChallanNumber: number
+    newChallanItemId: number
+    destinationDepartment: number
+    eventId: number
+    idempotencyKey: number
+    remarks: number
+    releasedById: number
+    releasedByName: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type DepartmentHoldReleaseAvgAggregateInputType = {
+    quantity?: true
+    remainingAfter?: true
+  }
+
+  export type DepartmentHoldReleaseSumAggregateInputType = {
+    quantity?: true
+    remainingAfter?: true
+  }
+
+  export type DepartmentHoldReleaseMinAggregateInputType = {
+    id?: true
+    holdId?: true
+    departmentCode?: true
+    mode?: true
+    quantity?: true
+    unit?: true
+    remainingAfter?: true
+    programId?: true
+    originalChallanId?: true
+    originalChallanNumber?: true
+    originalChallanItemId?: true
+    newChallanId?: true
+    newChallanNumber?: true
+    newChallanItemId?: true
+    destinationDepartment?: true
+    eventId?: true
+    idempotencyKey?: true
+    remarks?: true
+    releasedById?: true
+    releasedByName?: true
+    createdAt?: true
+  }
+
+  export type DepartmentHoldReleaseMaxAggregateInputType = {
+    id?: true
+    holdId?: true
+    departmentCode?: true
+    mode?: true
+    quantity?: true
+    unit?: true
+    remainingAfter?: true
+    programId?: true
+    originalChallanId?: true
+    originalChallanNumber?: true
+    originalChallanItemId?: true
+    newChallanId?: true
+    newChallanNumber?: true
+    newChallanItemId?: true
+    destinationDepartment?: true
+    eventId?: true
+    idempotencyKey?: true
+    remarks?: true
+    releasedById?: true
+    releasedByName?: true
+    createdAt?: true
+  }
+
+  export type DepartmentHoldReleaseCountAggregateInputType = {
+    id?: true
+    holdId?: true
+    departmentCode?: true
+    mode?: true
+    quantity?: true
+    unit?: true
+    remainingAfter?: true
+    programId?: true
+    originalChallanId?: true
+    originalChallanNumber?: true
+    originalChallanItemId?: true
+    newChallanId?: true
+    newChallanNumber?: true
+    newChallanItemId?: true
+    destinationDepartment?: true
+    eventId?: true
+    idempotencyKey?: true
+    remarks?: true
+    releasedById?: true
+    releasedByName?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type DepartmentHoldReleaseAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DepartmentHoldRelease to aggregate.
+     */
+    where?: DepartmentHoldReleaseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DepartmentHoldReleases to fetch.
+     */
+    orderBy?: DepartmentHoldReleaseOrderByWithRelationInput | DepartmentHoldReleaseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DepartmentHoldReleaseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DepartmentHoldReleases from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DepartmentHoldReleases.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DepartmentHoldReleases
+    **/
+    _count?: true | DepartmentHoldReleaseCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DepartmentHoldReleaseAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DepartmentHoldReleaseSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DepartmentHoldReleaseMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DepartmentHoldReleaseMaxAggregateInputType
+  }
+
+  export type GetDepartmentHoldReleaseAggregateType<T extends DepartmentHoldReleaseAggregateArgs> = {
+        [P in keyof T & keyof AggregateDepartmentHoldRelease]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDepartmentHoldRelease[P]>
+      : GetScalarType<T[P], AggregateDepartmentHoldRelease[P]>
+  }
+
+
+
+
+  export type DepartmentHoldReleaseGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DepartmentHoldReleaseWhereInput
+    orderBy?: DepartmentHoldReleaseOrderByWithAggregationInput | DepartmentHoldReleaseOrderByWithAggregationInput[]
+    by: DepartmentHoldReleaseScalarFieldEnum[] | DepartmentHoldReleaseScalarFieldEnum
+    having?: DepartmentHoldReleaseScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DepartmentHoldReleaseCountAggregateInputType | true
+    _avg?: DepartmentHoldReleaseAvgAggregateInputType
+    _sum?: DepartmentHoldReleaseSumAggregateInputType
+    _min?: DepartmentHoldReleaseMinAggregateInputType
+    _max?: DepartmentHoldReleaseMaxAggregateInputType
+  }
+
+  export type DepartmentHoldReleaseGroupByOutputType = {
+    id: string
+    holdId: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId: string | null
+    originalChallanNumber: string | null
+    originalChallanItemId: string | null
+    newChallanId: string | null
+    newChallanNumber: string | null
+    newChallanItemId: string | null
+    destinationDepartment: string | null
+    eventId: string | null
+    idempotencyKey: string | null
+    remarks: string | null
+    releasedById: string | null
+    releasedByName: string
+    createdAt: Date
+    _count: DepartmentHoldReleaseCountAggregateOutputType | null
+    _avg: DepartmentHoldReleaseAvgAggregateOutputType | null
+    _sum: DepartmentHoldReleaseSumAggregateOutputType | null
+    _min: DepartmentHoldReleaseMinAggregateOutputType | null
+    _max: DepartmentHoldReleaseMaxAggregateOutputType | null
+  }
+
+  type GetDepartmentHoldReleaseGroupByPayload<T extends DepartmentHoldReleaseGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DepartmentHoldReleaseGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DepartmentHoldReleaseGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DepartmentHoldReleaseGroupByOutputType[P]>
+            : GetScalarType<T[P], DepartmentHoldReleaseGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DepartmentHoldReleaseSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    holdId?: boolean
+    departmentCode?: boolean
+    mode?: boolean
+    quantity?: boolean
+    unit?: boolean
+    remainingAfter?: boolean
+    programId?: boolean
+    originalChallanId?: boolean
+    originalChallanNumber?: boolean
+    originalChallanItemId?: boolean
+    newChallanId?: boolean
+    newChallanNumber?: boolean
+    newChallanItemId?: boolean
+    destinationDepartment?: boolean
+    eventId?: boolean
+    idempotencyKey?: boolean
+    remarks?: boolean
+    releasedById?: boolean
+    releasedByName?: boolean
+    createdAt?: boolean
+    hold?: boolean | DepartmentHoldDefaultArgs<ExtArgs>
+    newChallan?: boolean | DepartmentHoldRelease$newChallanArgs<ExtArgs>
+  }, ExtArgs["result"]["departmentHoldRelease"]>
+
+  export type DepartmentHoldReleaseSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    holdId?: boolean
+    departmentCode?: boolean
+    mode?: boolean
+    quantity?: boolean
+    unit?: boolean
+    remainingAfter?: boolean
+    programId?: boolean
+    originalChallanId?: boolean
+    originalChallanNumber?: boolean
+    originalChallanItemId?: boolean
+    newChallanId?: boolean
+    newChallanNumber?: boolean
+    newChallanItemId?: boolean
+    destinationDepartment?: boolean
+    eventId?: boolean
+    idempotencyKey?: boolean
+    remarks?: boolean
+    releasedById?: boolean
+    releasedByName?: boolean
+    createdAt?: boolean
+    hold?: boolean | DepartmentHoldDefaultArgs<ExtArgs>
+    newChallan?: boolean | DepartmentHoldRelease$newChallanArgs<ExtArgs>
+  }, ExtArgs["result"]["departmentHoldRelease"]>
+
+  export type DepartmentHoldReleaseSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    holdId?: boolean
+    departmentCode?: boolean
+    mode?: boolean
+    quantity?: boolean
+    unit?: boolean
+    remainingAfter?: boolean
+    programId?: boolean
+    originalChallanId?: boolean
+    originalChallanNumber?: boolean
+    originalChallanItemId?: boolean
+    newChallanId?: boolean
+    newChallanNumber?: boolean
+    newChallanItemId?: boolean
+    destinationDepartment?: boolean
+    eventId?: boolean
+    idempotencyKey?: boolean
+    remarks?: boolean
+    releasedById?: boolean
+    releasedByName?: boolean
+    createdAt?: boolean
+    hold?: boolean | DepartmentHoldDefaultArgs<ExtArgs>
+    newChallan?: boolean | DepartmentHoldRelease$newChallanArgs<ExtArgs>
+  }, ExtArgs["result"]["departmentHoldRelease"]>
+
+  export type DepartmentHoldReleaseSelectScalar = {
+    id?: boolean
+    holdId?: boolean
+    departmentCode?: boolean
+    mode?: boolean
+    quantity?: boolean
+    unit?: boolean
+    remainingAfter?: boolean
+    programId?: boolean
+    originalChallanId?: boolean
+    originalChallanNumber?: boolean
+    originalChallanItemId?: boolean
+    newChallanId?: boolean
+    newChallanNumber?: boolean
+    newChallanItemId?: boolean
+    destinationDepartment?: boolean
+    eventId?: boolean
+    idempotencyKey?: boolean
+    remarks?: boolean
+    releasedById?: boolean
+    releasedByName?: boolean
+    createdAt?: boolean
+  }
+
+  export type DepartmentHoldReleaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "holdId" | "departmentCode" | "mode" | "quantity" | "unit" | "remainingAfter" | "programId" | "originalChallanId" | "originalChallanNumber" | "originalChallanItemId" | "newChallanId" | "newChallanNumber" | "newChallanItemId" | "destinationDepartment" | "eventId" | "idempotencyKey" | "remarks" | "releasedById" | "releasedByName" | "createdAt", ExtArgs["result"]["departmentHoldRelease"]>
+  export type DepartmentHoldReleaseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    hold?: boolean | DepartmentHoldDefaultArgs<ExtArgs>
+    newChallan?: boolean | DepartmentHoldRelease$newChallanArgs<ExtArgs>
+  }
+  export type DepartmentHoldReleaseIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    hold?: boolean | DepartmentHoldDefaultArgs<ExtArgs>
+    newChallan?: boolean | DepartmentHoldRelease$newChallanArgs<ExtArgs>
+  }
+  export type DepartmentHoldReleaseIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    hold?: boolean | DepartmentHoldDefaultArgs<ExtArgs>
+    newChallan?: boolean | DepartmentHoldRelease$newChallanArgs<ExtArgs>
+  }
+
+  export type $DepartmentHoldReleasePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DepartmentHoldRelease"
+    objects: {
+      hold: Prisma.$DepartmentHoldPayload<ExtArgs>
+      newChallan: Prisma.$ChallanPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      holdId: string
+      departmentCode: string
+      mode: string
+      quantity: number
+      unit: string
+      remainingAfter: number
+      programId: string
+      originalChallanId: string | null
+      originalChallanNumber: string | null
+      originalChallanItemId: string | null
+      newChallanId: string | null
+      newChallanNumber: string | null
+      newChallanItemId: string | null
+      destinationDepartment: string | null
+      eventId: string | null
+      idempotencyKey: string | null
+      remarks: string | null
+      releasedById: string | null
+      releasedByName: string
+      createdAt: Date
+    }, ExtArgs["result"]["departmentHoldRelease"]>
+    composites: {}
+  }
+
+  type DepartmentHoldReleaseGetPayload<S extends boolean | null | undefined | DepartmentHoldReleaseDefaultArgs> = $Result.GetResult<Prisma.$DepartmentHoldReleasePayload, S>
+
+  type DepartmentHoldReleaseCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DepartmentHoldReleaseFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DepartmentHoldReleaseCountAggregateInputType | true
+    }
+
+  export interface DepartmentHoldReleaseDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DepartmentHoldRelease'], meta: { name: 'DepartmentHoldRelease' } }
+    /**
+     * Find zero or one DepartmentHoldRelease that matches the filter.
+     * @param {DepartmentHoldReleaseFindUniqueArgs} args - Arguments to find a DepartmentHoldRelease
+     * @example
+     * // Get one DepartmentHoldRelease
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DepartmentHoldReleaseFindUniqueArgs>(args: SelectSubset<T, DepartmentHoldReleaseFindUniqueArgs<ExtArgs>>): Prisma__DepartmentHoldReleaseClient<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DepartmentHoldRelease that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DepartmentHoldReleaseFindUniqueOrThrowArgs} args - Arguments to find a DepartmentHoldRelease
+     * @example
+     * // Get one DepartmentHoldRelease
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DepartmentHoldReleaseFindUniqueOrThrowArgs>(args: SelectSubset<T, DepartmentHoldReleaseFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DepartmentHoldReleaseClient<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DepartmentHoldRelease that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DepartmentHoldReleaseFindFirstArgs} args - Arguments to find a DepartmentHoldRelease
+     * @example
+     * // Get one DepartmentHoldRelease
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DepartmentHoldReleaseFindFirstArgs>(args?: SelectSubset<T, DepartmentHoldReleaseFindFirstArgs<ExtArgs>>): Prisma__DepartmentHoldReleaseClient<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DepartmentHoldRelease that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DepartmentHoldReleaseFindFirstOrThrowArgs} args - Arguments to find a DepartmentHoldRelease
+     * @example
+     * // Get one DepartmentHoldRelease
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DepartmentHoldReleaseFindFirstOrThrowArgs>(args?: SelectSubset<T, DepartmentHoldReleaseFindFirstOrThrowArgs<ExtArgs>>): Prisma__DepartmentHoldReleaseClient<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DepartmentHoldReleases that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DepartmentHoldReleaseFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DepartmentHoldReleases
+     * const departmentHoldReleases = await prisma.departmentHoldRelease.findMany()
+     * 
+     * // Get first 10 DepartmentHoldReleases
+     * const departmentHoldReleases = await prisma.departmentHoldRelease.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const departmentHoldReleaseWithIdOnly = await prisma.departmentHoldRelease.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DepartmentHoldReleaseFindManyArgs>(args?: SelectSubset<T, DepartmentHoldReleaseFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DepartmentHoldRelease.
+     * @param {DepartmentHoldReleaseCreateArgs} args - Arguments to create a DepartmentHoldRelease.
+     * @example
+     * // Create one DepartmentHoldRelease
+     * const DepartmentHoldRelease = await prisma.departmentHoldRelease.create({
+     *   data: {
+     *     // ... data to create a DepartmentHoldRelease
+     *   }
+     * })
+     * 
+     */
+    create<T extends DepartmentHoldReleaseCreateArgs>(args: SelectSubset<T, DepartmentHoldReleaseCreateArgs<ExtArgs>>): Prisma__DepartmentHoldReleaseClient<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DepartmentHoldReleases.
+     * @param {DepartmentHoldReleaseCreateManyArgs} args - Arguments to create many DepartmentHoldReleases.
+     * @example
+     * // Create many DepartmentHoldReleases
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DepartmentHoldReleaseCreateManyArgs>(args?: SelectSubset<T, DepartmentHoldReleaseCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DepartmentHoldReleases and returns the data saved in the database.
+     * @param {DepartmentHoldReleaseCreateManyAndReturnArgs} args - Arguments to create many DepartmentHoldReleases.
+     * @example
+     * // Create many DepartmentHoldReleases
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DepartmentHoldReleases and only return the `id`
+     * const departmentHoldReleaseWithIdOnly = await prisma.departmentHoldRelease.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DepartmentHoldReleaseCreateManyAndReturnArgs>(args?: SelectSubset<T, DepartmentHoldReleaseCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DepartmentHoldRelease.
+     * @param {DepartmentHoldReleaseDeleteArgs} args - Arguments to delete one DepartmentHoldRelease.
+     * @example
+     * // Delete one DepartmentHoldRelease
+     * const DepartmentHoldRelease = await prisma.departmentHoldRelease.delete({
+     *   where: {
+     *     // ... filter to delete one DepartmentHoldRelease
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DepartmentHoldReleaseDeleteArgs>(args: SelectSubset<T, DepartmentHoldReleaseDeleteArgs<ExtArgs>>): Prisma__DepartmentHoldReleaseClient<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DepartmentHoldRelease.
+     * @param {DepartmentHoldReleaseUpdateArgs} args - Arguments to update one DepartmentHoldRelease.
+     * @example
+     * // Update one DepartmentHoldRelease
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DepartmentHoldReleaseUpdateArgs>(args: SelectSubset<T, DepartmentHoldReleaseUpdateArgs<ExtArgs>>): Prisma__DepartmentHoldReleaseClient<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DepartmentHoldReleases.
+     * @param {DepartmentHoldReleaseDeleteManyArgs} args - Arguments to filter DepartmentHoldReleases to delete.
+     * @example
+     * // Delete a few DepartmentHoldReleases
+     * const { count } = await prisma.departmentHoldRelease.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DepartmentHoldReleaseDeleteManyArgs>(args?: SelectSubset<T, DepartmentHoldReleaseDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DepartmentHoldReleases.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DepartmentHoldReleaseUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DepartmentHoldReleases
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DepartmentHoldReleaseUpdateManyArgs>(args: SelectSubset<T, DepartmentHoldReleaseUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DepartmentHoldReleases and returns the data updated in the database.
+     * @param {DepartmentHoldReleaseUpdateManyAndReturnArgs} args - Arguments to update many DepartmentHoldReleases.
+     * @example
+     * // Update many DepartmentHoldReleases
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DepartmentHoldReleases and only return the `id`
+     * const departmentHoldReleaseWithIdOnly = await prisma.departmentHoldRelease.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DepartmentHoldReleaseUpdateManyAndReturnArgs>(args: SelectSubset<T, DepartmentHoldReleaseUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DepartmentHoldRelease.
+     * @param {DepartmentHoldReleaseUpsertArgs} args - Arguments to update or create a DepartmentHoldRelease.
+     * @example
+     * // Update or create a DepartmentHoldRelease
+     * const departmentHoldRelease = await prisma.departmentHoldRelease.upsert({
+     *   create: {
+     *     // ... data to create a DepartmentHoldRelease
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DepartmentHoldRelease we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DepartmentHoldReleaseUpsertArgs>(args: SelectSubset<T, DepartmentHoldReleaseUpsertArgs<ExtArgs>>): Prisma__DepartmentHoldReleaseClient<$Result.GetResult<Prisma.$DepartmentHoldReleasePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DepartmentHoldReleases.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DepartmentHoldReleaseCountArgs} args - Arguments to filter DepartmentHoldReleases to count.
+     * @example
+     * // Count the number of DepartmentHoldReleases
+     * const count = await prisma.departmentHoldRelease.count({
+     *   where: {
+     *     // ... the filter for the DepartmentHoldReleases we want to count
+     *   }
+     * })
+    **/
+    count<T extends DepartmentHoldReleaseCountArgs>(
+      args?: Subset<T, DepartmentHoldReleaseCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DepartmentHoldReleaseCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DepartmentHoldRelease.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DepartmentHoldReleaseAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DepartmentHoldReleaseAggregateArgs>(args: Subset<T, DepartmentHoldReleaseAggregateArgs>): Prisma.PrismaPromise<GetDepartmentHoldReleaseAggregateType<T>>
+
+    /**
+     * Group by DepartmentHoldRelease.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DepartmentHoldReleaseGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DepartmentHoldReleaseGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DepartmentHoldReleaseGroupByArgs['orderBy'] }
+        : { orderBy?: DepartmentHoldReleaseGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DepartmentHoldReleaseGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDepartmentHoldReleaseGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DepartmentHoldRelease model
+   */
+  readonly fields: DepartmentHoldReleaseFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DepartmentHoldRelease.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DepartmentHoldReleaseClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    hold<T extends DepartmentHoldDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DepartmentHoldDefaultArgs<ExtArgs>>): Prisma__DepartmentHoldClient<$Result.GetResult<Prisma.$DepartmentHoldPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    newChallan<T extends DepartmentHoldRelease$newChallanArgs<ExtArgs> = {}>(args?: Subset<T, DepartmentHoldRelease$newChallanArgs<ExtArgs>>): Prisma__ChallanClient<$Result.GetResult<Prisma.$ChallanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DepartmentHoldRelease model
+   */
+  interface DepartmentHoldReleaseFieldRefs {
+    readonly id: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly holdId: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly departmentCode: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly mode: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly quantity: FieldRef<"DepartmentHoldRelease", 'Float'>
+    readonly unit: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly remainingAfter: FieldRef<"DepartmentHoldRelease", 'Float'>
+    readonly programId: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly originalChallanId: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly originalChallanNumber: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly originalChallanItemId: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly newChallanId: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly newChallanNumber: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly newChallanItemId: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly destinationDepartment: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly eventId: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly idempotencyKey: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly remarks: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly releasedById: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly releasedByName: FieldRef<"DepartmentHoldRelease", 'String'>
+    readonly createdAt: FieldRef<"DepartmentHoldRelease", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DepartmentHoldRelease findUnique
+   */
+  export type DepartmentHoldReleaseFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    /**
+     * Filter, which DepartmentHoldRelease to fetch.
+     */
+    where: DepartmentHoldReleaseWhereUniqueInput
+  }
+
+  /**
+   * DepartmentHoldRelease findUniqueOrThrow
+   */
+  export type DepartmentHoldReleaseFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    /**
+     * Filter, which DepartmentHoldRelease to fetch.
+     */
+    where: DepartmentHoldReleaseWhereUniqueInput
+  }
+
+  /**
+   * DepartmentHoldRelease findFirst
+   */
+  export type DepartmentHoldReleaseFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    /**
+     * Filter, which DepartmentHoldRelease to fetch.
+     */
+    where?: DepartmentHoldReleaseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DepartmentHoldReleases to fetch.
+     */
+    orderBy?: DepartmentHoldReleaseOrderByWithRelationInput | DepartmentHoldReleaseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DepartmentHoldReleases.
+     */
+    cursor?: DepartmentHoldReleaseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DepartmentHoldReleases from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DepartmentHoldReleases.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DepartmentHoldReleases.
+     */
+    distinct?: DepartmentHoldReleaseScalarFieldEnum | DepartmentHoldReleaseScalarFieldEnum[]
+  }
+
+  /**
+   * DepartmentHoldRelease findFirstOrThrow
+   */
+  export type DepartmentHoldReleaseFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    /**
+     * Filter, which DepartmentHoldRelease to fetch.
+     */
+    where?: DepartmentHoldReleaseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DepartmentHoldReleases to fetch.
+     */
+    orderBy?: DepartmentHoldReleaseOrderByWithRelationInput | DepartmentHoldReleaseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DepartmentHoldReleases.
+     */
+    cursor?: DepartmentHoldReleaseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DepartmentHoldReleases from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DepartmentHoldReleases.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DepartmentHoldReleases.
+     */
+    distinct?: DepartmentHoldReleaseScalarFieldEnum | DepartmentHoldReleaseScalarFieldEnum[]
+  }
+
+  /**
+   * DepartmentHoldRelease findMany
+   */
+  export type DepartmentHoldReleaseFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    /**
+     * Filter, which DepartmentHoldReleases to fetch.
+     */
+    where?: DepartmentHoldReleaseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DepartmentHoldReleases to fetch.
+     */
+    orderBy?: DepartmentHoldReleaseOrderByWithRelationInput | DepartmentHoldReleaseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DepartmentHoldReleases.
+     */
+    cursor?: DepartmentHoldReleaseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DepartmentHoldReleases from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DepartmentHoldReleases.
+     */
+    skip?: number
+    distinct?: DepartmentHoldReleaseScalarFieldEnum | DepartmentHoldReleaseScalarFieldEnum[]
+  }
+
+  /**
+   * DepartmentHoldRelease create
+   */
+  export type DepartmentHoldReleaseCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DepartmentHoldRelease.
+     */
+    data: XOR<DepartmentHoldReleaseCreateInput, DepartmentHoldReleaseUncheckedCreateInput>
+  }
+
+  /**
+   * DepartmentHoldRelease createMany
+   */
+  export type DepartmentHoldReleaseCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DepartmentHoldReleases.
+     */
+    data: DepartmentHoldReleaseCreateManyInput | DepartmentHoldReleaseCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DepartmentHoldRelease createManyAndReturn
+   */
+  export type DepartmentHoldReleaseCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * The data used to create many DepartmentHoldReleases.
+     */
+    data: DepartmentHoldReleaseCreateManyInput | DepartmentHoldReleaseCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DepartmentHoldRelease update
+   */
+  export type DepartmentHoldReleaseUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DepartmentHoldRelease.
+     */
+    data: XOR<DepartmentHoldReleaseUpdateInput, DepartmentHoldReleaseUncheckedUpdateInput>
+    /**
+     * Choose, which DepartmentHoldRelease to update.
+     */
+    where: DepartmentHoldReleaseWhereUniqueInput
+  }
+
+  /**
+   * DepartmentHoldRelease updateMany
+   */
+  export type DepartmentHoldReleaseUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DepartmentHoldReleases.
+     */
+    data: XOR<DepartmentHoldReleaseUpdateManyMutationInput, DepartmentHoldReleaseUncheckedUpdateManyInput>
+    /**
+     * Filter which DepartmentHoldReleases to update
+     */
+    where?: DepartmentHoldReleaseWhereInput
+    /**
+     * Limit how many DepartmentHoldReleases to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DepartmentHoldRelease updateManyAndReturn
+   */
+  export type DepartmentHoldReleaseUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * The data used to update DepartmentHoldReleases.
+     */
+    data: XOR<DepartmentHoldReleaseUpdateManyMutationInput, DepartmentHoldReleaseUncheckedUpdateManyInput>
+    /**
+     * Filter which DepartmentHoldReleases to update
+     */
+    where?: DepartmentHoldReleaseWhereInput
+    /**
+     * Limit how many DepartmentHoldReleases to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DepartmentHoldRelease upsert
+   */
+  export type DepartmentHoldReleaseUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DepartmentHoldRelease to update in case it exists.
+     */
+    where: DepartmentHoldReleaseWhereUniqueInput
+    /**
+     * In case the DepartmentHoldRelease found by the `where` argument doesn't exist, create a new DepartmentHoldRelease with this data.
+     */
+    create: XOR<DepartmentHoldReleaseCreateInput, DepartmentHoldReleaseUncheckedCreateInput>
+    /**
+     * In case the DepartmentHoldRelease was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DepartmentHoldReleaseUpdateInput, DepartmentHoldReleaseUncheckedUpdateInput>
+  }
+
+  /**
+   * DepartmentHoldRelease delete
+   */
+  export type DepartmentHoldReleaseDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
+    /**
+     * Filter which DepartmentHoldRelease to delete.
+     */
+    where: DepartmentHoldReleaseWhereUniqueInput
+  }
+
+  /**
+   * DepartmentHoldRelease deleteMany
+   */
+  export type DepartmentHoldReleaseDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DepartmentHoldReleases to delete
+     */
+    where?: DepartmentHoldReleaseWhereInput
+    /**
+     * Limit how many DepartmentHoldReleases to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DepartmentHoldRelease.newChallan
+   */
+  export type DepartmentHoldRelease$newChallanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Challan
+     */
+    select?: ChallanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Challan
+     */
+    omit?: ChallanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChallanInclude<ExtArgs> | null
+    where?: ChallanWhereInput
+  }
+
+  /**
+   * DepartmentHoldRelease without action
+   */
+  export type DepartmentHoldReleaseDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DepartmentHoldRelease
+     */
+    select?: DepartmentHoldReleaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DepartmentHoldRelease
+     */
+    omit?: DepartmentHoldReleaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentHoldReleaseInclude<ExtArgs> | null
   }
 
 
@@ -113310,6 +114806,33 @@ export namespace Prisma {
   };
 
   export type DepartmentHoldEventScalarFieldEnum = (typeof DepartmentHoldEventScalarFieldEnum)[keyof typeof DepartmentHoldEventScalarFieldEnum]
+
+
+  export const DepartmentHoldReleaseScalarFieldEnum: {
+    id: 'id',
+    holdId: 'holdId',
+    departmentCode: 'departmentCode',
+    mode: 'mode',
+    quantity: 'quantity',
+    unit: 'unit',
+    remainingAfter: 'remainingAfter',
+    programId: 'programId',
+    originalChallanId: 'originalChallanId',
+    originalChallanNumber: 'originalChallanNumber',
+    originalChallanItemId: 'originalChallanItemId',
+    newChallanId: 'newChallanId',
+    newChallanNumber: 'newChallanNumber',
+    newChallanItemId: 'newChallanItemId',
+    destinationDepartment: 'destinationDepartment',
+    eventId: 'eventId',
+    idempotencyKey: 'idempotencyKey',
+    remarks: 'remarks',
+    releasedById: 'releasedById',
+    releasedByName: 'releasedByName',
+    createdAt: 'createdAt'
+  };
+
+  export type DepartmentHoldReleaseScalarFieldEnum = (typeof DepartmentHoldReleaseScalarFieldEnum)[keyof typeof DepartmentHoldReleaseScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -116724,6 +118247,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferListRelationFilter
     deadlineAlerts?: DeadlineAlertListRelationFilter
     shrinkageRecords?: ShrinkageRecordListRelationFilter
+    holdReleases?: DepartmentHoldReleaseListRelationFilter
   }
 
   export type ChallanOrderByWithRelationInput = {
@@ -116778,6 +118302,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferOrderByRelationAggregateInput
     deadlineAlerts?: DeadlineAlertOrderByRelationAggregateInput
     shrinkageRecords?: ShrinkageRecordOrderByRelationAggregateInput
+    holdReleases?: DepartmentHoldReleaseOrderByRelationAggregateInput
   }
 
   export type ChallanWhereUniqueInput = Prisma.AtLeast<{
@@ -116836,6 +118361,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferListRelationFilter
     deadlineAlerts?: DeadlineAlertListRelationFilter
     shrinkageRecords?: ShrinkageRecordListRelationFilter
+    holdReleases?: DepartmentHoldReleaseListRelationFilter
   }, "id" | "fromDepartment_challanNumber">
 
   export type ChallanOrderByWithAggregationInput = {
@@ -122065,6 +123591,7 @@ export namespace Prisma {
     program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
     heldBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     events?: DepartmentHoldEventListRelationFilter
+    releases?: DepartmentHoldReleaseListRelationFilter
   }
 
   export type DepartmentHoldOrderByWithRelationInput = {
@@ -122109,6 +123636,7 @@ export namespace Prisma {
     program?: ProgramOrderByWithRelationInput
     heldBy?: UserOrderByWithRelationInput
     events?: DepartmentHoldEventOrderByRelationAggregateInput
+    releases?: DepartmentHoldReleaseOrderByRelationAggregateInput
   }
 
   export type DepartmentHoldWhereUniqueInput = Prisma.AtLeast<{
@@ -122156,6 +123684,7 @@ export namespace Prisma {
     program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
     heldBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     events?: DepartmentHoldEventListRelationFilter
+    releases?: DepartmentHoldReleaseListRelationFilter
   }, "id" | "holdNumber" | "activeKey">
 
   export type DepartmentHoldOrderByWithAggregationInput = {
@@ -122331,6 +123860,146 @@ export namespace Prisma {
     actorId?: StringNullableWithAggregatesFilter<"DepartmentHoldEvent"> | string | null
     actorName?: StringWithAggregatesFilter<"DepartmentHoldEvent"> | string
     createdAt?: DateTimeWithAggregatesFilter<"DepartmentHoldEvent"> | Date | string
+  }
+
+  export type DepartmentHoldReleaseWhereInput = {
+    AND?: DepartmentHoldReleaseWhereInput | DepartmentHoldReleaseWhereInput[]
+    OR?: DepartmentHoldReleaseWhereInput[]
+    NOT?: DepartmentHoldReleaseWhereInput | DepartmentHoldReleaseWhereInput[]
+    id?: StringFilter<"DepartmentHoldRelease"> | string
+    holdId?: StringFilter<"DepartmentHoldRelease"> | string
+    departmentCode?: StringFilter<"DepartmentHoldRelease"> | string
+    mode?: StringFilter<"DepartmentHoldRelease"> | string
+    quantity?: FloatFilter<"DepartmentHoldRelease"> | number
+    unit?: StringFilter<"DepartmentHoldRelease"> | string
+    remainingAfter?: FloatFilter<"DepartmentHoldRelease"> | number
+    programId?: StringFilter<"DepartmentHoldRelease"> | string
+    originalChallanId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    originalChallanNumber?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    originalChallanItemId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    newChallanId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    newChallanNumber?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    newChallanItemId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    destinationDepartment?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    eventId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    idempotencyKey?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    remarks?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    releasedById?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    releasedByName?: StringFilter<"DepartmentHoldRelease"> | string
+    createdAt?: DateTimeFilter<"DepartmentHoldRelease"> | Date | string
+    hold?: XOR<DepartmentHoldScalarRelationFilter, DepartmentHoldWhereInput>
+    newChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+  }
+
+  export type DepartmentHoldReleaseOrderByWithRelationInput = {
+    id?: SortOrder
+    holdId?: SortOrder
+    departmentCode?: SortOrder
+    mode?: SortOrder
+    quantity?: SortOrder
+    unit?: SortOrder
+    remainingAfter?: SortOrder
+    programId?: SortOrder
+    originalChallanId?: SortOrderInput | SortOrder
+    originalChallanNumber?: SortOrderInput | SortOrder
+    originalChallanItemId?: SortOrderInput | SortOrder
+    newChallanId?: SortOrderInput | SortOrder
+    newChallanNumber?: SortOrderInput | SortOrder
+    newChallanItemId?: SortOrderInput | SortOrder
+    destinationDepartment?: SortOrderInput | SortOrder
+    eventId?: SortOrderInput | SortOrder
+    idempotencyKey?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    releasedById?: SortOrderInput | SortOrder
+    releasedByName?: SortOrder
+    createdAt?: SortOrder
+    hold?: DepartmentHoldOrderByWithRelationInput
+    newChallan?: ChallanOrderByWithRelationInput
+  }
+
+  export type DepartmentHoldReleaseWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    idempotencyKey?: string
+    AND?: DepartmentHoldReleaseWhereInput | DepartmentHoldReleaseWhereInput[]
+    OR?: DepartmentHoldReleaseWhereInput[]
+    NOT?: DepartmentHoldReleaseWhereInput | DepartmentHoldReleaseWhereInput[]
+    holdId?: StringFilter<"DepartmentHoldRelease"> | string
+    departmentCode?: StringFilter<"DepartmentHoldRelease"> | string
+    mode?: StringFilter<"DepartmentHoldRelease"> | string
+    quantity?: FloatFilter<"DepartmentHoldRelease"> | number
+    unit?: StringFilter<"DepartmentHoldRelease"> | string
+    remainingAfter?: FloatFilter<"DepartmentHoldRelease"> | number
+    programId?: StringFilter<"DepartmentHoldRelease"> | string
+    originalChallanId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    originalChallanNumber?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    originalChallanItemId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    newChallanId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    newChallanNumber?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    newChallanItemId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    destinationDepartment?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    eventId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    remarks?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    releasedById?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    releasedByName?: StringFilter<"DepartmentHoldRelease"> | string
+    createdAt?: DateTimeFilter<"DepartmentHoldRelease"> | Date | string
+    hold?: XOR<DepartmentHoldScalarRelationFilter, DepartmentHoldWhereInput>
+    newChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+  }, "id" | "idempotencyKey">
+
+  export type DepartmentHoldReleaseOrderByWithAggregationInput = {
+    id?: SortOrder
+    holdId?: SortOrder
+    departmentCode?: SortOrder
+    mode?: SortOrder
+    quantity?: SortOrder
+    unit?: SortOrder
+    remainingAfter?: SortOrder
+    programId?: SortOrder
+    originalChallanId?: SortOrderInput | SortOrder
+    originalChallanNumber?: SortOrderInput | SortOrder
+    originalChallanItemId?: SortOrderInput | SortOrder
+    newChallanId?: SortOrderInput | SortOrder
+    newChallanNumber?: SortOrderInput | SortOrder
+    newChallanItemId?: SortOrderInput | SortOrder
+    destinationDepartment?: SortOrderInput | SortOrder
+    eventId?: SortOrderInput | SortOrder
+    idempotencyKey?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    releasedById?: SortOrderInput | SortOrder
+    releasedByName?: SortOrder
+    createdAt?: SortOrder
+    _count?: DepartmentHoldReleaseCountOrderByAggregateInput
+    _avg?: DepartmentHoldReleaseAvgOrderByAggregateInput
+    _max?: DepartmentHoldReleaseMaxOrderByAggregateInput
+    _min?: DepartmentHoldReleaseMinOrderByAggregateInput
+    _sum?: DepartmentHoldReleaseSumOrderByAggregateInput
+  }
+
+  export type DepartmentHoldReleaseScalarWhereWithAggregatesInput = {
+    AND?: DepartmentHoldReleaseScalarWhereWithAggregatesInput | DepartmentHoldReleaseScalarWhereWithAggregatesInput[]
+    OR?: DepartmentHoldReleaseScalarWhereWithAggregatesInput[]
+    NOT?: DepartmentHoldReleaseScalarWhereWithAggregatesInput | DepartmentHoldReleaseScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DepartmentHoldRelease"> | string
+    holdId?: StringWithAggregatesFilter<"DepartmentHoldRelease"> | string
+    departmentCode?: StringWithAggregatesFilter<"DepartmentHoldRelease"> | string
+    mode?: StringWithAggregatesFilter<"DepartmentHoldRelease"> | string
+    quantity?: FloatWithAggregatesFilter<"DepartmentHoldRelease"> | number
+    unit?: StringWithAggregatesFilter<"DepartmentHoldRelease"> | string
+    remainingAfter?: FloatWithAggregatesFilter<"DepartmentHoldRelease"> | number
+    programId?: StringWithAggregatesFilter<"DepartmentHoldRelease"> | string
+    originalChallanId?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    originalChallanNumber?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    originalChallanItemId?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    newChallanId?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    newChallanNumber?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    newChallanItemId?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    destinationDepartment?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    eventId?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    idempotencyKey?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    remarks?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    releasedById?: StringNullableWithAggregatesFilter<"DepartmentHoldRelease"> | string | null
+    releasedByName?: StringWithAggregatesFilter<"DepartmentHoldRelease"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"DepartmentHoldRelease"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -125900,6 +127569,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateInput = {
@@ -125946,6 +127616,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUpdateInput = {
@@ -125992,6 +127663,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateInput = {
@@ -126038,6 +127710,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanCreateManyInput = {
@@ -131932,6 +133605,7 @@ export namespace Prisma {
     program: ProgramCreateNestedOneWithoutDepartmentHoldsInput
     heldBy?: UserCreateNestedOneWithoutHoldsPlacedInput
     events?: DepartmentHoldEventCreateNestedManyWithoutHoldInput
+    releases?: DepartmentHoldReleaseCreateNestedManyWithoutHoldInput
   }
 
   export type DepartmentHoldUncheckedCreateInput = {
@@ -131974,6 +133648,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     events?: DepartmentHoldEventUncheckedCreateNestedManyWithoutHoldInput
+    releases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutHoldInput
   }
 
   export type DepartmentHoldUpdateInput = {
@@ -132016,6 +133691,7 @@ export namespace Prisma {
     program?: ProgramUpdateOneRequiredWithoutDepartmentHoldsNestedInput
     heldBy?: UserUpdateOneWithoutHoldsPlacedNestedInput
     events?: DepartmentHoldEventUpdateManyWithoutHoldNestedInput
+    releases?: DepartmentHoldReleaseUpdateManyWithoutHoldNestedInput
   }
 
   export type DepartmentHoldUncheckedUpdateInput = {
@@ -132058,6 +133734,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     events?: DepartmentHoldEventUncheckedUpdateManyWithoutHoldNestedInput
+    releases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutHoldNestedInput
   }
 
   export type DepartmentHoldCreateManyInput = {
@@ -132267,6 +133944,172 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     actorId?: NullableStringFieldUpdateOperationsInput | string | null
     actorName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DepartmentHoldReleaseCreateInput = {
+    id?: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId?: string | null
+    originalChallanNumber?: string | null
+    originalChallanItemId?: string | null
+    newChallanNumber?: string | null
+    newChallanItemId?: string | null
+    destinationDepartment?: string | null
+    eventId?: string | null
+    idempotencyKey?: string | null
+    remarks?: string | null
+    releasedById?: string | null
+    releasedByName: string
+    createdAt?: Date | string
+    hold: DepartmentHoldCreateNestedOneWithoutReleasesInput
+    newChallan?: ChallanCreateNestedOneWithoutHoldReleasesInput
+  }
+
+  export type DepartmentHoldReleaseUncheckedCreateInput = {
+    id?: string
+    holdId: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId?: string | null
+    originalChallanNumber?: string | null
+    originalChallanItemId?: string | null
+    newChallanId?: string | null
+    newChallanNumber?: string | null
+    newChallanItemId?: string | null
+    destinationDepartment?: string | null
+    eventId?: string | null
+    idempotencyKey?: string | null
+    remarks?: string | null
+    releasedById?: string | null
+    releasedByName: string
+    createdAt?: Date | string
+  }
+
+  export type DepartmentHoldReleaseUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    hold?: DepartmentHoldUpdateOneRequiredWithoutReleasesNestedInput
+    newChallan?: ChallanUpdateOneWithoutHoldReleasesNestedInput
+  }
+
+  export type DepartmentHoldReleaseUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    holdId?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DepartmentHoldReleaseCreateManyInput = {
+    id?: string
+    holdId: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId?: string | null
+    originalChallanNumber?: string | null
+    originalChallanItemId?: string | null
+    newChallanId?: string | null
+    newChallanNumber?: string | null
+    newChallanItemId?: string | null
+    destinationDepartment?: string | null
+    eventId?: string | null
+    idempotencyKey?: string | null
+    remarks?: string | null
+    releasedById?: string | null
+    releasedByName: string
+    createdAt?: Date | string
+  }
+
+  export type DepartmentHoldReleaseUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DepartmentHoldReleaseUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    holdId?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -134788,6 +136631,16 @@ export namespace Prisma {
   export type ChallanNullableScalarRelationFilter = {
     is?: ChallanWhereInput | null
     isNot?: ChallanWhereInput | null
+  }
+
+  export type DepartmentHoldReleaseListRelationFilter = {
+    every?: DepartmentHoldReleaseWhereInput
+    some?: DepartmentHoldReleaseWhereInput
+    none?: DepartmentHoldReleaseWhereInput
+  }
+
+  export type DepartmentHoldReleaseOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type ChallanFromDepartmentChallanNumberCompoundUniqueInput = {
@@ -138451,6 +140304,88 @@ export namespace Prisma {
   }
 
   export type DepartmentHoldEventSumOrderByAggregateInput = {
+    quantity?: SortOrder
+    remainingAfter?: SortOrder
+  }
+
+  export type DepartmentHoldReleaseCountOrderByAggregateInput = {
+    id?: SortOrder
+    holdId?: SortOrder
+    departmentCode?: SortOrder
+    mode?: SortOrder
+    quantity?: SortOrder
+    unit?: SortOrder
+    remainingAfter?: SortOrder
+    programId?: SortOrder
+    originalChallanId?: SortOrder
+    originalChallanNumber?: SortOrder
+    originalChallanItemId?: SortOrder
+    newChallanId?: SortOrder
+    newChallanNumber?: SortOrder
+    newChallanItemId?: SortOrder
+    destinationDepartment?: SortOrder
+    eventId?: SortOrder
+    idempotencyKey?: SortOrder
+    remarks?: SortOrder
+    releasedById?: SortOrder
+    releasedByName?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DepartmentHoldReleaseAvgOrderByAggregateInput = {
+    quantity?: SortOrder
+    remainingAfter?: SortOrder
+  }
+
+  export type DepartmentHoldReleaseMaxOrderByAggregateInput = {
+    id?: SortOrder
+    holdId?: SortOrder
+    departmentCode?: SortOrder
+    mode?: SortOrder
+    quantity?: SortOrder
+    unit?: SortOrder
+    remainingAfter?: SortOrder
+    programId?: SortOrder
+    originalChallanId?: SortOrder
+    originalChallanNumber?: SortOrder
+    originalChallanItemId?: SortOrder
+    newChallanId?: SortOrder
+    newChallanNumber?: SortOrder
+    newChallanItemId?: SortOrder
+    destinationDepartment?: SortOrder
+    eventId?: SortOrder
+    idempotencyKey?: SortOrder
+    remarks?: SortOrder
+    releasedById?: SortOrder
+    releasedByName?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DepartmentHoldReleaseMinOrderByAggregateInput = {
+    id?: SortOrder
+    holdId?: SortOrder
+    departmentCode?: SortOrder
+    mode?: SortOrder
+    quantity?: SortOrder
+    unit?: SortOrder
+    remainingAfter?: SortOrder
+    programId?: SortOrder
+    originalChallanId?: SortOrder
+    originalChallanNumber?: SortOrder
+    originalChallanItemId?: SortOrder
+    newChallanId?: SortOrder
+    newChallanNumber?: SortOrder
+    newChallanItemId?: SortOrder
+    destinationDepartment?: SortOrder
+    eventId?: SortOrder
+    idempotencyKey?: SortOrder
+    remarks?: SortOrder
+    releasedById?: SortOrder
+    releasedByName?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DepartmentHoldReleaseSumOrderByAggregateInput = {
     quantity?: SortOrder
     remainingAfter?: SortOrder
   }
@@ -143161,6 +145096,13 @@ export namespace Prisma {
     connect?: ShrinkageRecordWhereUniqueInput | ShrinkageRecordWhereUniqueInput[]
   }
 
+  export type DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput = {
+    create?: XOR<DepartmentHoldReleaseCreateWithoutNewChallanInput, DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput> | DepartmentHoldReleaseCreateWithoutNewChallanInput[] | DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput[]
+    connectOrCreate?: DepartmentHoldReleaseCreateOrConnectWithoutNewChallanInput | DepartmentHoldReleaseCreateOrConnectWithoutNewChallanInput[]
+    createMany?: DepartmentHoldReleaseCreateManyNewChallanInputEnvelope
+    connect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+  }
+
   export type ChallanUncheckedCreateNestedManyWithoutParentChallanInput = {
     create?: XOR<ChallanCreateWithoutParentChallanInput, ChallanUncheckedCreateWithoutParentChallanInput> | ChallanCreateWithoutParentChallanInput[] | ChallanUncheckedCreateWithoutParentChallanInput[]
     connectOrCreate?: ChallanCreateOrConnectWithoutParentChallanInput | ChallanCreateOrConnectWithoutParentChallanInput[]
@@ -143257,6 +145199,13 @@ export namespace Prisma {
     connectOrCreate?: ShrinkageRecordCreateOrConnectWithoutChallanInput | ShrinkageRecordCreateOrConnectWithoutChallanInput[]
     createMany?: ShrinkageRecordCreateManyChallanInputEnvelope
     connect?: ShrinkageRecordWhereUniqueInput | ShrinkageRecordWhereUniqueInput[]
+  }
+
+  export type DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput = {
+    create?: XOR<DepartmentHoldReleaseCreateWithoutNewChallanInput, DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput> | DepartmentHoldReleaseCreateWithoutNewChallanInput[] | DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput[]
+    connectOrCreate?: DepartmentHoldReleaseCreateOrConnectWithoutNewChallanInput | DepartmentHoldReleaseCreateOrConnectWithoutNewChallanInput[]
+    createMany?: DepartmentHoldReleaseCreateManyNewChallanInputEnvelope
+    connect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
   }
 
   export type ProgramUpdateOneRequiredWithoutChallansNestedInput = {
@@ -143527,6 +145476,20 @@ export namespace Prisma {
     deleteMany?: ShrinkageRecordScalarWhereInput | ShrinkageRecordScalarWhereInput[]
   }
 
+  export type DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput = {
+    create?: XOR<DepartmentHoldReleaseCreateWithoutNewChallanInput, DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput> | DepartmentHoldReleaseCreateWithoutNewChallanInput[] | DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput[]
+    connectOrCreate?: DepartmentHoldReleaseCreateOrConnectWithoutNewChallanInput | DepartmentHoldReleaseCreateOrConnectWithoutNewChallanInput[]
+    upsert?: DepartmentHoldReleaseUpsertWithWhereUniqueWithoutNewChallanInput | DepartmentHoldReleaseUpsertWithWhereUniqueWithoutNewChallanInput[]
+    createMany?: DepartmentHoldReleaseCreateManyNewChallanInputEnvelope
+    set?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    disconnect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    delete?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    connect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    update?: DepartmentHoldReleaseUpdateWithWhereUniqueWithoutNewChallanInput | DepartmentHoldReleaseUpdateWithWhereUniqueWithoutNewChallanInput[]
+    updateMany?: DepartmentHoldReleaseUpdateManyWithWhereWithoutNewChallanInput | DepartmentHoldReleaseUpdateManyWithWhereWithoutNewChallanInput[]
+    deleteMany?: DepartmentHoldReleaseScalarWhereInput | DepartmentHoldReleaseScalarWhereInput[]
+  }
+
   export type ChallanUncheckedUpdateManyWithoutParentChallanNestedInput = {
     create?: XOR<ChallanCreateWithoutParentChallanInput, ChallanUncheckedCreateWithoutParentChallanInput> | ChallanCreateWithoutParentChallanInput[] | ChallanUncheckedCreateWithoutParentChallanInput[]
     connectOrCreate?: ChallanCreateOrConnectWithoutParentChallanInput | ChallanCreateOrConnectWithoutParentChallanInput[]
@@ -143721,6 +145684,20 @@ export namespace Prisma {
     update?: ShrinkageRecordUpdateWithWhereUniqueWithoutChallanInput | ShrinkageRecordUpdateWithWhereUniqueWithoutChallanInput[]
     updateMany?: ShrinkageRecordUpdateManyWithWhereWithoutChallanInput | ShrinkageRecordUpdateManyWithWhereWithoutChallanInput[]
     deleteMany?: ShrinkageRecordScalarWhereInput | ShrinkageRecordScalarWhereInput[]
+  }
+
+  export type DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput = {
+    create?: XOR<DepartmentHoldReleaseCreateWithoutNewChallanInput, DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput> | DepartmentHoldReleaseCreateWithoutNewChallanInput[] | DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput[]
+    connectOrCreate?: DepartmentHoldReleaseCreateOrConnectWithoutNewChallanInput | DepartmentHoldReleaseCreateOrConnectWithoutNewChallanInput[]
+    upsert?: DepartmentHoldReleaseUpsertWithWhereUniqueWithoutNewChallanInput | DepartmentHoldReleaseUpsertWithWhereUniqueWithoutNewChallanInput[]
+    createMany?: DepartmentHoldReleaseCreateManyNewChallanInputEnvelope
+    set?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    disconnect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    delete?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    connect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    update?: DepartmentHoldReleaseUpdateWithWhereUniqueWithoutNewChallanInput | DepartmentHoldReleaseUpdateWithWhereUniqueWithoutNewChallanInput[]
+    updateMany?: DepartmentHoldReleaseUpdateManyWithWhereWithoutNewChallanInput | DepartmentHoldReleaseUpdateManyWithWhereWithoutNewChallanInput[]
+    deleteMany?: DepartmentHoldReleaseScalarWhereInput | DepartmentHoldReleaseScalarWhereInput[]
   }
 
   export type ChallanCreateNestedOneWithoutItemsInput = {
@@ -146761,11 +148738,25 @@ export namespace Prisma {
     connect?: DepartmentHoldEventWhereUniqueInput | DepartmentHoldEventWhereUniqueInput[]
   }
 
+  export type DepartmentHoldReleaseCreateNestedManyWithoutHoldInput = {
+    create?: XOR<DepartmentHoldReleaseCreateWithoutHoldInput, DepartmentHoldReleaseUncheckedCreateWithoutHoldInput> | DepartmentHoldReleaseCreateWithoutHoldInput[] | DepartmentHoldReleaseUncheckedCreateWithoutHoldInput[]
+    connectOrCreate?: DepartmentHoldReleaseCreateOrConnectWithoutHoldInput | DepartmentHoldReleaseCreateOrConnectWithoutHoldInput[]
+    createMany?: DepartmentHoldReleaseCreateManyHoldInputEnvelope
+    connect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+  }
+
   export type DepartmentHoldEventUncheckedCreateNestedManyWithoutHoldInput = {
     create?: XOR<DepartmentHoldEventCreateWithoutHoldInput, DepartmentHoldEventUncheckedCreateWithoutHoldInput> | DepartmentHoldEventCreateWithoutHoldInput[] | DepartmentHoldEventUncheckedCreateWithoutHoldInput[]
     connectOrCreate?: DepartmentHoldEventCreateOrConnectWithoutHoldInput | DepartmentHoldEventCreateOrConnectWithoutHoldInput[]
     createMany?: DepartmentHoldEventCreateManyHoldInputEnvelope
     connect?: DepartmentHoldEventWhereUniqueInput | DepartmentHoldEventWhereUniqueInput[]
+  }
+
+  export type DepartmentHoldReleaseUncheckedCreateNestedManyWithoutHoldInput = {
+    create?: XOR<DepartmentHoldReleaseCreateWithoutHoldInput, DepartmentHoldReleaseUncheckedCreateWithoutHoldInput> | DepartmentHoldReleaseCreateWithoutHoldInput[] | DepartmentHoldReleaseUncheckedCreateWithoutHoldInput[]
+    connectOrCreate?: DepartmentHoldReleaseCreateOrConnectWithoutHoldInput | DepartmentHoldReleaseCreateOrConnectWithoutHoldInput[]
+    createMany?: DepartmentHoldReleaseCreateManyHoldInputEnvelope
+    connect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
   }
 
   export type ProgramUpdateOneRequiredWithoutDepartmentHoldsNestedInput = {
@@ -146800,6 +148791,20 @@ export namespace Prisma {
     deleteMany?: DepartmentHoldEventScalarWhereInput | DepartmentHoldEventScalarWhereInput[]
   }
 
+  export type DepartmentHoldReleaseUpdateManyWithoutHoldNestedInput = {
+    create?: XOR<DepartmentHoldReleaseCreateWithoutHoldInput, DepartmentHoldReleaseUncheckedCreateWithoutHoldInput> | DepartmentHoldReleaseCreateWithoutHoldInput[] | DepartmentHoldReleaseUncheckedCreateWithoutHoldInput[]
+    connectOrCreate?: DepartmentHoldReleaseCreateOrConnectWithoutHoldInput | DepartmentHoldReleaseCreateOrConnectWithoutHoldInput[]
+    upsert?: DepartmentHoldReleaseUpsertWithWhereUniqueWithoutHoldInput | DepartmentHoldReleaseUpsertWithWhereUniqueWithoutHoldInput[]
+    createMany?: DepartmentHoldReleaseCreateManyHoldInputEnvelope
+    set?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    disconnect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    delete?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    connect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    update?: DepartmentHoldReleaseUpdateWithWhereUniqueWithoutHoldInput | DepartmentHoldReleaseUpdateWithWhereUniqueWithoutHoldInput[]
+    updateMany?: DepartmentHoldReleaseUpdateManyWithWhereWithoutHoldInput | DepartmentHoldReleaseUpdateManyWithWhereWithoutHoldInput[]
+    deleteMany?: DepartmentHoldReleaseScalarWhereInput | DepartmentHoldReleaseScalarWhereInput[]
+  }
+
   export type DepartmentHoldEventUncheckedUpdateManyWithoutHoldNestedInput = {
     create?: XOR<DepartmentHoldEventCreateWithoutHoldInput, DepartmentHoldEventUncheckedCreateWithoutHoldInput> | DepartmentHoldEventCreateWithoutHoldInput[] | DepartmentHoldEventUncheckedCreateWithoutHoldInput[]
     connectOrCreate?: DepartmentHoldEventCreateOrConnectWithoutHoldInput | DepartmentHoldEventCreateOrConnectWithoutHoldInput[]
@@ -146812,6 +148817,20 @@ export namespace Prisma {
     update?: DepartmentHoldEventUpdateWithWhereUniqueWithoutHoldInput | DepartmentHoldEventUpdateWithWhereUniqueWithoutHoldInput[]
     updateMany?: DepartmentHoldEventUpdateManyWithWhereWithoutHoldInput | DepartmentHoldEventUpdateManyWithWhereWithoutHoldInput[]
     deleteMany?: DepartmentHoldEventScalarWhereInput | DepartmentHoldEventScalarWhereInput[]
+  }
+
+  export type DepartmentHoldReleaseUncheckedUpdateManyWithoutHoldNestedInput = {
+    create?: XOR<DepartmentHoldReleaseCreateWithoutHoldInput, DepartmentHoldReleaseUncheckedCreateWithoutHoldInput> | DepartmentHoldReleaseCreateWithoutHoldInput[] | DepartmentHoldReleaseUncheckedCreateWithoutHoldInput[]
+    connectOrCreate?: DepartmentHoldReleaseCreateOrConnectWithoutHoldInput | DepartmentHoldReleaseCreateOrConnectWithoutHoldInput[]
+    upsert?: DepartmentHoldReleaseUpsertWithWhereUniqueWithoutHoldInput | DepartmentHoldReleaseUpsertWithWhereUniqueWithoutHoldInput[]
+    createMany?: DepartmentHoldReleaseCreateManyHoldInputEnvelope
+    set?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    disconnect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    delete?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    connect?: DepartmentHoldReleaseWhereUniqueInput | DepartmentHoldReleaseWhereUniqueInput[]
+    update?: DepartmentHoldReleaseUpdateWithWhereUniqueWithoutHoldInput | DepartmentHoldReleaseUpdateWithWhereUniqueWithoutHoldInput[]
+    updateMany?: DepartmentHoldReleaseUpdateManyWithWhereWithoutHoldInput | DepartmentHoldReleaseUpdateManyWithWhereWithoutHoldInput[]
+    deleteMany?: DepartmentHoldReleaseScalarWhereInput | DepartmentHoldReleaseScalarWhereInput[]
   }
 
   export type DepartmentHoldCreateNestedOneWithoutEventsInput = {
@@ -146842,6 +148861,36 @@ export namespace Prisma {
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutHoldEventsInput, UserUpdateWithoutHoldEventsInput>, UserUncheckedUpdateWithoutHoldEventsInput>
+  }
+
+  export type DepartmentHoldCreateNestedOneWithoutReleasesInput = {
+    create?: XOR<DepartmentHoldCreateWithoutReleasesInput, DepartmentHoldUncheckedCreateWithoutReleasesInput>
+    connectOrCreate?: DepartmentHoldCreateOrConnectWithoutReleasesInput
+    connect?: DepartmentHoldWhereUniqueInput
+  }
+
+  export type ChallanCreateNestedOneWithoutHoldReleasesInput = {
+    create?: XOR<ChallanCreateWithoutHoldReleasesInput, ChallanUncheckedCreateWithoutHoldReleasesInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutHoldReleasesInput
+    connect?: ChallanWhereUniqueInput
+  }
+
+  export type DepartmentHoldUpdateOneRequiredWithoutReleasesNestedInput = {
+    create?: XOR<DepartmentHoldCreateWithoutReleasesInput, DepartmentHoldUncheckedCreateWithoutReleasesInput>
+    connectOrCreate?: DepartmentHoldCreateOrConnectWithoutReleasesInput
+    upsert?: DepartmentHoldUpsertWithoutReleasesInput
+    connect?: DepartmentHoldWhereUniqueInput
+    update?: XOR<XOR<DepartmentHoldUpdateToOneWithWhereWithoutReleasesInput, DepartmentHoldUpdateWithoutReleasesInput>, DepartmentHoldUncheckedUpdateWithoutReleasesInput>
+  }
+
+  export type ChallanUpdateOneWithoutHoldReleasesNestedInput = {
+    create?: XOR<ChallanCreateWithoutHoldReleasesInput, ChallanUncheckedCreateWithoutHoldReleasesInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutHoldReleasesInput
+    upsert?: ChallanUpsertWithoutHoldReleasesInput
+    disconnect?: ChallanWhereInput | boolean
+    delete?: ChallanWhereInput | boolean
+    connect?: ChallanWhereUniqueInput
+    update?: XOR<XOR<ChallanUpdateToOneWithWhereWithoutHoldReleasesInput, ChallanUpdateWithoutHoldReleasesInput>, ChallanUncheckedUpdateWithoutHoldReleasesInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -147830,6 +149879,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutCreatedByInput = {
@@ -147875,6 +149925,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutCreatedByInput = {
@@ -147930,6 +149981,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutIssuedByInput = {
@@ -147975,6 +150027,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutIssuedByInput = {
@@ -148030,6 +150083,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutReceivedByInput = {
@@ -148075,6 +150129,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutReceivedByInput = {
@@ -148130,6 +150185,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutApprovedByInput = {
@@ -148175,6 +150231,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutApprovedByInput = {
@@ -149706,6 +151763,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDepartmentHoldsInput
     events?: DepartmentHoldEventCreateNestedManyWithoutHoldInput
+    releases?: DepartmentHoldReleaseCreateNestedManyWithoutHoldInput
   }
 
   export type DepartmentHoldUncheckedCreateWithoutHeldByInput = {
@@ -149747,6 +151805,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     events?: DepartmentHoldEventUncheckedCreateNestedManyWithoutHoldInput
+    releases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutHoldInput
   }
 
   export type DepartmentHoldCreateOrConnectWithoutHeldByInput = {
@@ -152215,6 +154274,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutFromDeptRelInput = {
@@ -152260,6 +154320,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutFromDeptRelInput = {
@@ -152315,6 +154376,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutToDeptRelInput = {
@@ -152360,6 +154422,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutToDeptRelInput = {
@@ -155084,6 +157147,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutProgramInput = {
@@ -155129,6 +157193,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutProgramInput = {
@@ -156182,6 +158247,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     heldBy?: UserCreateNestedOneWithoutHoldsPlacedInput
     events?: DepartmentHoldEventCreateNestedManyWithoutHoldInput
+    releases?: DepartmentHoldReleaseCreateNestedManyWithoutHoldInput
   }
 
   export type DepartmentHoldUncheckedCreateWithoutProgramInput = {
@@ -156223,6 +158289,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     events?: DepartmentHoldEventUncheckedCreateNestedManyWithoutHoldInput
+    releases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutHoldInput
   }
 
   export type DepartmentHoldCreateOrConnectWithoutProgramInput = {
@@ -161095,6 +163162,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutChildChallansInput = {
@@ -161140,6 +163208,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutChildChallansInput = {
@@ -161190,6 +163259,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutParentChallanInput = {
@@ -161235,6 +163305,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutParentChallanInput = {
@@ -162587,6 +164658,62 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DepartmentHoldReleaseCreateWithoutNewChallanInput = {
+    id?: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId?: string | null
+    originalChallanNumber?: string | null
+    originalChallanItemId?: string | null
+    newChallanNumber?: string | null
+    newChallanItemId?: string | null
+    destinationDepartment?: string | null
+    eventId?: string | null
+    idempotencyKey?: string | null
+    remarks?: string | null
+    releasedById?: string | null
+    releasedByName: string
+    createdAt?: Date | string
+    hold: DepartmentHoldCreateNestedOneWithoutReleasesInput
+  }
+
+  export type DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput = {
+    id?: string
+    holdId: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId?: string | null
+    originalChallanNumber?: string | null
+    originalChallanItemId?: string | null
+    newChallanNumber?: string | null
+    newChallanItemId?: string | null
+    destinationDepartment?: string | null
+    eventId?: string | null
+    idempotencyKey?: string | null
+    remarks?: string | null
+    releasedById?: string | null
+    releasedByName: string
+    createdAt?: Date | string
+  }
+
+  export type DepartmentHoldReleaseCreateOrConnectWithoutNewChallanInput = {
+    where: DepartmentHoldReleaseWhereUniqueInput
+    create: XOR<DepartmentHoldReleaseCreateWithoutNewChallanInput, DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput>
+  }
+
+  export type DepartmentHoldReleaseCreateManyNewChallanInputEnvelope = {
+    data: DepartmentHoldReleaseCreateManyNewChallanInput | DepartmentHoldReleaseCreateManyNewChallanInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProgramUpsertWithoutChallansInput = {
     update: XOR<ProgramUpdateWithoutChallansInput, ProgramUncheckedUpdateWithoutChallansInput>
     create: XOR<ProgramCreateWithoutChallansInput, ProgramUncheckedCreateWithoutChallansInput>
@@ -162818,6 +164945,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutChildChallansInput = {
@@ -162863,6 +164991,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUpsertWithWhereUniqueWithoutParentChallanInput = {
@@ -163659,6 +165788,49 @@ export namespace Prisma {
     data: XOR<ShrinkageRecordUpdateManyMutationInput, ShrinkageRecordUncheckedUpdateManyWithoutChallanInput>
   }
 
+  export type DepartmentHoldReleaseUpsertWithWhereUniqueWithoutNewChallanInput = {
+    where: DepartmentHoldReleaseWhereUniqueInput
+    update: XOR<DepartmentHoldReleaseUpdateWithoutNewChallanInput, DepartmentHoldReleaseUncheckedUpdateWithoutNewChallanInput>
+    create: XOR<DepartmentHoldReleaseCreateWithoutNewChallanInput, DepartmentHoldReleaseUncheckedCreateWithoutNewChallanInput>
+  }
+
+  export type DepartmentHoldReleaseUpdateWithWhereUniqueWithoutNewChallanInput = {
+    where: DepartmentHoldReleaseWhereUniqueInput
+    data: XOR<DepartmentHoldReleaseUpdateWithoutNewChallanInput, DepartmentHoldReleaseUncheckedUpdateWithoutNewChallanInput>
+  }
+
+  export type DepartmentHoldReleaseUpdateManyWithWhereWithoutNewChallanInput = {
+    where: DepartmentHoldReleaseScalarWhereInput
+    data: XOR<DepartmentHoldReleaseUpdateManyMutationInput, DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanInput>
+  }
+
+  export type DepartmentHoldReleaseScalarWhereInput = {
+    AND?: DepartmentHoldReleaseScalarWhereInput | DepartmentHoldReleaseScalarWhereInput[]
+    OR?: DepartmentHoldReleaseScalarWhereInput[]
+    NOT?: DepartmentHoldReleaseScalarWhereInput | DepartmentHoldReleaseScalarWhereInput[]
+    id?: StringFilter<"DepartmentHoldRelease"> | string
+    holdId?: StringFilter<"DepartmentHoldRelease"> | string
+    departmentCode?: StringFilter<"DepartmentHoldRelease"> | string
+    mode?: StringFilter<"DepartmentHoldRelease"> | string
+    quantity?: FloatFilter<"DepartmentHoldRelease"> | number
+    unit?: StringFilter<"DepartmentHoldRelease"> | string
+    remainingAfter?: FloatFilter<"DepartmentHoldRelease"> | number
+    programId?: StringFilter<"DepartmentHoldRelease"> | string
+    originalChallanId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    originalChallanNumber?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    originalChallanItemId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    newChallanId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    newChallanNumber?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    newChallanItemId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    destinationDepartment?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    eventId?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    idempotencyKey?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    remarks?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    releasedById?: StringNullableFilter<"DepartmentHoldRelease"> | string | null
+    releasedByName?: StringFilter<"DepartmentHoldRelease"> | string
+    createdAt?: DateTimeFilter<"DepartmentHoldRelease"> | Date | string
+  }
+
   export type ChallanCreateWithoutItemsInput = {
     id?: string
     challanNumber: string
@@ -163702,6 +165874,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutItemsInput = {
@@ -163747,6 +165920,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutItemsInput = {
@@ -164181,6 +166355,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutItemsInput = {
@@ -164226,6 +166401,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ProgramUpsertWithoutChallanItemsInput = {
@@ -164594,6 +166770,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemCreateNestedManyWithoutInboundChallanInput
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutShrinkageRecordsInput = {
@@ -164639,6 +166816,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemUncheckedCreateNestedManyWithoutInboundChallanInput
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutShrinkageRecordsInput = {
@@ -165180,6 +167358,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemUpdateManyWithoutInboundChallanNestedInput
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutShrinkageRecordsInput = {
@@ -165225,6 +167404,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemUncheckedUpdateManyWithoutInboundChallanNestedInput
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanItemUpsertWithoutShrinkageInput = {
@@ -165945,6 +168125,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutProductionLogsInput = {
@@ -165990,6 +168171,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutProductionLogsInput = {
@@ -166343,6 +168525,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutProductionLogsInput = {
@@ -166388,6 +168571,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type UserUpsertWithoutProductionRecordsInput = {
@@ -166554,6 +168738,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutInspectionsInput = {
@@ -166599,6 +168784,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutInspectionsInput = {
@@ -166835,6 +169021,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutInspectionsInput = {
@@ -166880,6 +169067,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type UserUpsertWithoutInspectionsInput = {
@@ -167174,6 +169362,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutEventsInput = {
@@ -167219,6 +169408,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutEventsInput = {
@@ -167395,6 +169585,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutEventsInput = {
@@ -167440,6 +169631,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type UserUpsertWithoutChallanEventsInput = {
@@ -168877,6 +171069,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutBundlesInput = {
@@ -168922,6 +171115,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutBundlesInput = {
@@ -169373,6 +171567,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutBundlesInput = {
@@ -169418,6 +171613,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type FabricRollUpsertWithoutBundlesInput = {
@@ -171198,6 +173394,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutDefectsInput = {
@@ -171243,6 +173440,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutDefectsInput = {
@@ -171739,6 +173937,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutDefectsInput = {
@@ -171784,6 +173983,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type BundleUpsertWithoutDefectsInput = {
@@ -177449,6 +179649,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutDyeingInboundOrdersInput = {
@@ -177494,6 +179695,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutDyeingInboundOrdersInput = {
@@ -177921,6 +180123,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutDyeingQc1OrdersInput = {
@@ -177966,6 +180169,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutDyeingQc1OrdersInput = {
@@ -178204,6 +180408,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutDyeingInboundOrdersInput = {
@@ -178249,6 +180454,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type UserUpsertWithoutDyeingOrdersReceivedInput = {
@@ -178684,6 +180890,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutDyeingQc1OrdersInput = {
@@ -178729,6 +180936,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type DyeingOrderCreateWithoutQcTransfersInput = {
@@ -178867,6 +181075,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutDyeingQcTransfersInput = {
@@ -178912,6 +181121,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutDyeingQcTransfersInput = {
@@ -179187,6 +181397,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutDyeingQcTransfersInput = {
@@ -179232,6 +181443,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type UserUpsertWithoutDyeingQcTransfersInput = {
@@ -179569,6 +181781,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutWorkItemsInboundInput = {
@@ -179614,6 +181827,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutWorkItemsInboundInput = {
@@ -180443,6 +182657,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutWorkItemsInboundInput = {
@@ -180488,6 +182703,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type WorkItemAllocationUpsertWithoutDownstreamItemsInput = {
@@ -181021,6 +183237,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemCreateNestedManyWithoutInboundChallanInput
     deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutWorkTransfersInput = {
@@ -181066,6 +183283,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemUncheckedCreateNestedManyWithoutInboundChallanInput
     deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutWorkTransfersInput = {
@@ -181402,6 +183620,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemUpdateManyWithoutInboundChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutWorkTransfersInput = {
@@ -181447,6 +183666,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemUncheckedUpdateManyWithoutInboundChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type WorkItemAllocationUpsertWithoutTransfersInput = {
@@ -183833,6 +186053,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemCreateNestedManyWithoutInboundChallanInput
     workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutDeadlineAlertsInput = {
@@ -183878,6 +186099,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemUncheckedCreateNestedManyWithoutInboundChallanInput
     workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
     shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+    holdReleases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutNewChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutDeadlineAlertsInput = {
@@ -184138,6 +186360,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemUpdateManyWithoutInboundChallanNestedInput
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutDeadlineAlertsInput = {
@@ -184183,6 +186406,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemUncheckedUpdateManyWithoutInboundChallanNestedInput
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type DeadlineAlertDismissalUpsertWithWhereUniqueWithoutAlertInput = {
@@ -186725,6 +188949,62 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DepartmentHoldReleaseCreateWithoutHoldInput = {
+    id?: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId?: string | null
+    originalChallanNumber?: string | null
+    originalChallanItemId?: string | null
+    newChallanNumber?: string | null
+    newChallanItemId?: string | null
+    destinationDepartment?: string | null
+    eventId?: string | null
+    idempotencyKey?: string | null
+    remarks?: string | null
+    releasedById?: string | null
+    releasedByName: string
+    createdAt?: Date | string
+    newChallan?: ChallanCreateNestedOneWithoutHoldReleasesInput
+  }
+
+  export type DepartmentHoldReleaseUncheckedCreateWithoutHoldInput = {
+    id?: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId?: string | null
+    originalChallanNumber?: string | null
+    originalChallanItemId?: string | null
+    newChallanId?: string | null
+    newChallanNumber?: string | null
+    newChallanItemId?: string | null
+    destinationDepartment?: string | null
+    eventId?: string | null
+    idempotencyKey?: string | null
+    remarks?: string | null
+    releasedById?: string | null
+    releasedByName: string
+    createdAt?: Date | string
+  }
+
+  export type DepartmentHoldReleaseCreateOrConnectWithoutHoldInput = {
+    where: DepartmentHoldReleaseWhereUniqueInput
+    create: XOR<DepartmentHoldReleaseCreateWithoutHoldInput, DepartmentHoldReleaseUncheckedCreateWithoutHoldInput>
+  }
+
+  export type DepartmentHoldReleaseCreateManyHoldInputEnvelope = {
+    data: DepartmentHoldReleaseCreateManyHoldInput | DepartmentHoldReleaseCreateManyHoldInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProgramUpsertWithoutDepartmentHoldsInput = {
     update: XOR<ProgramUpdateWithoutDepartmentHoldsInput, ProgramUncheckedUpdateWithoutDepartmentHoldsInput>
     create: XOR<ProgramCreateWithoutDepartmentHoldsInput, ProgramUncheckedCreateWithoutDepartmentHoldsInput>
@@ -187039,6 +189319,22 @@ export namespace Prisma {
     data: XOR<DepartmentHoldEventUpdateManyMutationInput, DepartmentHoldEventUncheckedUpdateManyWithoutHoldInput>
   }
 
+  export type DepartmentHoldReleaseUpsertWithWhereUniqueWithoutHoldInput = {
+    where: DepartmentHoldReleaseWhereUniqueInput
+    update: XOR<DepartmentHoldReleaseUpdateWithoutHoldInput, DepartmentHoldReleaseUncheckedUpdateWithoutHoldInput>
+    create: XOR<DepartmentHoldReleaseCreateWithoutHoldInput, DepartmentHoldReleaseUncheckedCreateWithoutHoldInput>
+  }
+
+  export type DepartmentHoldReleaseUpdateWithWhereUniqueWithoutHoldInput = {
+    where: DepartmentHoldReleaseWhereUniqueInput
+    data: XOR<DepartmentHoldReleaseUpdateWithoutHoldInput, DepartmentHoldReleaseUncheckedUpdateWithoutHoldInput>
+  }
+
+  export type DepartmentHoldReleaseUpdateManyWithWhereWithoutHoldInput = {
+    where: DepartmentHoldReleaseScalarWhereInput
+    data: XOR<DepartmentHoldReleaseUpdateManyMutationInput, DepartmentHoldReleaseUncheckedUpdateManyWithoutHoldInput>
+  }
+
   export type DepartmentHoldCreateWithoutEventsInput = {
     id?: string
     holdNumber: string
@@ -187078,6 +189374,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDepartmentHoldsInput
     heldBy?: UserCreateNestedOneWithoutHoldsPlacedInput
+    releases?: DepartmentHoldReleaseCreateNestedManyWithoutHoldInput
   }
 
   export type DepartmentHoldUncheckedCreateWithoutEventsInput = {
@@ -187119,6 +189416,7 @@ export namespace Prisma {
     closedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    releases?: DepartmentHoldReleaseUncheckedCreateNestedManyWithoutHoldInput
   }
 
   export type DepartmentHoldCreateOrConnectWithoutEventsInput = {
@@ -187291,6 +189589,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDepartmentHoldsNestedInput
     heldBy?: UserUpdateOneWithoutHoldsPlacedNestedInput
+    releases?: DepartmentHoldReleaseUpdateManyWithoutHoldNestedInput
   }
 
   export type DepartmentHoldUncheckedUpdateWithoutEventsInput = {
@@ -187332,6 +189631,7 @@ export namespace Prisma {
     closedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    releases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutHoldNestedInput
   }
 
   export type UserUpsertWithoutHoldEventsInput = {
@@ -187453,6 +189753,390 @@ export namespace Prisma {
     fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
+  }
+
+  export type DepartmentHoldCreateWithoutReleasesInput = {
+    id?: string
+    holdNumber: string
+    departmentCode: string
+    sourceType: string
+    sourceId: string
+    sourceKey: string
+    activeKey?: string | null
+    challanId?: string | null
+    challanNumber?: string | null
+    designNumber: string
+    serialNumber: string
+    productionSheetNumber: string
+    fabricName: string
+    colour?: string | null
+    size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
+    unit: string
+    receivedQuantity: number
+    forwardedQuantity: number
+    forwardedAtHold: number
+    holdQuantity: number
+    releasedQuantity?: number
+    remainingQuantity: number
+    reason: string
+    reasonOther?: string | null
+    remarks?: string | null
+    status?: string
+    heldByName: string
+    heldAt?: Date | string
+    closedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program: ProgramCreateNestedOneWithoutDepartmentHoldsInput
+    heldBy?: UserCreateNestedOneWithoutHoldsPlacedInput
+    events?: DepartmentHoldEventCreateNestedManyWithoutHoldInput
+  }
+
+  export type DepartmentHoldUncheckedCreateWithoutReleasesInput = {
+    id?: string
+    holdNumber: string
+    departmentCode: string
+    sourceType: string
+    sourceId: string
+    sourceKey: string
+    activeKey?: string | null
+    programId: string
+    challanId?: string | null
+    challanNumber?: string | null
+    designNumber: string
+    serialNumber: string
+    productionSheetNumber: string
+    fabricName: string
+    colour?: string | null
+    size?: string | null
+    productionType?: string | null
+    requiredColour?: string | null
+    challanDate?: Date | string | null
+    sendingDepartment?: string | null
+    processedAtHold?: number | null
+    unit: string
+    receivedQuantity: number
+    forwardedQuantity: number
+    forwardedAtHold: number
+    holdQuantity: number
+    releasedQuantity?: number
+    remainingQuantity: number
+    reason: string
+    reasonOther?: string | null
+    remarks?: string | null
+    status?: string
+    heldById?: string | null
+    heldByName: string
+    heldAt?: Date | string
+    closedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    events?: DepartmentHoldEventUncheckedCreateNestedManyWithoutHoldInput
+  }
+
+  export type DepartmentHoldCreateOrConnectWithoutReleasesInput = {
+    where: DepartmentHoldWhereUniqueInput
+    create: XOR<DepartmentHoldCreateWithoutReleasesInput, DepartmentHoldUncheckedCreateWithoutReleasesInput>
+  }
+
+  export type ChallanCreateWithoutHoldReleasesInput = {
+    id?: string
+    challanNumber: string
+    challanType: string
+    status?: string
+    priority?: string
+    issuedDate?: Date | string | null
+    receivedDate?: Date | string | null
+    completedDate?: Date | string | null
+    remarks?: string | null
+    inchargeName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveUnit?: string | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
+    program: ProgramCreateNestedOneWithoutChallansInput
+    parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
+    childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
+    fromDeptRel: DepartmentCreateNestedOneWithoutFromChallansInput
+    toDeptRel: DepartmentCreateNestedOneWithoutToChallansInput
+    createdBy: UserCreateNestedOneWithoutCreatedChallansInput
+    issuedBy?: UserCreateNestedOneWithoutIssuedChallansInput
+    receivedBy?: UserCreateNestedOneWithoutReceivedChallansInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedChallansInput
+    items?: ChallanItemCreateNestedManyWithoutChallanInput
+    productionLogs?: ProductionTransactionCreateNestedManyWithoutChallanInput
+    inspections?: QualityInspectionCreateNestedManyWithoutChallanInput
+    events?: ChallanEventCreateNestedManyWithoutChallanInput
+    bundles?: BundleCreateNestedManyWithoutChallanInput
+    defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcTransfers?: DyeingQcTransferCreateNestedManyWithoutChallanInput
+    workItemsInbound?: DepartmentWorkItemCreateNestedManyWithoutInboundChallanInput
+    workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
+    shrinkageRecords?: ShrinkageRecordCreateNestedManyWithoutChallanInput
+  }
+
+  export type ChallanUncheckedCreateWithoutHoldReleasesInput = {
+    id?: string
+    challanNumber: string
+    challanType: string
+    programId: string
+    parentChallanId?: string | null
+    fromDepartment: string
+    toDepartment: string
+    status?: string
+    priority?: string
+    issuedDate?: Date | string | null
+    receivedDate?: Date | string | null
+    completedDate?: Date | string | null
+    createdById: string
+    issuedById?: string | null
+    receivedById?: string | null
+    approvedById?: string | null
+    remarks?: string | null
+    inchargeName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveUnit?: string | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
+    childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
+    items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
+    productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
+    events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
+    bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
+    defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcTransfers?: DyeingQcTransferUncheckedCreateNestedManyWithoutChallanInput
+    workItemsInbound?: DepartmentWorkItemUncheckedCreateNestedManyWithoutInboundChallanInput
+    workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
+    shrinkageRecords?: ShrinkageRecordUncheckedCreateNestedManyWithoutChallanInput
+  }
+
+  export type ChallanCreateOrConnectWithoutHoldReleasesInput = {
+    where: ChallanWhereUniqueInput
+    create: XOR<ChallanCreateWithoutHoldReleasesInput, ChallanUncheckedCreateWithoutHoldReleasesInput>
+  }
+
+  export type DepartmentHoldUpsertWithoutReleasesInput = {
+    update: XOR<DepartmentHoldUpdateWithoutReleasesInput, DepartmentHoldUncheckedUpdateWithoutReleasesInput>
+    create: XOR<DepartmentHoldCreateWithoutReleasesInput, DepartmentHoldUncheckedCreateWithoutReleasesInput>
+    where?: DepartmentHoldWhereInput
+  }
+
+  export type DepartmentHoldUpdateToOneWithWhereWithoutReleasesInput = {
+    where?: DepartmentHoldWhereInput
+    data: XOR<DepartmentHoldUpdateWithoutReleasesInput, DepartmentHoldUncheckedUpdateWithoutReleasesInput>
+  }
+
+  export type DepartmentHoldUpdateWithoutReleasesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    holdNumber?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    sourceType?: StringFieldUpdateOperationsInput | string
+    sourceId?: StringFieldUpdateOperationsInput | string
+    sourceKey?: StringFieldUpdateOperationsInput | string
+    activeKey?: NullableStringFieldUpdateOperationsInput | string | null
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    designNumber?: StringFieldUpdateOperationsInput | string
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
+    unit?: StringFieldUpdateOperationsInput | string
+    receivedQuantity?: FloatFieldUpdateOperationsInput | number
+    forwardedQuantity?: FloatFieldUpdateOperationsInput | number
+    forwardedAtHold?: FloatFieldUpdateOperationsInput | number
+    holdQuantity?: FloatFieldUpdateOperationsInput | number
+    releasedQuantity?: FloatFieldUpdateOperationsInput | number
+    remainingQuantity?: FloatFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    reasonOther?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    heldByName?: StringFieldUpdateOperationsInput | string
+    heldAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneRequiredWithoutDepartmentHoldsNestedInput
+    heldBy?: UserUpdateOneWithoutHoldsPlacedNestedInput
+    events?: DepartmentHoldEventUpdateManyWithoutHoldNestedInput
+  }
+
+  export type DepartmentHoldUncheckedUpdateWithoutReleasesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    holdNumber?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    sourceType?: StringFieldUpdateOperationsInput | string
+    sourceId?: StringFieldUpdateOperationsInput | string
+    sourceKey?: StringFieldUpdateOperationsInput | string
+    activeKey?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    designNumber?: StringFieldUpdateOperationsInput | string
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    size?: NullableStringFieldUpdateOperationsInput | string | null
+    productionType?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    challanDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sendingDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAtHold?: NullableFloatFieldUpdateOperationsInput | number | null
+    unit?: StringFieldUpdateOperationsInput | string
+    receivedQuantity?: FloatFieldUpdateOperationsInput | number
+    forwardedQuantity?: FloatFieldUpdateOperationsInput | number
+    forwardedAtHold?: FloatFieldUpdateOperationsInput | number
+    holdQuantity?: FloatFieldUpdateOperationsInput | number
+    releasedQuantity?: FloatFieldUpdateOperationsInput | number
+    remainingQuantity?: FloatFieldUpdateOperationsInput | number
+    reason?: StringFieldUpdateOperationsInput | string
+    reasonOther?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    heldById?: NullableStringFieldUpdateOperationsInput | string | null
+    heldByName?: StringFieldUpdateOperationsInput | string
+    heldAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    closedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    events?: DepartmentHoldEventUncheckedUpdateManyWithoutHoldNestedInput
+  }
+
+  export type ChallanUpsertWithoutHoldReleasesInput = {
+    update: XOR<ChallanUpdateWithoutHoldReleasesInput, ChallanUncheckedUpdateWithoutHoldReleasesInput>
+    create: XOR<ChallanCreateWithoutHoldReleasesInput, ChallanUncheckedCreateWithoutHoldReleasesInput>
+    where?: ChallanWhereInput
+  }
+
+  export type ChallanUpdateToOneWithWhereWithoutHoldReleasesInput = {
+    where?: ChallanWhereInput
+    data: XOR<ChallanUpdateWithoutHoldReleasesInput, ChallanUncheckedUpdateWithoutHoldReleasesInput>
+  }
+
+  export type ChallanUpdateWithoutHoldReleasesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanNumber?: StringFieldUpdateOperationsInput | string
+    challanType?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
+    parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
+    childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
+    fromDeptRel?: DepartmentUpdateOneRequiredWithoutFromChallansNestedInput
+    toDeptRel?: DepartmentUpdateOneRequiredWithoutToChallansNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedChallansNestedInput
+    issuedBy?: UserUpdateOneWithoutIssuedChallansNestedInput
+    receivedBy?: UserUpdateOneWithoutReceivedChallansNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedChallansNestedInput
+    items?: ChallanItemUpdateManyWithoutChallanNestedInput
+    productionLogs?: ProductionTransactionUpdateManyWithoutChallanNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutChallanNestedInput
+    events?: ChallanEventUpdateManyWithoutChallanNestedInput
+    bundles?: BundleUpdateManyWithoutChallanNestedInput
+    defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcTransfers?: DyeingQcTransferUpdateManyWithoutChallanNestedInput
+    workItemsInbound?: DepartmentWorkItemUpdateManyWithoutInboundChallanNestedInput
+    workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
+    shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+  }
+
+  export type ChallanUncheckedUpdateWithoutHoldReleasesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanNumber?: StringFieldUpdateOperationsInput | string
+    challanType?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    parentChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    fromDepartment?: StringFieldUpdateOperationsInput | string
+    toDepartment?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    issuedById?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
+    items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
+    productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
+    events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
+    bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
+    defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcTransfers?: DyeingQcTransferUncheckedUpdateManyWithoutChallanNestedInput
+    workItemsInbound?: DepartmentWorkItemUncheckedUpdateManyWithoutInboundChallanNestedInput
+    workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
+    shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type UserRoleCreateManyUserInput = {
@@ -189020,6 +191704,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutCreatedByInput = {
@@ -189065,6 +191750,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutCreatedByInput = {
@@ -189141,6 +191827,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutIssuedByInput = {
@@ -189186,6 +191873,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutIssuedByInput = {
@@ -189262,6 +191950,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutReceivedByInput = {
@@ -189307,6 +191996,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutReceivedByInput = {
@@ -189383,6 +192073,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutApprovedByInput = {
@@ -189428,6 +192119,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutApprovedByInput = {
@@ -191276,6 +193968,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDepartmentHoldsNestedInput
     events?: DepartmentHoldEventUpdateManyWithoutHoldNestedInput
+    releases?: DepartmentHoldReleaseUpdateManyWithoutHoldNestedInput
   }
 
   export type DepartmentHoldUncheckedUpdateWithoutHeldByInput = {
@@ -191317,6 +194010,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     events?: DepartmentHoldEventUncheckedUpdateManyWithoutHoldNestedInput
+    releases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutHoldNestedInput
   }
 
   export type DepartmentHoldUncheckedUpdateManyWithoutHeldByInput = {
@@ -191986,6 +194680,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutFromDeptRelInput = {
@@ -192031,6 +194726,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutFromDeptRelInput = {
@@ -192107,6 +194803,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutToDeptRelInput = {
@@ -192152,6 +194849,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutToDeptRelInput = {
@@ -194396,6 +197094,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutProgramInput = {
@@ -194441,6 +197140,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutProgramInput = {
@@ -195736,6 +198436,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     heldBy?: UserUpdateOneWithoutHoldsPlacedNestedInput
     events?: DepartmentHoldEventUpdateManyWithoutHoldNestedInput
+    releases?: DepartmentHoldReleaseUpdateManyWithoutHoldNestedInput
   }
 
   export type DepartmentHoldUncheckedUpdateWithoutProgramInput = {
@@ -195777,6 +198478,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     events?: DepartmentHoldEventUncheckedUpdateManyWithoutHoldNestedInput
+    releases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutHoldNestedInput
   }
 
   export type DepartmentHoldUncheckedUpdateManyWithoutProgramInput = {
@@ -196233,6 +198935,29 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type DepartmentHoldReleaseCreateManyNewChallanInput = {
+    id?: string
+    holdId: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId?: string | null
+    originalChallanNumber?: string | null
+    originalChallanItemId?: string | null
+    newChallanNumber?: string | null
+    newChallanItemId?: string | null
+    destinationDepartment?: string | null
+    eventId?: string | null
+    idempotencyKey?: string | null
+    remarks?: string | null
+    releasedById?: string | null
+    releasedByName: string
+    createdAt?: Date | string
+  }
+
   export type ChallanUpdateWithoutParentChallanInput = {
     id?: StringFieldUpdateOperationsInput | string
     challanNumber?: StringFieldUpdateOperationsInput | string
@@ -196276,6 +199001,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutParentChallanInput = {
@@ -196321,6 +199047,7 @@ export namespace Prisma {
     workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutChallanNestedInput
     deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
     shrinkageRecords?: ShrinkageRecordUncheckedUpdateManyWithoutChallanNestedInput
+    holdReleases?: DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutParentChallanInput = {
@@ -197347,6 +200074,75 @@ export namespace Prisma {
     updatedById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DepartmentHoldReleaseUpdateWithoutNewChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    hold?: DepartmentHoldUpdateOneRequiredWithoutReleasesNestedInput
+  }
+
+  export type DepartmentHoldReleaseUncheckedUpdateWithoutNewChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    holdId?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DepartmentHoldReleaseUncheckedUpdateManyWithoutNewChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    holdId?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ChallanItemCreateManySourceChallanItemInput = {
@@ -199731,6 +202527,29 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type DepartmentHoldReleaseCreateManyHoldInput = {
+    id?: string
+    departmentCode: string
+    mode: string
+    quantity: number
+    unit: string
+    remainingAfter: number
+    programId: string
+    originalChallanId?: string | null
+    originalChallanNumber?: string | null
+    originalChallanItemId?: string | null
+    newChallanId?: string | null
+    newChallanNumber?: string | null
+    newChallanItemId?: string | null
+    destinationDepartment?: string | null
+    eventId?: string | null
+    idempotencyKey?: string | null
+    remarks?: string | null
+    releasedById?: string | null
+    releasedByName: string
+    createdAt?: Date | string
+  }
+
   export type DepartmentHoldEventUpdateWithoutHoldInput = {
     id?: StringFieldUpdateOperationsInput | string
     action?: StringFieldUpdateOperationsInput | string
@@ -199764,6 +202583,75 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     actorId?: NullableStringFieldUpdateOperationsInput | string | null
     actorName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DepartmentHoldReleaseUpdateWithoutHoldInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    newChallan?: ChallanUpdateOneWithoutHoldReleasesNestedInput
+  }
+
+  export type DepartmentHoldReleaseUncheckedUpdateWithoutHoldInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DepartmentHoldReleaseUncheckedUpdateManyWithoutHoldInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    mode?: StringFieldUpdateOperationsInput | string
+    quantity?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    remainingAfter?: FloatFieldUpdateOperationsInput | number
+    programId?: StringFieldUpdateOperationsInput | string
+    originalChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    originalChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    newChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedById?: NullableStringFieldUpdateOperationsInput | string | null
+    releasedByName?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

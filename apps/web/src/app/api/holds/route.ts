@@ -6,7 +6,7 @@ import { departmentName } from '@/lib/workflow-views';
 
 export const dynamic = 'force-dynamic';
 
-/** GET ?department=CODE|ALL&view=open|closed|all&search=&reason=&unit=&from=&to= : HOLD records of the department (ALL: administrators). */
+/** GET ?department=CODE|ALL&view=open|closed|all&search=&reason=&unit=&from=&to=&status= : HOLD records of the department (ALL: administrators). */
 export async function GET(request: Request) {
   const { user, response } = await requireUser(request);
   if (!user) return response;
@@ -18,6 +18,7 @@ export async function GET(request: Request) {
       unit: searchParams.get('unit'),
       from: searchParams.get('from'),
       to: searchParams.get('to'),
+      status: searchParams.get('status'),
     });
     return NextResponse.json({
       data,

@@ -1478,6 +1478,30 @@ exports.Prisma.DepartmentHoldEventScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.DepartmentHoldReleaseScalarFieldEnum = {
+  id: 'id',
+  holdId: 'holdId',
+  departmentCode: 'departmentCode',
+  mode: 'mode',
+  quantity: 'quantity',
+  unit: 'unit',
+  remainingAfter: 'remainingAfter',
+  programId: 'programId',
+  originalChallanId: 'originalChallanId',
+  originalChallanNumber: 'originalChallanNumber',
+  originalChallanItemId: 'originalChallanItemId',
+  newChallanId: 'newChallanId',
+  newChallanNumber: 'newChallanNumber',
+  newChallanItemId: 'newChallanItemId',
+  destinationDepartment: 'destinationDepartment',
+  eventId: 'eventId',
+  idempotencyKey: 'idempotencyKey',
+  remarks: 'remarks',
+  releasedById: 'releasedById',
+  releasedByName: 'releasedByName',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1652,7 +1676,8 @@ exports.Prisma.ModelName = {
   ManualMigration: 'ManualMigration',
   FabricPhoto: 'FabricPhoto',
   DepartmentHold: 'DepartmentHold',
-  DepartmentHoldEvent: 'DepartmentHoldEvent'
+  DepartmentHoldEvent: 'DepartmentHoldEvent',
+  DepartmentHoldRelease: 'DepartmentHoldRelease'
 };
 
 /**

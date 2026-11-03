@@ -772,6 +772,11 @@ export default function QC1MyWorkPage() {
                           >
                             {challan.challanNumber}
                           </button>
+                          {/Released from HOLD/i.test(challan.remarks || '') && (
+                            <span className="block mt-1 w-fit px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent-100 text-neutral-900" title={challan.remarks || undefined}>
+                              From HOLD release
+                            </span>
+                          )}
                           {challan.issuedDate && (
                             <span className="text-[10px] text-neutral-500 block">
                               Issued: {new Date(challan.issuedDate).toLocaleDateString()}
