@@ -69,8 +69,9 @@ export async function GET(
 
 /**
  * DELETE { reason } (preview: GET /api/admin/programs/:id/delete-impact): a sheet no challan has used yet can be deleted by Programming (e.g. a mistaken draft). Once
- * challans exist, only an administrator can delete it, with a reason: its challans are deleted first, each rolled
- * back as a single challan delete is (lib/admin-delete-server.ts), then the sheet and its own records.
+ * challans exist, only an administrator can delete it, with a reason: its challan lines go first with everything built
+ * on them (onward challans, department lines, QC, HOLD, packing), all rolled back (lib/admin-delete-server.ts), then
+ * the sheet and its own records. Lines of other sheets on shared challans are kept.
  */
 export async function DELETE(
   request: Request,
@@ -106,6 +107,13 @@ export async function DELETE(
       await tx.recutRequest.deleteMany({ where: { programId: id } });
       await tx.stockLedgerEntry.deleteMany({ where: { programId: id } });
       await tx.defectRecord.deleteMany({ where: { programId: id } });
+      // Deadline alerts raised for the sheet (they point at it, so they would stop the delete).
+      const alerts = await tx.deadlineAlert.findMany({ where: { programId: id }, select: { id: true } });
+      if (alerts.length > 0) {
+        const alertIds = alerts.map((a: { id: string }) => a.id);
+        await tx.deadlineAlertDismissal.deleteMany({ where: { alertId: { in: alertIds } } });
+        await tx.deadlineAlert.deleteMany({ where: { id: { in: alertIds } } });
+      }
 
       // Bundles, cartons, fabric rolls, fabric batches (clear cartonBundle first)
       const progBundles = await tx.bundle.findMany({ where: { programId: id }, select: { id: true } });

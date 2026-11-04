@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Trash2, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { AlertTriangle, Trash2 } from 'lucide-react';
+import { ModalShell } from '@/components/common/ModalShell';
 
 // Delete confirmation shared by every department: a challan (lib/admin-delete-server.ts), a received entry or a HOLD
 // (lib/record-delete-server.ts). It first shows what the delete affects and why it is refused when it cannot be
@@ -78,6 +79,12 @@ export function DeleteRecordDialog({ target, onClose, onDeleted }: { target: Del
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const isChallan = target.kind === 'CHALLAN';
+  const errorRef = useRef<HTMLParagraphElement>(null);
+
+  // A failed delete keeps the dialog (and the reason typed) and brings its message into view.
+  useEffect(() => {
+    if (error) errorRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [error]);
 
   useEffect(() => {
     const url = isChallan ? `/api/challans/${target.id}/delete-impact` : `/api/records/delete?kind=${target.kind}&id=${encodeURIComponent(target.id)}`;
@@ -111,18 +118,29 @@ export function DeleteRecordDialog({ target, onClose, onDeleted }: { target: Del
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-neutral-900/50 p-3 overflow-y-auto text-left" role="dialog" aria-modal="true" aria-labelledby="delete-record-title">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-neutral-200">
-        <div className="px-5 py-4 border-b border-neutral-200 flex items-center justify-between gap-3">
-          <h3 id="delete-record-title" className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-            <Trash2 className="w-4 h-4 text-danger-600" />
-            {TITLE[target.kind]} · {target.label}
-          </h3>
-          <button type="button" onClick={onClose} className="p-1.5 text-neutral-500 hover:bg-neutral-100 rounded-lg" aria-label="Close">
-            <X className="w-4 h-4" />
+    <ModalShell
+      titleId="delete-record-title"
+      title={
+        <>
+          <Trash2 className="w-4 h-4 shrink-0 text-danger-600" />
+          {TITLE[target.kind]} · {target.label}
+        </>
+      }
+      onClose={onClose}
+      busy={deleting}
+      footer={
+        <>
+          <button type="button" onClick={onClose} disabled={deleting} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-700 border border-neutral-300 hover:bg-neutral-50">
+            {blocked ? 'Close' : 'Cancel'}
           </button>
-        </div>
-        <div className="p-5 space-y-4 text-xs">
+          {!blocked && (
+            <button type="button" onClick={submit} disabled={!ready} className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-danger-600 hover:bg-danger-700 disabled:opacity-50">
+              {deleting ? 'Deleting…' : 'Delete'}
+            </button>
+          )}
+        </>
+      }
+    >
           {loadError && <p role="alert" className="px-3 py-2 rounded-lg border border-danger-200 bg-danger-50 font-semibold text-danger-700">{loadError}</p>}
           {!impact && !loadError && <p className="text-neutral-500">Checking what this delete affects…</p>}
           {impact && (
@@ -159,21 +177,13 @@ export function DeleteRecordDialog({ target, onClose, onDeleted }: { target: Del
                   </label>
                 </>
               )}
-              {error && <p role="alert" className="px-3 py-2 rounded-lg border border-danger-200 bg-danger-50 font-semibold text-danger-700">{error}</p>}
+              {error && (
+                <p ref={errorRef} role="alert" className="px-3 py-2 rounded-lg border border-danger-200 bg-danger-50 font-semibold text-danger-700 whitespace-pre-wrap">
+                  {error}
+                </p>
+              )}
             </>
           )}
-        </div>
-        <div className="px-5 py-4 border-t border-neutral-200 flex justify-end gap-2">
-          <button type="button" onClick={onClose} disabled={deleting} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-700 border border-neutral-300 hover:bg-neutral-50">
-            {blocked ? 'Close' : 'Cancel'}
-          </button>
-          {!blocked && (
-            <button type="button" onClick={submit} disabled={!ready} className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-danger-600 hover:bg-danger-700 disabled:opacity-50">
-              {deleting ? 'Deleting…' : 'Delete'}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

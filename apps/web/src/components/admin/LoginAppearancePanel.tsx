@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Eye, EyeOff, RefreshCw, RotateCcw, Upload, X } from 'lucide-react';
 import {
   DEFAULT_APP_BACKGROUND,
   DEFAULT_LOGIN_BACKGROUND,
   DEFAULT_SIDEBAR_IMAGE,
   appBackgroundSrc,
+  brandingVersionToken,
   loginBackgroundSrc,
   sidebarImageSrc,
 } from '@/lib/branding';
@@ -35,13 +36,16 @@ type Notify = (text: string, type?: 'success' | 'error') => void;
 const formatSize = (bytes: number) =>
   bytes >= 1024 * 1024 ? `${(bytes / (1024 * 1024)).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
 
-/** A scaled-down login screen with the same background framing and overlay as the real page. */
+/**
+ * A scaled-down login screen with the same background framing and overlay as the real page. Like the
+ * login page, nothing is layered under the image: if it cannot load, the neutral canvas shows.
+ */
 function LoginPreview({ src, dimmed }: { src: string; dimmed?: boolean }) {
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
+    <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-neutral-200 bg-canvas">
       <div
         className={`absolute inset-0 bg-cover bg-center bg-no-repeat ${dimmed ? 'opacity-30 grayscale' : ''}`}
-        style={{ backgroundImage: `url("${src}"), url("${DEFAULT_LOGIN_BACKGROUND}")` }}
+        style={{ backgroundImage: `url("${src}")` }}
       />
       <div className="absolute inset-0 bg-white/55" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_50%_45%,rgba(255,255,255,0.6),transparent)]" />
@@ -101,13 +105,16 @@ function DepartmentPreview({ src, dimmed, off }: { src: string; dimmed?: boolean
   );
 }
 
-/** A scaled-down department sidebar: the image covers it from the bottom under a white fade. */
+/**
+ * A scaled-down department sidebar: the image covers it from the bottom under a white fade. Like the
+ * real sidebar, nothing is layered under the image: if it cannot load, the sidebar stays plain.
+ */
 function SidebarPreview({ src, dimmed }: { src: string; dimmed?: boolean }) {
   return (
     <div className="relative mx-auto aspect-[9/16] w-full max-w-[220px] overflow-hidden rounded-xl border border-neutral-200 bg-white">
       <div
         className={`absolute inset-0 bg-cover bg-bottom bg-no-repeat ${dimmed ? 'opacity-30 grayscale' : ''}`}
-        style={{ backgroundImage: `url("${src}"), url("${DEFAULT_SIDEBAR_IMAGE}")` }}
+        style={{ backgroundImage: `url("${src}")` }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-white from-25% via-white/85 via-50% to-white/0 to-90%" />
       <div className="relative p-[8%] space-y-2">
@@ -126,7 +133,7 @@ interface BrandingImagePanelProps {
   description: string;
   noun: string;
   defaultSrc: string;
-  srcForVersion: (version: number) => string;
+  srcForVersion: (version: string) => string;
   renderPreview: (props: { src: string; dimmed: boolean; off: boolean }) => React.ReactNode;
   /** Adds an on/off switch backed by the route's `enabled` setting. */
   withEnableSwitch?: boolean;
@@ -154,6 +161,9 @@ function BrandingImagePanel({
   const [altText, setAltText] = useState('');
   const [fileError, setFileError] = useState<string | null>(null);
   const Noun = noun.charAt(0).toUpperCase() + noun.slice(1);
+  // Each request takes a number; only the newest may apply its result, so a slow Refresh that returns
+  // after a Replace / Restore cannot put the previous image back on screen.
+  const latestRequest = useRef(0);
 
   const applyResponse = (data: { image?: BrandingImageInfo | null; enabled?: boolean }) => {
     setImage(data.image ?? null);
@@ -161,11 +171,13 @@ function BrandingImagePanel({
   };
 
   const load = async () => {
+    const seq = ++latestRequest.current;
     try {
       setLoading(true);
       setLoadError(null);
-      const res = await fetch(api);
+      const res = await fetch(api, { cache: 'no-store' });
       const data = await res.json();
+      if (seq !== latestRequest.current) return;
       if (!res.ok) throw new Error(data.error || `Failed to load the ${noun}`);
       applyResponse(data);
       setAltText(data.image?.altText || '');
@@ -211,12 +223,13 @@ function BrandingImagePanel({
   };
 
   const request = async (init: RequestInit, success: (data: any) => string) => {
+    const seq = ++latestRequest.current;
     try {
       setBusy(true);
       const res = await fetch(api, init);
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Request failed');
-      applyResponse(data);
+      if (seq === latestRequest.current) applyResponse(data);
       onNotify(success(data));
       return true;
     } catch (err: any) {
@@ -232,12 +245,13 @@ function BrandingImagePanel({
     const form = new FormData();
     form.append('file', file);
     form.append('altText', altText);
+    const seq = ++latestRequest.current;
     try {
       setBusy(true);
       const res = await fetch(api, { method: 'POST', body: form });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Upload failed');
-      applyResponse(data);
+      if (seq === latestRequest.current) applyResponse(data);
       clearDraft();
       onNotify(`${Noun} saved. It appears on the next page load.`);
     } catch (err: any) {
@@ -259,7 +273,7 @@ function BrandingImagePanel({
     }
   };
 
-  const currentSrc = image ? srcForVersion(image.version) : defaultSrc;
+  const currentSrc = image ? srcForVersion(brandingVersionToken(image.id, image.version)) : defaultSrc;
   const off = !!withEnableSwitch && !enabled;
   const badge = off
     ? { text: 'Off', cls: 'bg-neutral-100 text-neutral-600 border-neutral-200' }

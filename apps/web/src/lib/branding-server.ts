@@ -4,6 +4,7 @@ import { requireUser } from './auth/require-user';
 import { cloudinaryTransformUrl, destroyCloudinaryImage, uploadImageToCloudinary } from './cloudinary';
 import { MAX_ALT_TEXT_LENGTH, MAX_DEPARTMENT_IMAGE_BYTES, validateDepartmentImage } from './department-images';
 import { appearanceErrorResponse } from './department-images-server';
+import { brandingVersionToken } from './branding';
 
 /** Every column except the image bytes, so metadata reads never load the blob. */
 export const BRANDING_ASSET_META_SELECT = {
@@ -95,17 +96,17 @@ export async function readBooleanSetting(key: string, fallback: boolean): Promis
 
 /**
  * Streams (DATABASE) or redirects to (CLOUDINARY) the active image for a branding key, or redirects
- * to `defaultUrl` when none is active or it cannot be loaded. Versioned requests (?v=) are cached
- * for good; unversioned ones for 5 minutes, then revalidated by ETag.
+ * to `defaultUrl` when none is active or it cannot be loaded. Requests carrying the active image's
+ * version token (?v=) are cached for good; unversioned ones for 5 minutes, then revalidated by ETag.
  */
 export async function serveBrandingImage(
   request: Request,
   options: { key: string; defaultUrl: string; scope: 'public' | 'private'; cloudinaryTransform: string },
 ) {
-  const versioned = new URL(request.url).searchParams.has('v');
-  const cacheControl = versioned ? `${options.scope}, max-age=31536000, immutable` : `${options.scope}, max-age=300`;
+  const requested = new URL(request.url).searchParams.get('v');
+  const shortCache = `${options.scope}, max-age=300`;
   // Relative Location keeps the redirect on whatever host the browser used.
-  const fallback = (cache = cacheControl) =>
+  const fallback = (cache: string) =>
     new Response(null, { status: 302, headers: { Location: options.defaultUrl, 'Cache-Control': cache } });
 
   try {
@@ -113,7 +114,14 @@ export async function serveBrandingImage(
       where: { key: options.key, isActive: true },
       select: { id: true, version: true, storageProvider: true, imageUrl: true, mimeType: true },
     });
-    if (!meta) return fallback();
+    // A versioned URL that no longer names the active image (it changed after the page was rendered)
+    // must not cache whatever is current under that old URL for a year.
+    if (!meta) return fallback(requested ? 'no-store' : shortCache);
+    const cacheControl = !requested
+      ? shortCache
+      : requested === brandingVersionToken(meta.id, meta.version)
+      ? `${options.scope}, max-age=31536000, immutable`
+      : 'no-store';
 
     const etag = `"brand-${meta.id}-${meta.version}"`;
     if (request.headers.get('if-none-match') === etag) {
@@ -128,7 +136,7 @@ export async function serveBrandingImage(
     }
 
     const stored = await prisma.brandingAsset.findUnique({ where: { id: meta.id }, select: { imageData: true } });
-    if (!stored?.imageData) return fallback();
+    if (!stored?.imageData) return fallback('no-store');
 
     return new Response(stored.imageData, {
       status: 200,
@@ -146,14 +154,18 @@ export async function serveBrandingImage(
   }
 }
 
-/** Version of the active image for a key, or 0 when the default image is in use. */
-export async function activeBrandingVersion(key: string): Promise<number> {
+/**
+ * Version token of the active image for a key: '' when the default image is in use, null when it could
+ * not be read (callers decide whether the default is a safe guess).
+ */
+export async function activeBrandingVersion(key: string): Promise<string | null> {
   try {
-    const row = await prisma.brandingAsset.findFirst({ where: { key, isActive: true }, select: { version: true } });
-    return row?.version || 0;
+    const row = await prisma.brandingAsset.findFirst({ where: { key, isActive: true }, select: { id: true, version: true } });
+    return row ? brandingVersionToken(row.id, row.version) : '';
   } catch (error) {
-    if ((error as { code?: string } | null)?.code !== 'P2021') console.error(`Failed to read branding ${key}:`, error);
-    return 0;
+    if ((error as { code?: string } | null)?.code === 'P2021') return '';
+    console.error(`Failed to read branding ${key}:`, error);
+    return null;
   }
 }
 

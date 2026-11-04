@@ -4,17 +4,21 @@ import { WorkRequestError, round } from '@/lib/work-items-server';
 import { isQcItem, qcStatusOf, statusAfterTransfer } from '@/lib/work-items.mjs';
 import { allocationStatusOf } from '@/lib/recutting.mjs';
 import { statusAfterTransfer as dyeingStatusAfterTransfer } from '@/lib/dyeing-workflow.mjs';
-import { totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
-import { STOCK_TRANSACTION_OPTIONS, syncChallanStock } from '@/lib/fabric-stock-ledger';
+import { MIXED_UNIT, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
+import { STOCK_TRANSACTION_OPTIONS, isStoreOutwardChallan, syncChallanStock } from '@/lib/fabric-stock-ledger';
 import { syncItem as syncRecuttingItem } from '@/lib/recutting-server';
 import { writeAuditLog } from '@/lib/audit-log';
 import { wilcomSheetLabel } from '@/lib/wilcom-sheets';
 import { userBelongsToDepartment } from '@/lib/auth/department-access';
 import { departmentName } from '@/lib/workflow-views';
 
-// Administrator deletes of one challan or one Production Sheet, done so nothing is left inconsistent.
+// Deletes of one challan or one Production Sheet, done so nothing is left inconsistent.
 //
-// Deleting a challan removes it with everything that exists only because of it, and rolls back what it changed
+// Administrators: nothing built on the record stops the delete. Everything that depends on it (onward challans,
+// department lines, dyeing orders, QC records, HOLDs, packing) is removed with it, following the exact records by id,
+// with every quantity rolled back; see "Administrator deletes" below.
+//
+// The issuing department (before receipt): deleting a challan removes it with everything that exists only because of it, and rolls back what it changed
 // elsewhere, in one transaction:
 // - the sending side gets the quantity back (the department line, Recutting allocation or dyeing order it was
 //   issued from), and Fabric Store stock it issued returns to the store (MTR and PCS apart);
@@ -24,9 +28,9 @@ import { departmentName } from '@/lib/workflow-views';
 // deleting it would leave that work pointing at nothing, so the delete is refused and names what to delete first.
 // Deleting from the end of the chain backwards keeps every count right.
 //
-// Deleting a Production Sheet deletes all of its challans the same way (dependents first), then the sheet with its
-// own records (Wilcom designs are stored in the sheet). Records of other sheets are never touched: a sheet whose
-// challans also carry lines of another sheet (or the other way round) is refused until those lines are separated.
+// Deleting a Production Sheet (administrators only once it has challans) removes its challan lines with everything
+// built on them, then the sheet with its own records (Wilcom designs are stored in the sheet). Lines of other sheets
+// are never removed: a challan shared with another sheet keeps that sheet's lines.
 //
 // Every delete needs a reason and is written to the audit log with a snapshot; audit rows are never deleted.
 
@@ -159,6 +163,7 @@ function permissionBlockers(facts: NonNullable<Awaited<ReturnType<typeof challan
 export async function challanDeleteImpact(id: string, user: AuthenticatedUser) {
   const facts = await challanFacts(prisma, id);
   if (!facts) throw new WorkRequestError('Challan not found.', 404);
+  if (user.isAdmin) return adminChallanImpact(facts);
   return {
     ...facts.summary,
     fromDepartmentName: departmentName(facts.challan.fromDepartment),
@@ -269,43 +274,431 @@ const snapshotOf = (facts: NonNullable<Awaited<ReturnType<typeof challanFacts>>>
  */
 export async function deleteChallanAsAdmin(id: string, reason: string | null | undefined, user: AuthenticatedUser) {
   const why = typeof reason === 'string' ? reason.trim().slice(0, 500) : '';
-  if (!why) throw new WorkRequestError('Enter the reason for deleting this challan.');
+  // Administrators confirm in the dialog without a reason; a department deleting its own challan gives one.
+  if (!why && !user.isAdmin) throw new WorkRequestError('Enter the reason for deleting this challan.');
   return prisma.$transaction(async (tx) => {
     const facts = await challanFacts(tx, id);
     if (!facts) throw new WorkRequestError('Challan not found.', 404);
+    if (user.isAdmin) {
+      const plan = await buildDeletePlan(tx, { challanIds: [id] });
+      const removed = await describePlan(tx, plan, facts.challan.programId);
+      await executeDeletePlan(tx, plan, user.id, why || null);
+      await writeAuditLog(tx, {
+        actorId: user.id,
+        action: 'CHALLAN_DELETED',
+        entity: 'Challan',
+        entityId: id,
+        before: { ...snapshotOf(facts), stockAdjustments: { fabricStoreReturned: removed.storeReturnByUnit }, removed, reason: why || null },
+      });
+      return facts.summary;
+    }
     const denied = permissionBlockers(facts, user);
     if (denied.length) throw new WorkRequestError(denied.join(' '), 403);
     if (facts.blockers.length) throw new WorkRequestError(`Challan ${facts.challan.challanNumber} cannot be deleted yet. ${facts.blockers.join(' ')}`, 409);
     await removeChallan(tx, facts, user.id);
     await writeAuditLog(tx, { actorId: user.id, action: 'CHALLAN_DELETED', entity: 'Challan', entityId: id, before: { ...snapshotOf(facts), reason: why } });
     return facts.summary;
-  }, { ...TX, ...STOCK_TRANSACTION_OPTIONS });
+  }, { ...TX, ...STOCK_TRANSACTION_OPTIONS, timeout: 120000 });
 }
 
-/** A sheet's challans in delete order: a challan built on another goes first. */
-async function sheetChallans(db: Db, programId: string) {
-  const challans = await db.challan.findMany({ where: { programId }, select: { id: true, challanNumber: true, createdAt: true }, orderBy: { createdAt: 'desc' } });
-  return challans;
+/** An administrator's view of a challan delete: everything that goes with it, and nothing that stops it. */
+async function adminChallanImpact(facts: NonNullable<Awaited<ReturnType<typeof challanFacts>>>) {
+  const plan = await buildDeletePlan(prisma, { challanIds: [facts.challan.id] });
+  const details = await describePlan(prisma, plan, facts.challan.programId);
+  const onward = details.challans.filter((c) => c.id !== facts.challan.id);
+  const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  return {
+    ...facts.summary,
+    fromDepartmentName: departmentName(facts.challan.fromDepartment),
+    toDepartmentName: departmentName(facts.challan.toDepartment),
+    received: facts.received,
+    warning: facts.received ? `${departmentName(facts.challan.toDepartment)} has already received this challan; deleting it also removes that receipt and everything done with it since.` : null,
+    blockers: [] as string[],
+    effects: [
+      ...facts.effects,
+      onward.length
+        ? `${plural(onward.length, 'later challan')} built on it ${onward.length === 1 ? 'is' : 'are'} rolled back too: ${onward
+            .map((c) => `${c.challanNumber} (${c.whole ? 'deleted' : `${c.removedLines} of ${c.removedLines + c.keptLines} lines removed`})`)
+            .join(', ')}.`
+        : null,
+      details.departmentLines.length > facts.workItemIds.length
+        ? `${plural(details.departmentLines.length, 'department line')} in all ${details.departmentLines.length === 1 ? 'is' : 'are'} removed (${details.linesByDepartment.map((d) => `${d.department} ${d.count}`).join(', ')}).`
+        : null,
+      details.packing.length
+        ? `Packing ${details.packing.map((p) => `${p.packingNumber} (${p.inventoryLine}, ${p.quantity} PCS)`).join(', ')} ${details.packing.length === 1 ? 'is' : 'are'} removed with ${details.packing.length === 1 ? 'its' : 'their'} Inventory stock entries.`
+        : null,
+      details.otherSheets.length ? `Lines of other Production Sheets built on this challan are removed too: ${details.otherSheets.join(', ')}.` : null,
+    ].filter(Boolean) as string[],
+    ...details,
+  };
 }
 
-/** What deleting the Production Sheet would do (for the confirmation dialog), or why it cannot be deleted yet. */
+
+// ---------------------------------------------------------------- Administrator deletes: the whole dependency chain
+//
+// An administrator's delete is never stopped by later work. Starting from the exact challan lines being deleted (by
+// id, never by design or serial number), the plan follows every record built on them: lines issued onward from them
+// (sourceChallanItemId), department lines and dyeing orders received on them, what those forwarded on challans,
+// rework tasks and Recutting lines made from them, and packing sent from Inventory lines. Everything found is removed
+// in one transaction; quantities go back to whatever line they came from that stays, and Fabric Store stock comes back
+// per challan (MTR and PCS apart). A challan loses only the lines in the plan: one that also carries other lines
+// (another Production Sheet's) keeps them, and is deleted only when no line is left.
+
+interface PlanChallan {
+  id: string;
+  challanNumber: string;
+  challanType: string;
+  programId: string;
+  fromDepartment: string;
+  toDepartment: string;
+  status: string;
+  fabricUnit: string | null;
+  defectiveUnit: string | null;
+  defectivePieces: number | null;
+  items: Array<{ id: string; programId: string | null; quantity: number; uom: string }>;
+  removedItemIds: string[];
+  /** Every line goes, so the challan goes too. */
+  whole: boolean;
+}
+
+interface DeletePlan {
+  itemIds: Set<string>;
+  workItemIds: Set<string>;
+  orderIds: Set<string>;
+  challans: PlanChallan[];
+}
+
+const MAX_PLAN_ROUNDS = 200;
+
+async function buildDeletePlan(db: Db, seed: { itemIds?: string[]; challanIds?: string[] }): Promise<DeletePlan> {
+  const itemIds = new Set<string>();
+  const workItemIds = new Set<string>();
+  const orderIds = new Set<string>();
+  const wholeIds = new Set<string>();
+  let lines: string[] = [];
+  let works: string[] = [];
+  let orders: string[] = [];
+  let wholes: string[] = [];
+  const add = (set: Set<string>, queue: string[], id: string | null | undefined) => {
+    if (id && !set.has(id)) {
+      set.add(id);
+      queue.push(id);
+    }
+  };
+  for (const id of seed.itemIds || []) add(itemIds, lines, id);
+  for (const id of seed.challanIds || []) add(wholeIds, wholes, id);
+
+  let challans: PlanChallan[] = [];
+  for (let round = 0; ; round++) {
+    if (round > MAX_PLAN_ROUNDS) throw new WorkRequestError('This record is linked to too many others to delete in one step.', 409);
+    if (wholes.length) {
+      const ids = wholes;
+      wholes = [];
+      const [items, received, dyed, qcOutputs] = await Promise.all([
+        db.challanItem.findMany({ where: { challanId: { in: ids } }, select: { id: true } }),
+        db.departmentWorkItem.findMany({ where: { inboundChallanId: { in: ids } }, select: { id: true } }),
+        db.dyeingOrder.findMany({ where: { inboundChallanId: { in: ids } }, select: { id: true } }),
+        // QC results sent on from the challan; older ones are linked to it only as their parent.
+        db.challan.findMany({ where: { parentChallanId: { in: ids }, challanType: { in: QC_OUTPUT_TYPES } }, select: { id: true } }),
+      ]);
+      items.forEach((i) => add(itemIds, lines, i.id));
+      received.forEach((w) => add(workItemIds, works, w.id));
+      dyed.forEach((o) => add(orderIds, orders, o.id));
+      qcOutputs.forEach((c) => add(wholeIds, wholes, c.id));
+      continue;
+    }
+    if (lines.length) {
+      const ids = lines;
+      lines = [];
+      const [derived, received, dyed] = await Promise.all([
+        db.challanItem.findMany({ where: { sourceChallanItemId: { in: ids } }, select: { id: true } }),
+        db.departmentWorkItem.findMany({ where: { inboundChallanItemId: { in: ids } }, select: { id: true } }),
+        db.dyeingOrder.findMany({ where: { OR: [{ inboundChallanItemId: { in: ids } }, { reworkChallanItemId: { in: ids } }] }, select: { id: true } }),
+      ]);
+      derived.forEach((i) => add(itemIds, lines, i.id));
+      received.forEach((w) => add(workItemIds, works, w.id));
+      dyed.forEach((o) => add(orderIds, orders, o.id));
+      continue;
+    }
+    if (works.length) {
+      const ids = works;
+      works = [];
+      const [transfers, downstream] = await Promise.all([
+        db.departmentWorkTransfer.findMany({ where: { workItemId: { in: ids } }, select: { challanItemId: true } }),
+        // Rework tasks and Recutting lines made from these lines (with or without a challan of their own).
+        db.departmentWorkItem.findMany({
+          where: { OR: [{ sourceWorkItemId: { in: ids } }, { reworkSourceItemId: { in: ids } }, { sourceAllocation: { workItemId: { in: ids } } }] },
+          select: { id: true, inboundChallanItemId: true, origin: true },
+        }),
+      ]);
+      transfers.forEach((t) => add(itemIds, lines, t.challanItemId));
+      for (const w of downstream) {
+        add(workItemIds, works, w.id);
+        // A rework task shares the incoming line of the QC line it came from; other lines came on their own line.
+        if (w.origin !== 'REWORK') add(itemIds, lines, w.inboundChallanItemId);
+      }
+      continue;
+    }
+    if (orders.length) {
+      const ids = orders;
+      orders = [];
+      const sent = await db.dyeingQcTransfer.findMany({ where: { dyeingOrderId: { in: ids } }, select: { challanItemId: true } });
+      sent.forEach((t) => add(itemIds, lines, t.challanItemId));
+      continue;
+    }
+
+    // Nothing new to follow: see which challans lose every line. Those go as a whole, which can reach a little more
+    // (records tied only to the challan), so the walk continues until nothing changes.
+    const touched = itemIds.size ? await db.challanItem.findMany({ where: { id: { in: [...itemIds] } }, select: { challanId: true } }) : [];
+    const ids = Array.from(new Set([...wholeIds, ...touched.map((t) => t.challanId)]));
+    const rows = ids.length
+      ? await db.challan.findMany({
+          where: { id: { in: ids } },
+          select: {
+            id: true,
+            challanNumber: true,
+            challanType: true,
+            programId: true,
+            fromDepartment: true,
+            toDepartment: true,
+            status: true,
+            fabricUnit: true,
+            defectiveUnit: true,
+            defectivePieces: true,
+            items: { select: { id: true, programId: true, quantity: true, uom: true } },
+          },
+          orderBy: { createdAt: 'desc' },
+        })
+      : [];
+    challans = rows.map((c) => {
+      const removedItemIds = c.items.filter((i) => itemIds.has(i.id)).map((i) => i.id);
+      return { ...c, removedItemIds, whole: wholeIds.has(c.id) || removedItemIds.length === c.items.length };
+    });
+    const newlyWhole = challans.filter((c) => c.whole && !wholeIds.has(c.id));
+    if (!newlyWhole.length) break;
+    newlyWhole.forEach((c) => add(wholeIds, wholes, c.id));
+  }
+  return { itemIds, workItemIds, orderIds, challans };
+}
+
+/** What a plan removes, in words and numbers, for the confirmation dialog and the deletion history snapshot. */
+async function describePlan(db: Db, plan: DeletePlan, targetProgramId: string | null) {
+  const workIds = [...plan.workItemIds];
+  const orderIds = [...plan.orderIds];
+  const wholeIds = plan.challans.filter((c) => c.whole).map((c) => c.id);
+  const [works, orders, packing, holds, qcInspections, productionLogs] = await Promise.all([
+    workIds.length
+      ? db.departmentWorkItem.findMany({
+          where: { id: { in: workIds } },
+          select: { id: true, itemNumber: true, departmentCode: true, programId: true, status: true, uom: true, receivedQuantity: true, expectedQuantity: true },
+        })
+      : [],
+    orderIds.length
+      ? db.dyeingOrder.findMany({ where: { id: { in: orderIds } }, select: { id: true, orderNumber: true, programId: true, status: true, uom: true, requiredQuantity: true } })
+      : [],
+    workIds.length
+      ? db.packingAllocation.findMany({
+          where: { workItemId: { in: workIds } },
+          select: { id: true, packingNumber: true, quantity: true, packedQuantity: true, returnedQuantity: true, status: true, workItem: { select: { itemNumber: true } } },
+          orderBy: { createdAt: 'asc' },
+        })
+      : [],
+    workIds.length || orderIds.length || wholeIds.length
+      ? db.departmentHold.count({
+          where: {
+            OR: [
+              { sourceType: 'WORK_ITEM', sourceId: { in: workIds } },
+              { sourceType: 'DYEING_ORDER', sourceId: { in: orderIds } },
+              { sourceType: 'QC1_CHALLAN', sourceId: { in: wholeIds } },
+            ],
+          },
+        })
+      : 0,
+    wholeIds.length ? db.qualityInspection.count({ where: { challanId: { in: wholeIds } } }) : 0,
+    wholeIds.length ? db.productionTransaction.count({ where: { challanId: { in: wholeIds } } }) : 0,
+  ]);
+
+  const removedLines = plan.challans.flatMap((c) =>
+    c.items.filter((i) => plan.itemIds.has(i.id)).map((i) => ({ ...i, sheetId: i.programId || c.programId, challan: c })),
+  );
+  const storeLines = removedLines.filter((l) => isStoreOutwardChallan(l.challan));
+  const byDepartment: Record<string, number> = {};
+  for (const w of works) byDepartment[w.departmentCode] = (byDepartment[w.departmentCode] || 0) + 1;
+  if (orders.length) byDepartment.DYEING = (byDepartment.DYEING || 0) + orders.length;
+
+  // Lines of other Production Sheets that the plan reaches (built on this material) are named, never hidden.
+  const otherIds = new Set<string>();
+  if (targetProgramId) {
+    for (const l of removedLines) if (l.sheetId !== targetProgramId) otherIds.add(l.sheetId);
+    for (const r of [...works, ...orders]) if (r.programId !== targetProgramId) otherIds.add(r.programId);
+  }
+  const otherSheets = otherIds.size
+    ? (await db.program.findMany({ where: { id: { in: [...otherIds] } }, select: { programNumber: true, programSerialNo: true } })).map(sheetRef)
+    : [];
+
+  return {
+    challans: plan.challans.map((c) => {
+      const removed = c.items.filter((i) => plan.itemIds.has(i.id));
+      return {
+        id: c.id,
+        challanNumber: c.challanNumber,
+        fromDepartment: c.fromDepartment,
+        toDepartment: c.toDepartment,
+        whole: c.whole,
+        removedLines: removed.length,
+        keptLines: c.items.length - removed.length,
+        quantity: totalsText(removed),
+        quantityByUnit: totalsByUnit(removed, null),
+      };
+    }),
+    departmentLines: works.map((w) => ({
+      itemNumber: w.itemNumber,
+      department: departmentName(w.departmentCode),
+      status: w.status,
+      quantity: `${round(w.receivedQuantity ?? w.expectedQuantity)} ${w.uom}`,
+    })),
+    dyeingOrders: orders.map((o) => ({ orderNumber: o.orderNumber, status: o.status, quantity: `${round(o.requiredQuantity)} ${o.uom}` })),
+    packing: packing.map((a) => ({
+      packingNumber: a.packingNumber,
+      inventoryLine: a.workItem.itemNumber,
+      quantity: a.quantity,
+      packedQuantity: a.packedQuantity,
+      returnedQuantity: a.returnedQuantity,
+      status: a.status,
+    })),
+    inventoryLines: works.filter((w) => w.departmentCode === 'INVENTORY').map((w) => w.itemNumber),
+    linesByDepartment: Object.entries(byDepartment).map(([code, count]) => ({ department: departmentName(code), count })),
+    counts: { holds, qcInspections, productionLogs },
+    storeReturn: storeLines.length ? totalsText(storeLines) : null,
+    storeReturnByUnit: totalsByUnit(storeLines, null),
+    otherSheets,
+  };
+}
+
+/** Removes everything in the plan (see the notes above). Runs inside the caller's transaction. */
+async function executeDeletePlan(tx: any, plan: DeletePlan, actorId: string, why: string | null) {
+  const itemIds = [...plan.itemIds];
+  const workIds = [...plan.workItemIds];
+  const orderIds = [...plan.orderIds];
+  const whole = plan.challans.filter((c) => c.whole);
+  const partial = plan.challans.filter((c) => !c.whole);
+  const wholeIds = whole.map((c) => c.id);
+
+  // Senders that stay get their quantity back (senders in the plan are removed below anyway). Fabric Store stock
+  // issued on challans that go returns now; challans that keep lines are re-posted once their removed lines are gone.
+  await returnToSenders(tx, itemIds);
+  for (const c of whole) await syncChallanStock(tx, c.id, actorId, { removed: true });
+
+  // Receiving side: packing and its Inventory stock entries, receipt stock entries, HOLDs, deadline alerts.
+  const works = workIds.length ? await tx.departmentWorkItem.findMany({ where: { id: { in: workIds } }, select: { id: true, departmentCode: true } }) : [];
+  const packing = workIds.length ? await tx.packingAllocation.findMany({ where: { workItemId: { in: workIds } }, select: { id: true } }) : [];
+  const packingIds = packing.map((p: { id: string }) => p.id);
+  if (packingIds.length || works.length) {
+    await tx.stockLedgerEntry.deleteMany({
+      where: {
+        OR: [
+          { referenceType: 'PACKING', referenceId: { in: packingIds } },
+          { idempotencyKey: { in: works.map((w: { id: string; departmentCode: string }) => `${w.departmentCode}_RECEIPT:${w.id}`) } },
+        ],
+      },
+    });
+  }
+  await tx.packingAllocation.deleteMany({ where: { id: { in: packingIds } } });
+  await tx.departmentHold.deleteMany({
+    where: {
+      OR: [
+        { sourceType: 'WORK_ITEM', sourceId: { in: workIds } },
+        { sourceType: 'DYEING_ORDER', sourceId: { in: orderIds } },
+        { sourceType: 'QC1_CHALLAN', sourceId: { in: wholeIds } },
+      ],
+    },
+  });
+  const alerts = await tx.deadlineAlert.findMany({
+    where: { OR: [{ challanId: { in: wholeIds } }, { entityId: { in: [...wholeIds, ...orderIds, ...workIds] } }] },
+    select: { id: true },
+  });
+  if (alerts.length) {
+    const alertIds = alerts.map((a: { id: string }) => a.id);
+    await tx.deadlineAlertDismissal.deleteMany({ where: { alertId: { in: alertIds } } });
+    await tx.deadlineAlert.deleteMany({ where: { id: { in: alertIds } } });
+  }
+  await tx.departmentWorkItem.deleteMany({ where: { id: { in: workIds } } });
+  await tx.dyeingOrder.deleteMany({ where: { id: { in: orderIds } } });
+
+  // Challans that keep other lines: only the plan's lines go; stock and header totals follow the remaining lines.
+  for (const c of partial) {
+    const removed = c.items.filter((i) => c.removedItemIds.includes(i.id));
+    const remaining = c.items.filter((i) => !c.removedItemIds.includes(i.id));
+    await tx.challanItem.deleteMany({ where: { id: { in: c.removedItemIds } } });
+    await syncChallanStock(tx, c.id, actorId);
+    const totals = totalsByUnit(remaining, c.fabricUnit) as Record<string, number>;
+    const units = Object.keys(totals);
+    const defective = units.length === 1 && unitOf(c.defectiveUnit || c.fabricUnit) === units[0] ? Number(c.defectivePieces) || 0 : 0;
+    await tx.challan.update({
+      where: { id: c.id },
+      data:
+        units.length === 1
+          ? { fabricUnit: units[0], fabricOut: totals[units[0]], fabricIn: round(totals[units[0]] + defective) }
+          : { fabricUnit: MIXED_UNIT, fabricOut: null, fabricIn: null },
+    });
+    await tx.challanEvent.create({
+      data: {
+        challanId: c.id,
+        fromStatus: c.status,
+        toStatus: c.status,
+        action: 'LINES_DELETED',
+        actorId,
+        reason: why,
+        notes: `Administrator delete removed ${removed.length} line(s) (${totalsText(removed)}); ${remaining.length} line(s) kept.`,
+      },
+    });
+  }
+
+  // Challans that go: their own records, then the challans. Other challans only lose their link back to them.
+  if (wholeIds.length) {
+    await tx.dyeingOrder.updateMany({ where: { qc1ChallanId: { in: wholeIds } }, data: { qc1ChallanId: null } });
+    await tx.productionTransaction.deleteMany({ where: { challanId: { in: wholeIds } } });
+    const inspections = await tx.qualityInspection.findMany({ where: { challanId: { in: wholeIds } }, select: { id: true } });
+    const inspectionIds = inspections.map((i: { id: string }) => i.id);
+    if (inspectionIds.length) {
+      await tx.defectLog.deleteMany({ where: { inspectionId: { in: inspectionIds } } });
+      await tx.qualityInspectionParameter.deleteMany({ where: { inspectionId: { in: inspectionIds } } });
+    }
+    await tx.qualityInspection.deleteMany({ where: { challanId: { in: wholeIds } } });
+    await tx.defectRecord.deleteMany({ where: { challanId: { in: wholeIds } } });
+    const bundles = await tx.bundle.findMany({ where: { challanId: { in: wholeIds } }, select: { id: true } });
+    if (bundles.length) await tx.cartonBundle.deleteMany({ where: { bundleId: { in: bundles.map((b: { id: string }) => b.id) } } });
+    await tx.bundle.deleteMany({ where: { challanId: { in: wholeIds } } });
+    await tx.challan.updateMany({ where: { parentChallanId: { in: wholeIds } }, data: { parentChallanId: null } });
+    await tx.challanItem.deleteMany({ where: { challanId: { in: wholeIds } } });
+    await tx.challanEvent.deleteMany({ where: { challanId: { in: wholeIds } } });
+    await tx.challan.deleteMany({ where: { id: { in: wholeIds } } });
+  }
+}
+
+/** The lines a Production Sheet owns: lines naming it, and older lines without a sheet on its own challans. */
+async function sheetSeed(db: Db, programId: string) {
+  const [items, empty] = await Promise.all([
+    db.challanItem.findMany({ where: { OR: [{ programId }, { programId: null, challan: { programId } }] }, select: { id: true } }),
+    db.challan.findMany({ where: { programId, items: { none: {} } }, select: { id: true } }),
+  ]);
+  return { itemIds: items.map((i) => i.id), challanIds: empty.map((c) => c.id) };
+}
+
+/** What deleting the Production Sheet would remove (for the confirmation dialog). Nothing is changed. */
 export async function programDeleteImpact(id: string) {
   const program = await prisma.program.findUnique({
     where: { id },
     select: { id: true, programNumber: true, programSerialNo: true, designNumber: true, status: true, metadataJson: true, mainStyle: true, styleCode: true },
   });
   if (!program) throw new WorkRequestError('Production Sheet not found.', 404);
-  const challans = await sheetChallans(prisma, id);
-  const challanIds = challans.map((c) => c.id);
-  const [foreignLines, ownLinesElsewhere, workItems, orders, holds, inspections, productionLogs] = await Promise.all([
-    // Lines of other sheets carried on this sheet's challans.
-    prisma.challanItem.findMany({ where: { challanId: { in: challanIds }, programId: { not: null }, NOT: { programId: id } }, select: { challan: { select: { challanNumber: true } } } }),
-    // This sheet's lines carried on other sheets' challans.
-    prisma.challanItem.findMany({ where: { programId: id, challan: { programId: { not: id } } }, select: { challan: { select: { challanNumber: true } } } }),
-    prisma.departmentWorkItem.count({ where: { OR: [{ programId: id }, { inboundChallanId: { in: challanIds } }] } }),
-    prisma.dyeingOrder.count({ where: { programId: id } }),
+  const plan = await buildDeletePlan(prisma, await sheetSeed(prisma, id));
+  const details = await describePlan(prisma, plan, id);
+  const [sheetLines, sheetOrders, sheetHolds, sheetLogs] = await Promise.all([
+    // Records named after the sheet but not reached through a challan line (older data) go with the sheet too.
+    prisma.departmentWorkItem.count({ where: { programId: id, id: { notIn: [...plan.workItemIds] } } }),
+    prisma.dyeingOrder.count({ where: { programId: id, id: { notIn: [...plan.orderIds] } } }),
     prisma.departmentHold.count({ where: { programId: id } }),
-    prisma.qualityInspection.count({ where: { challanId: { in: challanIds } } }),
     prisma.productionTransaction.count({ where: { programId: id } }),
   ]);
   let wilcom = 0;
@@ -318,11 +711,9 @@ export async function programDeleteImpact(id: string) {
     const keys = components ? Object.keys(components).filter((k) => components[k]?.enabled !== false) : [];
     productionTypes = keys.length ? Array.from(new Set(keys.map((k) => wilcomSheetLabel(k, components)))) : ['TOP'];
   } catch {}
-  const blockers: string[] = [];
-  const foreign = Array.from(new Set(foreignLines.map((l) => l.challan.challanNumber)));
-  if (foreign.length) blockers.push(`Challan${foreign.length === 1 ? '' : 's'} ${foreign.join(', ')} of this sheet also carr${foreign.length === 1 ? 'ies' : 'y'} lines of other Production Sheets. Remove those lines (Edit challan) first.`);
-  const elsewhere = Array.from(new Set(ownLinesElsewhere.map((l) => l.challan.challanNumber)));
-  if (elsewhere.length) blockers.push(`This sheet has lines on other sheets' challan${elsewhere.length === 1 ? '' : 's'} ${elsewhere.join(', ')}. Remove those lines (Edit challan) first.`);
+  const deleted = details.challans.filter((c) => c.whole);
+  const departmentLines = details.departmentLines.length + sheetLines;
+  const dyeingOrders = details.dyeingOrders.length + sheetOrders;
   return {
     id: program.id,
     productionSheet: sheetRef(program),
@@ -332,18 +723,29 @@ export async function programDeleteImpact(id: string) {
     style: program.mainStyle || program.styleCode || null,
     productionTypes,
     status: program.status,
-    challanCount: challans.length,
-    challanNumbers: challans.map((c) => c.challanNumber),
+    challanCount: deleted.length,
+    challanNumbers: deleted.map((c) => c.challanNumber),
+    sharedChallans: details.challans.filter((c) => !c.whole),
     wilcomCount: wilcom,
-    dependentRecords: { departmentLines: workItems, dyeingOrders: orders, holds, qcInspections: inspections, productionLogs },
-    highImpact: challans.length > 0 || workItems > 0 || orders > 0,
-    blockers,
+    dependentRecords: {
+      departmentLines,
+      dyeingOrders,
+      holds: Math.max(details.counts.holds, sheetHolds),
+      qcInspections: details.counts.qcInspections,
+      productionLogs: Math.max(details.counts.productionLogs, sheetLogs),
+      packingRecords: details.packing.length,
+    },
+    dependentTotal: details.challans.length + departmentLines + dyeingOrders + details.packing.length,
+    ...details,
+    highImpact: details.challans.length > 0 || departmentLines > 0 || dyeingOrders > 0,
+    // An administrator's delete is not stopped by later work; kept for the dialog's shape.
+    blockers: [] as string[],
   };
 }
 
 /**
- * Deletes a Production Sheet with all of its challans (each rolled back as a single challan delete is) and its own
- * records. `removeSheetRecords` removes the sheet itself and its sheet-only records (the existing route code).
+ * Deletes a Production Sheet with everything built on its challan lines (see the notes above) and then the sheet with
+ * its own records. `removeSheetRecords` removes the sheet itself and its sheet-only records (the existing route code).
  */
 export async function deleteProgramAsAdmin(
   id: string,
@@ -352,41 +754,53 @@ export async function deleteProgramAsAdmin(
   removeSheetRecords: (tx: any) => Promise<void>,
 ) {
   if (!user.isAdmin) throw new WorkRequestError('Only an administrator can delete a Production Sheet that has challans.', 403);
-  const why = typeof reason === 'string' ? reason.trim().slice(0, 500) : '';
-  if (!why) throw new WorkRequestError('Enter the reason for deleting this Production Sheet.');
+  // Optional: the administrator confirms in the dialog; a reason sent anyway is kept in the history.
+  const why = typeof reason === 'string' ? reason.trim().slice(0, 500) || null : null;
   const impact = await programDeleteImpact(id);
-  if (impact.blockers.length) throw new WorkRequestError(`Production Sheet ${impact.productionSheet} cannot be deleted yet. ${impact.blockers.join(' ')}`, 409);
 
   return prisma.$transaction(async (tx) => {
-    // Challans built on another challan go first, so every rollback finds its source. Challans of other sheets that
-    // were issued onward from this sheet's challans would stop the loop; the blockers above rule out shared lines.
-    let remaining = await sheetChallans(tx, id);
-    const removed: any[] = [];
-    while (remaining.length) {
-      let progressed = false;
-      for (const c of remaining) {
-        const facts = await challanFacts(tx, c.id);
-        if (!facts) continue;
-        // Only dependants on this same sheet may wait for their turn; anything else blocks the delete.
-        if (facts.blockers.length) continue;
-        await removeChallan(tx, facts, user.id);
-        removed.push(snapshotOf(facts));
-        progressed = true;
+    // Planned again inside the transaction, so work saved since the dialog opened is included.
+    const plan = await buildDeletePlan(tx, await sheetSeed(tx, id));
+    const removed = await describePlan(tx, plan, id);
+    await executeDeletePlan(tx, plan, user.id, why);
+
+    // Challans of this sheet that keep other sheets' lines move to the sheet of their remaining lines, with their
+    // Fabric Store entries, so removing the sheet's own records below leaves the other sheets' stock as it is.
+    const kept = await tx.challan.findMany({
+      where: { programId: id },
+      select: { id: true, challanNumber: true, items: { where: { programId: { not: null } }, select: { programId: true }, take: 1 } },
+    });
+    for (const c of kept) {
+      const owner = c.items[0]?.programId;
+      if (!owner || owner === id) {
+        throw new WorkRequestError(`Challan ${c.challanNumber} could not be separated from Production Sheet ${impact.productionSheet}. Nothing was deleted.`, 409);
       }
-      const left = await sheetChallans(tx, id);
-      if (!progressed && left.length) {
-        const facts = await challanFacts(tx, left[0].id);
-        throw new WorkRequestError(`Production Sheet ${impact.productionSheet} cannot be deleted yet. ${facts?.blockers.join(' ') || ''}`, 409);
-      }
-      remaining = left;
+      await tx.challan.update({ where: { id: c.id }, data: { programId: owner } });
+      await tx.stockLedgerEntry.updateMany({ where: { referenceId: c.id, programId: id }, data: { programId: owner } });
+      await tx.deadlineAlert.updateMany({ where: { challanId: c.id, programId: id }, data: { programId: owner } });
     }
+
     await removeSheetRecords(tx);
     await writeAuditLog(tx, {
       actorId: user.id,
       action: 'PROGRAM_DELETED',
       entity: 'Program',
       entityId: id,
-      before: { ...impact, reason: why, challans: removed },
+      before: {
+        productionSheet: impact.productionSheet,
+        programNumber: impact.programNumber,
+        serialNumber: impact.serialNumber,
+        designNumber: impact.designNumber,
+        style: impact.style,
+        productionTypes: impact.productionTypes,
+        status: impact.status,
+        wilcomCount: impact.wilcomCount,
+        dependentRecords: impact.dependentRecords,
+        quantity: removed.storeReturn,
+        stockAdjustments: { fabricStoreReturned: removed.storeReturnByUnit },
+        removed,
+        reason: why,
+      },
     });
     return impact;
   }, { ...TX, ...STOCK_TRANSACTION_OPTIONS, timeout: 120000 });
