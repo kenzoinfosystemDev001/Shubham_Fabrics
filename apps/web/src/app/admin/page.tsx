@@ -39,6 +39,7 @@ import { DeletionHistoryPanel } from '@/components/admin/DeletionHistoryPanel';
 import { QualityMonitorPanel, type MonitorKind } from '@/components/admin/QualityMonitorPanel';
 import { departmentName } from '@/lib/workflow-views';
 import { printProductionSheet } from '@/lib/download-production-sheet';
+import { PasswordInput } from '@/components/common/PasswordInput';
 
 const QUALITY_TAB_KIND = { rejected: 'REJECT', rework: 'REWORK', hold: 'HOLD' } as const;
 const QUALITY_KIND_TAB = { REJECT: 'rejected', REWORK: 'rework', HOLD: 'hold' } as const;
@@ -1187,13 +1188,13 @@ export default function AdminConsolePage() {
                   <label className="block text-xs font-semibold text-neutral-700 mb-1">
                     Station PIN *
                   </label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     placeholder=""
+                    autoComplete="new-password"
                     value={newUser.pin}
                     onChange={(e) => setNewUser({ ...newUser, pin: e.target.value })}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-mono tracking-widest focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full pl-3 pr-10 py-2 border border-neutral-300 rounded-lg text-xs font-mono tracking-widest focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -1286,13 +1287,12 @@ export default function AdminConsolePage() {
 
               <div>
                 <label className="block text-xs font-semibold text-neutral-700 mb-1">New PIN</label>
-                <input
-                  type="password"
+                <PasswordInput
                   autoComplete="new-password"
                   placeholder="Leave blank to keep the current PIN"
                   value={editingUser.pin}
                   onChange={(e) => setEditingUser({ ...editingUser, pin: e.target.value })}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-mono tracking-widest focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                  className="w-full pl-3 pr-10 py-2 border border-neutral-300 rounded-lg text-xs font-mono tracking-widest focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 />
                 <p className="mt-1 text-[10px] text-neutral-500">
                   At least 4 characters. Simple PINs like 1234 or 0000 are not accepted.

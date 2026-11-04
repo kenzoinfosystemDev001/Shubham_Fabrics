@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { PasswordInput } from '@/components/common/PasswordInput';
 import { checkRouteAccess, getUserStationHome } from '@/lib/rbac';
 import { MES_DEPARTMENTS, isStationUsername } from '@/lib/departments';
 import {
@@ -243,22 +244,20 @@ export function LoginScreen({ backgroundSrc }: { backgroundSrc: string | null })
             </div>
 
             <div>
-              <div className="relative">
-                <input
-                  type="password"
-                  required
-                  name="mes-station-pin"
-                  // "new-password" stops browsers from filling in a saved PIN (they ignore "off" on password fields).
-                  autoComplete="new-password"
-                  data-lpignore="true"
-                  data-1p-ignore
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  placeholder="Security PIN"
-                  className="w-full pl-10 pr-4 py-3 bg-white/85 backdrop-blur-md border border-white/80 shadow-sm shadow-neutral-900/5 rounded-xl text-sm text-neutral-900 placeholder-neutral-400 tracking-wider focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500/40 transition"
-                />
-                <Lock className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
-              </div>
+              <PasswordInput
+                required
+                name="mes-station-pin"
+                // "new-password" stops browsers from filling in a saved PIN (they ignore "off" on password fields).
+                autoComplete="new-password"
+                data-lpignore="true"
+                data-1p-ignore
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                placeholder="Security PIN"
+                className="w-full pl-10 pr-11 py-3 bg-white/85 backdrop-blur-md border border-white/80 shadow-sm shadow-neutral-900/5 rounded-xl text-sm text-neutral-900 placeholder-neutral-400 tracking-wider focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500/40 transition"
+              >
+                <Lock className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5 pointer-events-none" />
+              </PasswordInput>
             </div>
 
             <button
