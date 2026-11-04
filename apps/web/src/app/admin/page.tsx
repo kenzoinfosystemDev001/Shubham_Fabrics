@@ -730,9 +730,6 @@ export default function AdminConsolePage() {
                     <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">
                       Master Production Sheets
                     </h2>
-                    <p className="text-xs text-neutral-500">
-                      View, print traveler cards, and delete/remove production sheets.
-                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -802,7 +799,7 @@ export default function AdminConsolePage() {
                                 <button
                                   onClick={() => printProductionSheet(p)}
                                   className="p-1 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded"
-                                  title="Print Traveler Sheet"
+                                  title="Print Production Sheet"
                                 >
                                   <Printer className="w-3.5 h-3.5" />
                                 </button>
