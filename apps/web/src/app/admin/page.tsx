@@ -708,7 +708,7 @@ export default function AdminConsolePage() {
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-xs"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>+ Add Production Sheet</span>
+                      <span>Add Production Sheet</span>
                     </Link>
                   </div>
                 </div>
@@ -730,7 +730,7 @@ export default function AdminConsolePage() {
                       {programs.length === 0 ? (
                         <tr>
                           <td colSpan={7} className="py-8 text-center text-neutral-500">
-                            No production sheets found. Click "+ Add Production Sheet" to create one.
+                            No production sheets found. Click "Add Production Sheet" to create one.
                           </td>
                         </tr>
                       ) : (
