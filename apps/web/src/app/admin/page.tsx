@@ -8,15 +8,13 @@ import {
   FileText,
   Truck,
   Building,
-  Layers,
-  Boxes,
+  Warehouse,
+  PackageCheck,
   Plus,
   Trash2,
   CheckCircle,
   AlertCircle,
-  Building2,
   LogOut,
-  ExternalLink,
   Printer,
   Search,
   RefreshCw,
@@ -36,6 +34,8 @@ import { AdminDepartmentMenu } from '@/components/admin/AdminDepartmentMenu';
 import { AdminDeleteDialog, type AdminDeleteTarget } from '@/components/admin/AdminDeleteDialog';
 import { DeletionHistoryPanel } from '@/components/admin/DeletionHistoryPanel';
 import { QualityMonitorPanel, type MonitorKind } from '@/components/admin/QualityMonitorPanel';
+import { FabricStorePanel } from '@/components/admin/FabricStorePanel';
+import { FinishedGoodsPanel } from '@/components/admin/FinishedGoodsPanel';
 import { departmentName } from '@/lib/workflow-views';
 import { printProductionSheet } from '@/lib/download-production-sheet';
 import { PasswordInput } from '@/components/common/PasswordInput';
@@ -83,7 +83,7 @@ interface EditableUser {
 export default function AdminConsolePage() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabrics' | 'stocks' | 'rejected' | 'rework' | 'hold' | 'deletions' | 'login-appearance'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabric-store' | 'inventory' | 'rejected' | 'rework' | 'hold' | 'deletions' | 'login-appearance'>('users');
   const [loading, setLoading] = useState(true);
 
   // Data states
@@ -91,10 +91,10 @@ export default function AdminConsolePage() {
   const [programs, setPrograms] = useState<any[]>([]);
   const [challans, setChallans] = useState<any[]>([]);
   const [suppliers, setSuppliers] = useState<any[]>([]);
-  const [fabrics, setFabrics] = useState<any[]>([]);
-  const [stocksData, setStocksData] = useState<any>(null);
   // Live counts of REJECT / REWORK / HOLD records for the monitoring tabs.
   const [qualityCounts, setQualityCounts] = useState<Record<MonitorKind, number> | null>(null);
+  // Production Sheets with finished garments still to be packed (Inventory badge).
+  const [inventoryOpenSheets, setInventoryOpenSheets] = useState<number | null>(null);
 
   // Search filter
   const [searchTerm, setSearchTerm] = useState('');
@@ -121,17 +121,6 @@ export default function AdminConsolePage() {
     taxNumber: '',
   });
 
-  const [showAddFabricModal, setShowAddFabricModal] = useState(false);
-  const [newFabric, setNewFabric] = useState({
-    name: '',
-    code: '',
-    fabricType: 'KNIT_PIQUE',
-    composition: '100% Cotton',
-    widthInInches: 60,
-    gsm: 220,
-    weaveType: 'Single Jersey',
-  });
-
   const [actionMessage, setActionMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [submittingModal, setSubmittingModal] = useState(false);
 
@@ -139,14 +128,13 @@ export default function AdminConsolePage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [usersRes, programsRes, challansRes, suppliersRes, fabricsRes, stocksRes, qualityRes] = await Promise.all([
+      const [usersRes, programsRes, challansRes, suppliersRes, qualityRes, inventoryRes] = await Promise.all([
         fetch('/api/admin/users').then((r) => r.json()).catch(() => []),
         fetch('/api/programs').then((r) => r.json()).catch(() => []),
         fetch('/api/challans').then((r) => r.json()).catch(() => []),
         fetch('/api/admin/suppliers').then((r) => r.json()).catch(() => []),
-        fetch('/api/admin/fabrics').then((r) => r.json()).catch(() => []),
-        fetch('/api/admin/stocks').then((r) => r.json()).catch(() => null),
         fetch('/api/admin/quality-monitor?countsOnly=1').then((r) => (r.ok ? r.json() : null)).catch(() => null),
+        fetch('/api/admin/inventory?view=counts').then((r) => (r.ok ? r.json() : null)).catch(() => null),
       ]);
 
       // Retired duplicate station accounts ("<name>-old", switched off) exist only so old records keep
@@ -159,9 +147,8 @@ export default function AdminConsolePage() {
       setPrograms(Array.isArray(programsRes) ? programsRes : []);
       setChallans(Array.isArray(challansRes) ? challansRes : []);
       setSuppliers(Array.isArray(suppliersRes) ? suppliersRes : []);
-      setFabrics(Array.isArray(fabricsRes) ? fabricsRes : []);
-      setStocksData(stocksRes);
       if (qualityRes?.counts) setQualityCounts(qualityRes.counts);
+      if (typeof inventoryRes?.openSheets === 'number') setInventoryOpenSheets(inventoryRes.openSheets);
     } catch (err: any) {
       console.error('Failed to load admin data:', err);
     } finally {
@@ -360,37 +347,6 @@ export default function AdminConsolePage() {
     }
   };
 
-  // Create Fabric handler
-  const handleCreateFabric = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setSubmittingModal(true);
-      const res = await fetch('/api/admin/fabrics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newFabric),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to add fabric');
-      showNotification(`Fabric "${newFabric.name}" registered.`);
-      setShowAddFabricModal(false);
-      setNewFabric({
-        name: '',
-        code: '',
-        fabricType: 'KNIT_PIQUE',
-        composition: '100% Cotton',
-        widthInInches: 60,
-        gsm: 220,
-        weaveType: 'Single Jersey',
-      });
-      loadData();
-    } catch (err: any) {
-      showNotification(err.message, 'error');
-    } finally {
-      setSubmittingModal(false);
-    }
-  };
-
   const handleSignOut = () => {
     api.clearToken();
     if (typeof window !== 'undefined') {
@@ -468,8 +424,8 @@ export default function AdminConsolePage() {
                   { id: 'programs', label: 'Program Sheets', icon: FileText, count: programs.length },
                   { id: 'challans', label: 'Challans', icon: Truck, count: challans.length },
                   { id: 'suppliers', label: 'Suppliers', icon: Building, count: suppliers.length },
-                  { id: 'fabrics', label: 'Fabrics Master', icon: Layers, count: fabrics.length },
-                  { id: 'stocks', label: 'Stocks & Inventory', icon: Boxes, count: stocksData?.summary?.totalRolls },
+                  { id: 'fabric-store', label: 'Fabric Store', icon: Warehouse, count: undefined },
+                  { id: 'inventory', label: 'Inventory', icon: PackageCheck, count: inventoryOpenSheets ?? undefined },
                   { id: 'rejected', label: 'Rejected Fabric', icon: ShieldAlert, count: qualityCounts?.REJECT },
                   { id: 'rework', label: 'Rework Fabric', icon: RotateCcw, count: qualityCounts?.REWORK },
                   { id: 'hold', label: 'Hold Fabric', icon: PauseCircle, count: qualityCounts?.HOLD },
@@ -532,6 +488,8 @@ export default function AdminConsolePage() {
             {/* DEPARTMENT SIDEBAR IMAGES */}
             {activeTab === 'deletions' && <DeletionHistoryPanel />}
             {activeTab === 'login-appearance' && <AppearancePanel onNotify={showNotification} />}
+            {activeTab === 'fabric-store' && <FabricStorePanel />}
+            {activeTab === 'inventory' && <FinishedGoodsPanel onOpenSheets={setInventoryOpenSheets} />}
 
             {/* REJECTED / REWORK / HOLD FABRIC MONITORING */}
             {(activeTab === 'rejected' || activeTab === 'rework' || activeTab === 'hold') && (
@@ -952,155 +910,6 @@ export default function AdminConsolePage() {
               </div>
             )}
 
-            {/* TAB 5: FABRICS MASTER */}
-            {activeTab === 'fabrics' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">
-                      Fabric Specifications Catalog
-                    </h2>
-                    <p className="text-xs text-neutral-500">
-                      Standard mill specs, compositions, weave types, and GSM weights.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setShowAddFabricModal(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-xs"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Add Fabric Spec</span>
-                  </button>
-                </div>
-
-                <div className="bg-white rounded-xl border border-neutral-200 shadow-xs overflow-x-auto">
-                  <table className="w-full text-left text-xs min-w-[640px]">
-                    <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-600 uppercase tracking-wider text-[10px]">
-                      <tr>
-                        <th className="py-3 px-4 font-bold">Code</th>
-                        <th className="py-3 px-4 font-bold">Fabric Name</th>
-                        <th className="py-3 px-4 font-bold">Type</th>
-                        <th className="py-3 px-4 font-bold">Composition</th>
-                        <th className="py-3 px-4 font-bold">GSM</th>
-                        <th className="py-3 px-4 font-bold">Width (Inches)</th>
-                        <th className="py-3 px-4 font-bold">Supplier</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-neutral-100">
-                      {fabrics.length === 0 ? (
-                        <tr>
-                          <td colSpan={7} className="py-8 text-center text-neutral-500">
-                            No fabric specs registered yet.
-                          </td>
-                        </tr>
-                      ) : (
-                        fabrics.map((f) => (
-                          <tr key={f.id} className="hover:bg-neutral-50/70 transition">
-                            <td className="py-3 px-4 font-mono font-bold text-neutral-900">{f.code}</td>
-                            <td className="py-3 px-4 font-semibold text-neutral-900">{f.name}</td>
-                            <td className="py-3 px-4 font-mono text-[11px] text-neutral-600">{f.fabricType}</td>
-                            <td className="py-3 px-4 text-neutral-700">{f.composition}</td>
-                            <td className="py-3 px-4 font-mono text-neutral-900">{f.gsm} gsm</td>
-                            <td className="py-3 px-4 font-mono text-neutral-900">{f.widthInInches}&quot;</td>
-                            <td className="py-3 px-4 text-neutral-600">{f.supplier?.name || '—'}</td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 6: STOCKS & INVENTORY */}
-            {activeTab === 'stocks' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">
-                      Factory Stocks &amp; Inventory Telemetry
-                    </h2>
-                    <p className="text-xs text-neutral-500">
-                      Live fabric rolls, batches, and stock distribution.
-                    </p>
-                  </div>
-                  <Link
-                    href="/fabric-store/inventory/stock"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-xs"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Open Fabric Store Inventory</span>
-                  </Link>
-                </div>
-
-                {/* KPI Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">
-                      Total Fabric Rolls
-                    </span>
-                    <div className="text-2xl font-bold font-mono text-neutral-900">
-                      {stocksData?.summary?.totalRolls || 0}
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">
-                      Total Fabric Length
-                    </span>
-                    <div className="text-2xl font-bold font-mono text-brand-700">
-                      {(stocksData?.summary?.totalMeters || 0).toLocaleString()} Mtr{stocksData?.summary?.totalPcs ? ` / ${stocksData.summary.totalPcs.toLocaleString()} Pcs` : ''}
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">
-                      Total Net Weight
-                    </span>
-                    <div className="text-2xl font-bold font-mono text-brand-700">
-                      {(stocksData?.summary?.totalWeightKg || 0).toLocaleString()} Kg
-                    </div>
-                  </div>
-                </div>
-
-                {/* Rolls Table */}
-                <div className="bg-white rounded-xl border border-neutral-200 shadow-xs overflow-x-auto">
-                  <div className="p-3 border-b border-neutral-200 bg-neutral-50 flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-900">Rolls In Stock</span>
-                  </div>
-                  <table className="w-full text-left text-xs min-w-[640px]">
-                    <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-600 uppercase tracking-wider text-[10px]">
-                      <tr>
-                        <th className="py-2.5 px-4 font-bold">Roll Barcode</th>
-                        <th className="py-2.5 px-4 font-bold">Batch #</th>
-                        <th className="py-2.5 px-4 font-bold">Fabric Name</th>
-                        <th className="py-2.5 px-4 font-bold">Color</th>
-                        <th className="py-2.5 px-4 font-bold">Length</th>
-                        <th className="py-2.5 px-4 font-bold">Weight</th>
-                        <th className="py-2.5 px-4 font-bold">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-neutral-100">
-                      {(stocksData?.rolls || []).slice(0, 20).map((r: any) => (
-                        <tr key={r.id} className="hover:bg-neutral-50/70 transition">
-                          <td className="py-2.5 px-4 font-mono font-bold text-neutral-900">{r.barcode}</td>
-                          <td className="py-2.5 px-4 font-mono text-neutral-600">{r.batchNumber}</td>
-                          <td className="py-2.5 px-4 text-neutral-900 font-medium">{r.fabricName}</td>
-                          <td className="py-2.5 px-4 text-neutral-700">{r.color}</td>
-                          <td className="py-2.5 px-4 font-mono font-semibold text-brand-700">{r.lengthMeters} {r.unit === 'PCS' ? 'PCS' : 'M'}</td>
-                          <td className="py-2.5 px-4 font-mono text-neutral-600">{r.netWeightKg} kg</td>
-                          <td className="py-2.5 px-4">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-700">
-                              {r.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
           </>
         )}
         </div>
@@ -1384,109 +1193,6 @@ export default function AdminConsolePage() {
                   className="px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
                 >
                   {submittingModal ? 'Saving...' : 'Save Supplier'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: ADD FABRIC */}
-      {showAddFabricModal && (
-        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-neutral-200 p-6 animate-in fade-in zoom-in-95">
-            <h3 className="text-base font-bold text-neutral-900 mb-4 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-brand-600" />
-              Add Fabric Specification
-            </h3>
-
-            <form onSubmit={handleCreateFabric} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                  Fabric Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder=""
-                  value={newFabric.name}
-                  onChange={(e) => setNewFabric({ ...newFabric, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                    Composition
-                  </label>
-                  <input
-                    type="text"
-                    placeholder=""
-                    value={newFabric.composition}
-                    onChange={(e) => setNewFabric({ ...newFabric, composition: e.target.value })}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                    Fabric Type
-                  </label>
-                  <select
-                    value={newFabric.fabricType}
-                    onChange={(e) => setNewFabric({ ...newFabric, fabricType: e.target.value })}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                  >
-                    <option value="KNIT_PIQUE">KNIT_PIQUE</option>
-                    <option value="SINGLE_JERSEY">SINGLE_JERSEY</option>
-                    <option value="FLEECE">FLEECE</option>
-                    <option value="RIB">RIB</option>
-                    <option value="WOVEN_TWILL">WOVEN_TWILL</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                    GSM (Weight)
-                  </label>
-                  <input
-                    type="number"
-                    placeholder=""
-                    value={newFabric.gsm}
-                    onChange={(e) => setNewFabric({ ...newFabric, gsm: parseFloat(e.target.value) || 220 })}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                    Width (Inches)
-                  </label>
-                  <input
-                    type="number"
-                    placeholder=""
-                    value={newFabric.widthInInches}
-                    onChange={(e) => setNewFabric({ ...newFabric, widthInInches: parseFloat(e.target.value) || 60 })}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
-                <button
-                  type="button"
-                  onClick={() => setShowAddFabricModal(false)}
-                  className="px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg text-xs font-semibold transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submittingModal}
-                  className="px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
-                >
-                  {submittingModal ? 'Saving...' : 'Save Fabric'}
                 </button>
               </div>
             </form>
