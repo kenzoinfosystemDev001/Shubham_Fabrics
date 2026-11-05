@@ -449,21 +449,9 @@ export default function AdminConsolePage() {
       {/* PAGE HEADING & TABS */}
       <div className="bg-white border-b border-neutral-200/80">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-5">
-          {/* Equal side columns keep the heading at the exact page centre; the button sits in the right one. */}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
-            <span aria-hidden="true" className="hidden md:block" />
-            <h1 className="text-xl sm:text-2xl font-semibold text-neutral-900 tracking-tight text-center">
-              Enterprise Administration &amp; Master Console
-            </h1>
-            <Link
-              href="/my-work/create-production-sheet"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-neutral-50 text-neutral-900 rounded-lg text-xs font-semibold ring-1 ring-neutral-300 shadow-xs transition justify-self-center md:justify-self-end"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Program Sheet</span>
-            </Link>
-          </div>
-
+          <h1 className="text-xl sm:text-2xl font-semibold text-neutral-900 tracking-tight text-center">
+            Enterprise Administration &amp; Master Console
+          </h1>
         </div>
       </div>
 
