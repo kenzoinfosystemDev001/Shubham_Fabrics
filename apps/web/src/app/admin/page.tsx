@@ -422,18 +422,7 @@ export default function AdminConsolePage() {
             </div>
           </div>
 
-          {/* No sideways scrolling here: it would clip the department menu. */}
           <div className="flex items-center gap-2">
-            <AdminDepartmentMenu />
-            <span className="hidden md:block w-px h-6 bg-neutral-200 mx-1" aria-hidden="true" />
-            <button
-              onClick={handleClearAllFactoryData}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-danger-700 border border-danger-200 bg-white hover:bg-danger-50 transition shrink-0"
-              title="Wipe all production sheets, challans, and operational data (Factory Reset)"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Wipe All Data</span>
-            </button>
             <button
               onClick={handleSignOut}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition shrink-0"
@@ -485,78 +474,67 @@ export default function AdminConsolePage() {
 
       {/* CONTENT AREA: sections listed one below another on the left (a single scrolling row on small screens) */}
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-6 lg:py-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
-        <nav aria-label="Administration sections" className="lg:w-60 shrink-0 lg:sticky lg:top-6 lg:self-start -mx-4 px-4 md:mx-0 md:px-0 overflow-x-auto lg:overflow-visible">
-          <div className="flex gap-1 w-max lg:w-auto lg:flex-col lg:gap-5 lg:bg-white lg:rounded-2xl lg:ring-1 lg:ring-neutral-200 lg:shadow-xs lg:p-3">
-            {[
-              {
-                label: 'General Management',
-                tabs: [
+        {/* Departments on top, the sections below (scrolling on their own when tall), Wipe All Data pinned at the bottom. */}
+        <nav aria-label="Administration sections" className="lg:w-60 shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] flex flex-col gap-3 lg:gap-0 lg:bg-white lg:rounded-2xl lg:ring-1 lg:ring-neutral-200 lg:shadow-xs lg:p-3">
+          <div className="flex flex-col gap-3 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
+            <AdminDepartmentMenu />
+            <div className="-mx-4 px-4 md:mx-0 md:px-0 overflow-x-auto lg:overflow-visible">
+              <div className="flex gap-1 w-max lg:w-auto lg:flex-col lg:gap-0.5">
+                {[
                   { id: 'users', label: 'Users', icon: Users, count: users.length },
                   { id: 'programs', label: 'Program Sheets', icon: FileText, count: programs.length },
                   { id: 'challans', label: 'Challans', icon: Truck, count: challans.length },
                   { id: 'suppliers', label: 'Suppliers', icon: Building, count: suppliers.length },
-                ],
-              },
-              {
-                label: 'Master Data & Inventory',
-                tabs: [
                   { id: 'fabrics', label: 'Fabrics Master', icon: Layers, count: fabrics.length },
                   { id: 'stocks', label: 'Stocks & Inventory', icon: Boxes, count: stocksData?.summary?.totalRolls },
-                ],
-              },
-              {
-                label: 'Production Monitoring',
-                tabs: [
                   { id: 'rejected', label: 'Rejected Fabric', icon: ShieldAlert, count: qualityCounts?.REJECT },
                   { id: 'rework', label: 'Rework Fabric', icon: RotateCcw, count: qualityCounts?.REWORK },
                   { id: 'hold', label: 'Hold Fabric', icon: PauseCircle, count: qualityCounts?.HOLD },
-                ],
-              },
-              {
-                label: 'System Administration',
-                tabs: [
                   { id: 'deletions', label: 'Deletion History', icon: Trash2, count: undefined },
                   // Sidebar image, department background and login background all live in Appearance.
                   { id: 'login-appearance', label: 'Appearance', icon: Palette, count: undefined },
-                ],
-              },
-            ].map((group) => (
-              <div key={group.label} role="group" aria-label={group.label} className="contents lg:block">
-                <p className="hidden lg:block px-2.5 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-neutral-400">{group.label}</p>
-                <div className="contents lg:flex lg:flex-col lg:gap-0.5">
-                  {group.tabs.map((tab) => {
-                    const Icon = tab.icon;
-                    const active = activeTab === tab.id;
-                    return (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setActiveTab(tab.id as any)}
-                        aria-current={active ? 'page' : undefined}
-                        className={`relative inline-flex lg:flex items-center gap-2.5 h-9 px-3 lg:w-full rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 ${
-                          active
-                            ? 'bg-brand-50 text-brand-800 ring-1 ring-inset ring-brand-100'
-                            : 'bg-white lg:bg-transparent ring-1 ring-inset ring-neutral-200 lg:ring-0 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
-                        }`}
-                      >
-                        {active && <span aria-hidden className="hidden lg:block absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-brand-600" />}
-                        <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-brand-600' : 'text-neutral-400'}`} />
-                        <span>{tab.label}</span>
-                        {tab.count !== undefined && tab.count !== null && (
-                          <span
-                            className={`lg:ml-auto text-[11px] leading-[18px] min-w-[22px] px-1.5 rounded-md tabular-nums text-center font-semibold ${
-                              active ? 'bg-white text-brand-700 ring-1 ring-inset ring-brand-100' : 'bg-neutral-100 text-neutral-500'
-                            }`}
-                          >
-                            {tab.count}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
+                ].map((tab) => {
+                  const Icon = tab.icon;
+                  const active = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id as any)}
+                      aria-current={active ? 'page' : undefined}
+                      className={`relative inline-flex lg:flex items-center gap-2.5 h-9 px-3 lg:w-full rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 ${
+                        active
+                          ? 'bg-brand-50 text-brand-800 ring-1 ring-inset ring-brand-100'
+                          : 'bg-white lg:bg-transparent ring-1 ring-inset ring-neutral-200 lg:ring-0 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
+                      }`}
+                    >
+                      {active && <span aria-hidden className="hidden lg:block absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-brand-600" />}
+                      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-brand-600' : 'text-neutral-400'}`} />
+                      <span>{tab.label}</span>
+                      {tab.count !== undefined && tab.count !== null && (
+                        <span
+                          className={`lg:ml-auto text-[11px] leading-[18px] min-w-[22px] px-1.5 rounded-md tabular-nums text-center font-semibold ${
+                            active ? 'bg-white text-brand-700 ring-1 ring-inset ring-brand-100' : 'bg-neutral-100 text-neutral-500'
+                          }`}
+                        >
+                          {tab.count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-            ))}
+            </div>
+          </div>
+          <div className="shrink-0 lg:mt-3 lg:pt-3 lg:border-t lg:border-neutral-100">
+            <button
+              onClick={handleClearAllFactoryData}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-danger-700 border border-danger-200 bg-white hover:bg-danger-50 transition"
+              title="Wipe all production sheets, challans, and operational data (Factory Reset)"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Wipe All Data</span>
+            </button>
           </div>
         </nav>
 
