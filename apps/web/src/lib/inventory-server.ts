@@ -665,6 +665,11 @@ function startOfFactoryDay() {
   return new Date(d.getTime() - offset);
 }
 
+/** Garment stages, in floor order: pieces from Stitching onward, ending in finished goods Inventory. */
+const GARMENT_STAGES = ['STITCHING', 'FINISHING', 'STEAM_PRESS', 'FINAL_CHECK', 'INVENTORY'];
+const sheetRefOf = (program: { programSerialNo?: string | null; programNumber?: string | null } | null | undefined) =>
+  program?.programSerialNo || program?.programNumber || '—';
+
 const PACKING_ENTRY_TYPES = [LEDGER.SENT_FOR_PACKING, LEDGER.PACKING_STARTED, LEDGER.PACKED, LEDGER.RETURNED_FROM_PACKING];
 
 /**
@@ -819,8 +824,51 @@ export async function adminInventory(request: Request) {
       completedToday.length > 0 && { tone: 'success', key: 'completed', title: `Packing completed today for ${completedToday.length} Production Sheet${completedToday.length === 1 ? '' : 's'}`, detail: names(completedToday) + '.' },
     ].filter(Boolean);
 
+    // Department-wise and design-wise production: garment pieces received at each garment stage (PCS lines only),
+    // and pieces dispatched to a stage but not yet received there.
+    const stageLines = await prisma.departmentWorkItem.findMany({
+      where: { departmentCode: { in: GARMENT_STAGES }, uom: INVENTORY_UNIT },
+      select: { departmentCode: true, status: true, receivedQuantity: true, expectedQuantity: true, receivedAt: true, programId: true, program: { select: PROGRAM_SELECT } },
+    });
+    const emptyStages = () => Object.fromEntries(GARMENT_STAGES.map((d) => [d, { received: 0, awaiting: 0 }])) as Record<string, { received: number; awaiting: number }>;
+    const departments = emptyStages();
+    const designs = new Map<string, any>();
+    for (const l of stageLines) {
+      const awaiting = l.status === 'AWAITING_RECEIPT';
+      const qty = awaiting ? l.expectedQuantity : l.receivedQuantity ?? l.expectedQuantity;
+      const bucket = awaiting ? 'awaiting' : 'received';
+      departments[l.departmentCode][bucket] += qty;
+      const design = l.program?.designNumber || l.program?.wilcomDesignNumber || sheetRefOf(l.program);
+      const row = designs.get(design) || { design, sheets: new Map<string, any>(), stages: emptyStages(), lastActivityAt: null as Date | null };
+      row.sheets.set(l.programId, l.program);
+      row.stages[l.departmentCode][bucket] += qty;
+      if (l.receivedAt && (!row.lastActivityAt || l.receivedAt > row.lastActivityAt)) row.lastActivityAt = l.receivedAt;
+      designs.set(design, row);
+    }
+    const designRows = Array.from(designs.values())
+      .map((r) => {
+        const own = sheetRows.filter((s) => r.sheets.has(s.programId));
+        const received = sum(own.map((s) => s.received));
+        const packed = sum(own.map((s) => s.packed));
+        return {
+          design: r.design,
+          sheets: Array.from(r.sheets.values()),
+          stages: r.stages,
+          received,
+          packed,
+          remaining: sum(own.map((s) => s.remaining)),
+          progress: received > 0 ? Math.round((packed / received) * 1000) / 10 : 0,
+          packingStatus: received > 0 ? packingStatusOf({ received, packed }) : null,
+          lastActivityAt: r.lastActivityAt,
+        };
+      })
+      .sort((a, b) => new Date(b.lastActivityAt || 0).getTime() - new Date(a.lastActivityAt || 0).getTime());
+
     const packingNames = new Map(allocations.map((a) => [a.id, a.packingNumber]));
     return NextResponse.json({
+      stages: GARMENT_STAGES,
+      departments,
+      designs: designRows,
       generatedAt: new Date().toISOString(),
       totals: {
         received: sum(stocks.map((s) => s.received)),

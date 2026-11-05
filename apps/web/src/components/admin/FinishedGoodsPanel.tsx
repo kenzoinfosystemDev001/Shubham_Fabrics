@@ -16,11 +16,13 @@ import {
   Shirt,
   Boxes,
   Layers3,
+  ChevronRight,
 } from 'lucide-react';
 import { EmptyRow, THEAD, fetchJson, fmtDate, sheetRef } from '@/components/workflow/WorkflowUi';
 import { CategorySelect, GarmentImage, Pager, RecordDrawer, ledgerLabel, pcs } from '@/components/inventory/InventoryUi';
 import { ALLOCATION_STATUS_LABEL } from '@/lib/inventory.mjs';
 import { CATEGORY_LABEL } from '@/lib/recutting.mjs';
+import { departmentName } from '@/lib/workflow-views';
 import { printWhenReady } from '@/lib/print-window';
 
 // Admin Console > Inventory: finished garments received from Final QC (always PCS) and how far packing has got,
@@ -155,7 +157,7 @@ async function downloadRecord(record: any) {
   XLSX.writeFile(book, `${record.itemNumber}_${sheetRef(record.program)}.xlsx`.replace(/[\\/:*?"<>|\s]+/g, '_'));
 }
 
-type Tab = 'sheets' | 'goods' | 'today' | 'history';
+type Tab = 'sheets' | 'designs' | 'goods' | 'today' | 'history';
 const EMPTY_FILTERS = { search: '', category: '', packingStatus: '', from: '', to: '', sort: 'received_desc' };
 
 export function FinishedGoodsPanel({ onOpenSheets }: { onOpenSheets?: (count: number) => void }) {
@@ -168,6 +170,7 @@ export function FinishedGoodsPanel({ onOpenSheets }: { onOpenSheets?: (count: nu
   // Production Sheets (filtered in the browser: one row per sheet).
   const [sheetSearch, setSheetSearch] = useState('');
   const [sheetStatus, setSheetStatus] = useState('');
+  const [designSearch, setDesignSearch] = useState('');
 
   // Finished goods records (server pages).
   const [filters, setFilters] = useState(EMPTY_FILTERS);
@@ -284,6 +287,16 @@ export function FinishedGoodsPanel({ onOpenSheets }: { onOpenSheets?: (count: nu
         'Latest packing date': fmtDate(r.latestPackingDate),
       })));
     }
+    if (overview?.designs) {
+      add('Design & Department-wise', overview.designs.map((d: any) => ({
+        Design: d.design,
+        'Production Sheets': d.sheets.map((p: any) => sheetRef(p)).join(', '),
+        ...Object.fromEntries(overview.stages.flatMap((st: string) => [[`${stageName(st)} received (PCS)`, d.stages[st].received], [`${stageName(st)} awaiting (PCS)`, d.stages[st].awaiting]])),
+        'Packed (PCS)': d.packed,
+        'Remaining to pack (PCS)': d.remaining,
+        'Packing %': d.progress,
+      })));
+    }
     add('Finished Goods', (body?.data || []).map((r: any) => ({
       'Production Sheet': sheetRef(r.program),
       Design: r.program?.designNumber || r.program?.wilcomDesignNumber || '',
@@ -310,10 +323,17 @@ export function FinishedGoodsPanel({ onOpenSheets }: { onOpenSheets?: (count: nu
       (!sheetStatus || r.packingStatus === sheetStatus) &&
       (!sq || [r.program?.programSerialNo, r.program?.programNumber, r.program?.designNumber, r.program?.wilcomDesignNumber, r.program?.clientName].some((v) => String(v || '').toLowerCase().includes(sq))),
   );
+  const dq = designSearch.trim().toLowerCase();
+  const designs: any[] = (overview?.designs || []).filter(
+    (d: any) => !dq || [d.design, ...d.sheets.flatMap((p: any) => [p?.programSerialNo, p?.programNumber, p?.clientName])].some((v) => String(v || '').toLowerCase().includes(dq)),
+  );
+  const stages: string[] = overview?.stages || [];
+  const stageName = (code: string) => (code === 'INVENTORY' ? 'Inventory' : departmentName(code).replace(/ Department$/, ''));
   const field = 'h-9 px-2.5 border border-neutral-300 rounded-lg text-xs text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-brand-500 w-full';
   const label = 'block text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1';
   const TABS: Array<{ id: Tab; label: string; count?: number }> = [
     { id: 'sheets', label: 'Production Sheets', count: c?.sheets },
+    { id: 'designs', label: 'Design & Department-wise', count: overview?.designs?.length },
     { id: 'goods', label: 'Finished Goods', count: c?.records },
     { id: 'today', label: "Today's Packing", count: overview?.today?.length },
     { id: 'history', label: 'Packing History' },
@@ -453,6 +473,65 @@ export function FinishedGoodsPanel({ onOpenSheets }: { onOpenSheets?: (count: nu
                       <td className="py-2.5 px-3 text-right">
                         <button type="button" onClick={() => showSheetGarments(r)} className="text-xs font-semibold text-brand-700 hover:underline whitespace-nowrap">View garments</button>
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {/* DESIGN & DEPARTMENT-WISE: garment pieces received at each stage, per design */}
+        {tab === 'designs' && (
+          <>
+            <div className="p-4 border-b border-neutral-100 space-y-3">
+              <div className="flex flex-wrap items-stretch gap-1.5">
+                {stages.map((st, i) => (
+                  <React.Fragment key={st}>
+                    <div className={`flex-1 min-w-[120px] rounded-xl px-3 py-2.5 ring-1 ${st === 'INVENTORY' ? 'bg-brand-50 ring-brand-100' : 'bg-neutral-50 ring-neutral-200'}`}>
+                      <p className="text-[11px] font-semibold text-neutral-600">{stageName(st)}</p>
+                      <p className="text-sm font-semibold text-neutral-900 tabular-nums">{pcs(overview?.departments?.[st]?.received)}</p>
+                      <p className="text-[10px] text-neutral-500 tabular-nums">
+                        {overview?.departments?.[st]?.awaiting ? `${pcs(overview.departments[st].awaiting)} awaiting receipt` : 'received'}
+                      </p>
+                    </div>
+                    {i < stages.length - 1 && <ChevronRight className="hidden md:block w-4 h-4 self-center text-neutral-300 shrink-0" aria-hidden="true" />}
+                  </React.Fragment>
+                ))}
+              </div>
+              <div className="max-w-md">
+                <label className={label} htmlFor="fg-design-search">Search</label>
+                <input id="fg-design-search" value={designSearch} onChange={(e) => setDesignSearch(e.target.value)} placeholder="Design number, Production Sheet or client" className={field} />
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className={THEAD}>
+                  <tr>
+                    <th className="py-3 px-4">Design</th>
+                    {stages.map((st) => <th key={st} className="py-3 px-3 text-right">{stageName(st)}</th>)}
+                    <th className="py-3 px-3 text-right">Packed</th>
+                    <th className="py-3 px-3">Packing Progress</th>
+                    <th className="py-3 px-3">Last Received</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-100">
+                  {overview && designs.length === 0 && <EmptyRow colSpan={stages.length + 4} text="No garments have reached Stitching or later yet" />}
+                  {designs.map((d) => (
+                    <tr key={d.design} className="hover:bg-neutral-50/60 align-top">
+                      <td className="py-2.5 px-4">
+                        <span className="font-semibold text-neutral-900">{d.design}</span>
+                        <span className="block font-mono text-[11px] text-neutral-500">{d.sheets.map((p: any) => sheetRef(p)).join(', ')}</span>
+                      </td>
+                      {stages.map((st) => (
+                        <td key={st} className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
+                          {d.stages[st].received ? pcs(d.stages[st].received) : <span className="text-neutral-300">—</span>}
+                          {d.stages[st].awaiting > 0 && <span className="block text-[10px] text-neutral-500">+{pcs(d.stages[st].awaiting)} awaiting</span>}
+                        </td>
+                      ))}
+                      <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{pcs(d.packed)}</td>
+                      <td className="py-2.5 px-3">{d.packingStatus ? <Progress value={d.progress} /> : <span className="text-neutral-400">Not in Inventory yet</span>}</td>
+                      <td className="py-2.5 px-3 whitespace-nowrap text-neutral-600">{fmtDate(d.lastActivityAt)}</td>
                     </tr>
                   ))}
                 </tbody>
