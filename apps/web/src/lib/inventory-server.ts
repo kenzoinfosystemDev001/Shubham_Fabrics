@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import { apiErrorResponse } from '@/lib/api-errors';
+import { requireUser } from '@/lib/auth/require-user';
 import { PROGRAM_SELECT, TX, USER_SELECT, WORKFLOWS, WorkRequestError, guarded, syncWorkItems, textOf, workflowHandlers } from '@/lib/work-items-server';
 import {
   INVENTORY_UNIT,
@@ -647,6 +648,257 @@ export const transactions = (request: Request) =>
       pageSize,
     });
   }, 'Failed to load inventory transactions.');
+
+// ---------------------------------------------------------------- Admin Console: finished goods overview
+
+/** Packing position of a record or a whole Production Sheet: nothing packed, some packed, all packed. */
+function packingStatusOf(s: { received: number; packed: number }) {
+  if (s.received > 0 && s.packed >= s.received) return 'FULLY_PACKED';
+  return s.packed > 0 ? 'PARTIALLY_PACKED' : 'PENDING_PACKING';
+}
+
+/** Midnight today on the factory's clock (India), whatever the server's time zone. */
+function startOfFactoryDay() {
+  const offset = 330 * 60_000;
+  const d = new Date(Date.now() + offset);
+  d.setUTCHours(0, 0, 0, 0);
+  return new Date(d.getTime() - offset);
+}
+
+/** Garment stages, in floor order: pieces from Stitching onward, ending in finished goods Inventory. */
+const GARMENT_STAGES = ['STITCHING', 'FINISHING', 'STEAM_PRESS', 'FINAL_CHECK', 'INVENTORY'];
+const sheetRefOf = (program: { programSerialNo?: string | null; programNumber?: string | null } | null | undefined) =>
+  program?.programSerialNo || program?.programNumber || '—';
+
+const PACKING_ENTRY_TYPES = [LEDGER.SENT_FOR_PACKING, LEDGER.PACKING_STARTED, LEDGER.PACKED, LEDGER.RETURNED_FROM_PACKING];
+
+/**
+ * GET /api/admin/inventory?view=overview|records|counts — read-only, administrators only. Every figure comes
+ * from the Inventory records (finished garments received from Final QC, in PCS), their packing references and
+ * the inventory ledger; packing itself still goes through the Inventory endpoints above.
+ *   overview: totals, Production Sheet packing progress, alerts and today's packing activity.
+ *   records:  finished garment records (search, category, packingStatus, from, to, sort, page, pageSize).
+ *   counts:   Production Sheets still to be packed (the sidebar badge).
+ */
+export async function adminInventory(request: Request) {
+  const { user, response } = await requireUser(request, { admin: true });
+  if (!user) return response;
+  try {
+    await syncWorkItems(cfg);
+    const p = new URL(request.url).searchParams;
+    const view = p.get('view') || 'overview';
+    const items = await prisma.departmentWorkItem.findMany({
+      where: { ...dept, status: { not: 'AWAITING_RECEIPT' } },
+      include: RECORD_INCLUDE,
+      orderBy: { receivedAt: 'desc' },
+    });
+
+    if (view === 'counts') {
+      const open = new Set(items.filter((i) => stockOf(i).remaining > 0).map((i) => i.programId));
+      return NextResponse.json({ openSheets: open.size });
+    }
+
+    if (view === 'records') {
+      const page = Math.max(1, parseInt(p.get('page') || '1', 10) || 1);
+      const pageSize = Math.min(MAX_ROWS, Math.max(5, parseInt(p.get('pageSize') || '25', 10) || 25));
+      const search = p.get('search')?.trim().toLowerCase();
+      const category = p.get('category')?.toUpperCase();
+      const packing = p.get('packingStatus');
+      const range = dateRange(p);
+      const [imageOf, sizes] = await Promise.all([
+        imagesFor(items.map((i) => i.programId)),
+        prisma.challanItem.findMany({ where: { id: { in: items.map((i) => i.inboundChallanItemId) } }, select: { id: true, size: true } }),
+      ]);
+      const sizeOf = new Map(sizes.map((s) => [s.id, s.size]));
+      let rows = items
+        .filter((i) => !category || i.garmentCategory === category)
+        .filter((i) => !range || (i.receivedAt && (!range.gte || i.receivedAt >= range.gte) && (!range.lte || i.receivedAt <= range.lte)))
+        .filter((i) => {
+          if (!search) return true;
+          const pr = i.program || ({} as any);
+          return [i.itemNumber, i.styleRef, i.colour, i.inboundChallan?.challanNumber, pr.programNumber, pr.programSerialNo, pr.designNumber, pr.wilcomDesignNumber]
+            .some((t) => String(t || '').toLowerCase().includes(search));
+        })
+        .map((i) => {
+          const record = toRecord(i, imageOf);
+          return {
+            ...record,
+            size: sizeOf.get(i.inboundChallanItemId) || null,
+            finalCheckDate: i.inboundChallan?.issuedDate || null,
+            packingStatus: packingStatusOf(record.stock),
+            progress: record.stock.received > 0 ? Math.round((record.stock.packed / record.stock.received) * 1000) / 10 : 0,
+          };
+        });
+      if (packing) rows = rows.filter((r) => r.packingStatus === packing);
+      const time = (d: unknown) => (d ? new Date(d as string).getTime() : 0);
+      const by: Record<string, (a: (typeof rows)[number], b: (typeof rows)[number]) => number> = {
+        received_desc: (a, b) => time(b.receivedAt) - time(a.receivedAt),
+        received_asc: (a, b) => time(a.receivedAt) - time(b.receivedAt),
+        final_check: (a, b) => time(b.finalCheckDate) - time(a.finalCheckDate),
+        sheet: (a, b) => String(a.program?.programSerialNo || a.program?.programNumber || '').localeCompare(String(b.program?.programSerialNo || b.program?.programNumber || ''), undefined, { numeric: true }),
+        design: (a, b) => String(a.program?.designNumber || '').localeCompare(String(b.program?.designNumber || ''), undefined, { numeric: true }),
+        remaining: (a, b) => b.stock.remaining - a.stock.remaining,
+        progress: (a, b) => a.progress - b.progress,
+      };
+      rows.sort(by[p.get('sort') || ''] || by.received_desc);
+      return NextResponse.json({ data: rows.slice((page - 1) * pageSize, page * pageSize), total: rows.length, page, pageSize });
+    }
+
+    const today = startOfFactoryDay();
+    const dayAgo = new Date(Date.now() - 24 * 3600_000);
+    const [allocations, awaiting, pendingChallans, todayEntries, recentReceipts] = await Promise.all([
+      prisma.packingAllocation.findMany({
+        where: { workItem: dept },
+        select: { id: true, packingNumber: true, workItemId: true, quantity: true, packedQuantity: true, returnedQuantity: true, startedAt: true, packingDate: true, completedAt: true, createdAt: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.departmentWorkItem.findMany({ where: { ...dept, status: 'AWAITING_RECEIPT', uom: INVENTORY_UNIT }, select: { expectedQuantity: true } }),
+      prisma.challan.count({ where: { toDepartment: cfg.code, workItemsInbound: { some: { ...dept, status: 'AWAITING_RECEIPT' } } } }),
+      prisma.stockLedgerEntry.findMany({
+        where: { departmentCode: cfg.code, entryType: { in: PACKING_ENTRY_TYPES }, createdAt: { gte: today } },
+        include: { actor: { select: USER_SELECT }, program: { select: PROGRAM_SELECT } },
+        orderBy: { createdAt: 'desc' },
+        take: 200,
+      }),
+      prisma.stockLedgerEntry.findMany({ where: { departmentCode: cfg.code, entryType: LEDGER.RECEIPT, createdAt: { gte: dayAgo } }, select: { quantity: true } }),
+    ]);
+
+    const sum = (list: number[]) => list.reduce((s, q) => s + q, 0);
+    const stocks = items.map((i) => stockOf(i));
+    const allocationsOf = new Map<string, typeof allocations>();
+    for (const a of allocations) allocationsOf.set(a.workItemId, [...(allocationsOf.get(a.workItemId) || []), a]);
+
+    // One row per Production Sheet: everything Inventory received for it, and how far packing has got.
+    const sheets = new Map<string, any>();
+    for (const i of items) {
+      const s = stockOf(i);
+      const row = sheets.get(i.programId) || {
+        programId: i.programId,
+        program: i.program,
+        records: 0, received: 0, packed: 0, available: 0, inPacking: 0, held: 0, remaining: 0,
+        batches: [] as string[], latestPackingDate: null as Date | null, firstReceivedAt: null as Date | null, lastReceivedAt: null as Date | null,
+        lastFinalCheckDate: null as Date | null, completedAt: null as Date | null,
+      };
+      row.records += 1;
+      row.received += s.received;
+      row.packed += s.packed;
+      row.available += s.available;
+      row.inPacking += s.inPacking;
+      row.held += s.held;
+      row.remaining += s.remaining;
+      const later = (a: Date | null, b: Date | null | undefined) => (b && (!a || b > a) ? b : a);
+      const earlier = (a: Date | null, b: Date | null | undefined) => (b && (!a || b < a) ? b : a);
+      row.firstReceivedAt = earlier(row.firstReceivedAt, i.receivedAt);
+      row.lastReceivedAt = later(row.lastReceivedAt, i.receivedAt);
+      row.lastFinalCheckDate = later(row.lastFinalCheckDate, i.inboundChallan?.issuedDate);
+      for (const a of allocationsOf.get(i.id) || []) {
+        row.batches.push(a.packingNumber);
+        row.latestPackingDate = later(row.latestPackingDate, a.packingDate);
+        row.completedAt = later(row.completedAt, a.completedAt);
+      }
+      sheets.set(i.programId, row);
+    }
+    const sheetRows = Array.from(sheets.values())
+      .map((r) => ({
+        ...r,
+        batches: r.batches.sort().reverse(),
+        progress: r.received > 0 ? Math.round((r.packed / r.received) * 1000) / 10 : 0,
+        packingStatus: packingStatusOf(r),
+      }))
+      .sort((a, b) => (a.packingStatus === 'FULLY_PACKED' ? 1 : 0) - (b.packingStatus === 'FULLY_PACKED' ? 1 : 0) || b.remaining - a.remaining);
+
+    const now = Date.now();
+    const pendingSheets = sheetRows.filter((r) => r.packingStatus === 'PENDING_PACKING' && r.remaining > 0);
+    const partialSheets = sheetRows.filter((r) => r.packingStatus === 'PARTIALLY_PACKED');
+    const completedToday = sheetRows.filter((r) => r.packingStatus === 'FULLY_PACKED' && r.completedAt && r.completedAt >= today);
+    const overdue = sheetRows.filter((r) => r.remaining > 0 && r.program?.deliveryDate && new Date(r.program.deliveryDate).getTime() < now);
+    const receivedRecently = sum(recentReceipts.map((e) => e.quantity));
+    const awaitingPcs = sum(awaiting.map((a) => a.expectedQuantity));
+    const names = (list: any[]) => list.slice(0, 5).map((r) => r.program?.programSerialNo || r.program?.programNumber).filter(Boolean).join(', ') + (list.length > 5 ? ` and ${list.length - 5} more` : '');
+    const alerts = [
+      receivedRecently > 0 && { tone: 'info', key: 'received', title: `${receivedRecently.toLocaleString('en-IN')} PCS received from Final QC in the last 24 hours`, detail: `${recentReceipts.length} receipt${recentReceipts.length === 1 ? '' : 's'} posted to finished goods inventory.` },
+      pendingChallans > 0 && { tone: 'info', key: 'awaiting', title: `${pendingChallans} Final QC challan${pendingChallans === 1 ? '' : 's'} waiting to be received`, detail: `${awaitingPcs.toLocaleString('en-IN')} PCS dispatched by Final QC, not yet received in Inventory.` },
+      pendingSheets.length > 0 && { tone: 'warning', key: 'pending', title: `${pendingSheets.length} Production Sheet${pendingSheets.length === 1 ? '' : 's'} not packed yet`, detail: `${sum(pendingSheets.map((r) => r.remaining)).toLocaleString('en-IN')} PCS pending packing: ${names(pendingSheets)}.` },
+      partialSheets.length > 0 && { tone: 'warning', key: 'partial', title: `${partialSheets.length} Production Sheet${partialSheets.length === 1 ? '' : 's'} partially packed`, detail: `${sum(partialSheets.map((r) => r.remaining)).toLocaleString('en-IN')} PCS still to pack: ${names(partialSheets)}.` },
+      overdue.length > 0 && { tone: 'danger', key: 'overdue', title: `${overdue.length} Production Sheet${overdue.length === 1 ? '' : 's'} past delivery date with packing pending`, detail: names(overdue) + '.' },
+      completedToday.length > 0 && { tone: 'success', key: 'completed', title: `Packing completed today for ${completedToday.length} Production Sheet${completedToday.length === 1 ? '' : 's'}`, detail: names(completedToday) + '.' },
+    ].filter(Boolean);
+
+    // Department-wise and design-wise production: garment pieces received at each garment stage (PCS lines only),
+    // and pieces dispatched to a stage but not yet received there.
+    const stageLines = await prisma.departmentWorkItem.findMany({
+      where: { departmentCode: { in: GARMENT_STAGES }, uom: INVENTORY_UNIT },
+      select: { departmentCode: true, status: true, receivedQuantity: true, expectedQuantity: true, receivedAt: true, programId: true, program: { select: PROGRAM_SELECT } },
+    });
+    const emptyStages = () => Object.fromEntries(GARMENT_STAGES.map((d) => [d, { received: 0, awaiting: 0 }])) as Record<string, { received: number; awaiting: number }>;
+    const departments = emptyStages();
+    const designs = new Map<string, any>();
+    for (const l of stageLines) {
+      const awaiting = l.status === 'AWAITING_RECEIPT';
+      const qty = awaiting ? l.expectedQuantity : l.receivedQuantity ?? l.expectedQuantity;
+      const bucket = awaiting ? 'awaiting' : 'received';
+      departments[l.departmentCode][bucket] += qty;
+      const design = l.program?.designNumber || l.program?.wilcomDesignNumber || sheetRefOf(l.program);
+      const row = designs.get(design) || { design, sheets: new Map<string, any>(), stages: emptyStages(), lastActivityAt: null as Date | null };
+      row.sheets.set(l.programId, l.program);
+      row.stages[l.departmentCode][bucket] += qty;
+      if (l.receivedAt && (!row.lastActivityAt || l.receivedAt > row.lastActivityAt)) row.lastActivityAt = l.receivedAt;
+      designs.set(design, row);
+    }
+    const designRows = Array.from(designs.values())
+      .map((r) => {
+        const own = sheetRows.filter((s) => r.sheets.has(s.programId));
+        const received = sum(own.map((s) => s.received));
+        const packed = sum(own.map((s) => s.packed));
+        return {
+          design: r.design,
+          sheets: Array.from(r.sheets.values()),
+          stages: r.stages,
+          received,
+          packed,
+          remaining: sum(own.map((s) => s.remaining)),
+          progress: received > 0 ? Math.round((packed / received) * 1000) / 10 : 0,
+          packingStatus: received > 0 ? packingStatusOf({ received, packed }) : null,
+          lastActivityAt: r.lastActivityAt,
+        };
+      })
+      .sort((a, b) => new Date(b.lastActivityAt || 0).getTime() - new Date(a.lastActivityAt || 0).getTime());
+
+    const packingNames = new Map(allocations.map((a) => [a.id, a.packingNumber]));
+    return NextResponse.json({
+      stages: GARMENT_STAGES,
+      departments,
+      designs: designRows,
+      generatedAt: new Date().toISOString(),
+      totals: {
+        received: sum(stocks.map((s) => s.received)),
+        packed: sum(stocks.map((s) => s.packed)),
+        pendingPacking: sum(stocks.map((s) => s.remaining)),
+        available: sum(stocks.map((s) => s.available)),
+        inPacking: sum(stocks.map((s) => s.inPacking)),
+        held: sum(stocks.map((s) => s.held)),
+        batches: allocations.length,
+        openBatches: allocations.filter((a) => allocationOpen(a) > 0).length,
+        todayPacked: sum(todayEntries.filter((e) => e.entryType === LEDGER.PACKED).map((e) => e.quantity)),
+        todayBatches: allocations.filter((a) => a.createdAt >= today).length,
+        awaitingReceipt: awaitingPcs,
+      },
+      counts: {
+        records: items.length,
+        sheets: sheetRows.length,
+        pendingSheets: pendingSheets.length,
+        partialSheets: partialSheets.length,
+        packedSheets: sheetRows.filter((r) => r.packingStatus === 'FULLY_PACKED').length,
+        pendingChallans,
+      },
+      alerts,
+      sheets: sheetRows,
+      today: todayEntries.map((e) => ({ ...e, reference: e.referenceId ? packingNames.get(e.referenceId) || null : null })),
+    });
+  } catch (error) {
+    return apiErrorResponse(error, 'Failed to load the finished goods inventory.');
+  }
+}
 
 /**
  * POST garment-images (multipart: programId, garmentCategory, styleRef?, file) — upload or replace the

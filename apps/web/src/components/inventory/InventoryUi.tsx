@@ -459,7 +459,7 @@ function ImageUploader({ record, onUploaded }: { record: any; onUploaded: () => 
 }
 
 /** Full details of one record: image, documents, quantities, packing references and transactions. */
-export function RecordDrawer({ id, onClose, onChanged }: { id: string; onClose: () => void; onChanged?: () => void }) {
+export function RecordDrawer({ id, onClose, onChanged, extraActions }: { id: string; onClose: () => void; onChanged?: () => void; extraActions?: (record: any) => React.ReactNode }) {
   const [record, setRecord] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -534,6 +534,7 @@ export function RecordDrawer({ id, onClose, onChanged }: { id: string; onClose: 
                   <HoldSection department="INVENTORY" sourceId={record.id} holdPage="/inventory/hold" onChanged={changed} />
                   <div className="flex flex-wrap items-center gap-2">
                     <DocumentsButton programId={record.programId} challanId={record.inboundChallan?.id} />
+                    {extraActions?.(record)}
                     {s.available > 0 && (
                       <button type="button" onClick={() => setSending(true)} className={BTN_PRIMARY}>
                         <Send className="w-3.5 h-3.5" />

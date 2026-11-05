@@ -128,6 +128,17 @@ const CATEGORY_META: Record<string, {
   },
 };
 
+/** Heading of a substyle added with Add Substyle, until the user renames it. */
+const NEW_SUB_STYLE_NAME = 'SUBSTYLE';
+
+/** Blank and repeated substyle names in one Average section (names key the section's data, so each must be unique). */
+function subStyleNameProblem(subStyles: Array<{ name: string }>): string | null {
+  const names = subStyles.map((sub) => sub.name.trim().toUpperCase());
+  if (names.some((name) => !name)) return 'Enter a name for every substyle';
+  const repeated = names.find((name, idx) => names.indexOf(name) !== idx);
+  return repeated ? `Two substyles are named ${repeated}; give each one its own name` : null;
+}
+
 const COMMON_GARMENT_SUB_STYLES = [
   'FRONT',
   'BACK',
@@ -1069,15 +1080,22 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
     const updatedSubStyles = [...components[cat].subStyles];
     updatedSubStyles[index] = { ...updatedSubStyles[index], name: cleanName };
 
+    // A substyle's name keys its sizes and row selections. While another substyle shares the old name (two new
+    // SUBSTYLE sections) or already has the new one (a name passed through while typing), those keys are theirs:
+    // only this substyle's own data moves, so a rename never takes or drops another substyle's values.
+    const usedByOthers = (name: string) => components[cat].subStyles.some((sub, idx) => idx !== index && sub.name === name);
+    const ownsOld = Boolean(oldName) && !usedByOthers(oldName);
+    const claimsNew = Boolean(cleanName) && !usedByOthers(cleanName);
     const updatedGrid = components[cat].productionGrid.map((row) => {
       const nextSizes = { ...row.sizes };
-      if (oldName && oldName in nextSizes) {
-        nextSizes[cleanName] = nextSizes[oldName];
-        delete nextSizes[oldName];
-      } else if (cleanName) {
-        nextSizes[cleanName] = '';
-      }
-      return { ...row, sizes: nextSizes };
+      const carried = ownsOld && oldName in nextSizes ? nextSizes[oldName] : '';
+      if (ownsOld) delete nextSizes[oldName];
+      if (claimsNew) nextSizes[cleanName] = carried;
+      const rowSubs = Array.isArray(row.subStyles) ? row.subStyles : [];
+      const nextSubs = ownsOld && rowSubs.includes(oldName)
+        ? rowSubs.map((n) => (n === oldName ? cleanName : n)).filter((n, i, all) => n && all.indexOf(n) === i)
+        : rowSubs;
+      return { ...row, sizes: nextSizes, subStyles: nextSubs };
     });
 
     setComponents((prev) => ({
@@ -1090,10 +1108,13 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
     }));
   };
 
+  // Which substyle heading to focus after Add Substyle, so its name can be typed straight away.
+  const [focusSubStyle, setFocusSubStyle] = useState<{ cat: GarmentCategory; index: number } | null>(null);
+
   const handleAddSubStyle = (cat: GarmentCategory) => {
-    const nextNum = components[cat].subStyles.length + 1;
-    const newName = `PART-${nextNum}`;
-    const updatedSubStyles = [...components[cat].subStyles, { name: newName, average: '', rows: [{ part: '', mtr: '' }] }];
+    // Always SUBSTYLE, never a generated number: the user names it (PART, DUPATTA, anything) in the heading.
+    const updatedSubStyles = [...components[cat].subStyles, { name: NEW_SUB_STYLE_NAME, average: '', rows: [{ part: '', mtr: '' }] }];
+    setFocusSubStyle({ cat, index: updatedSubStyles.length - 1 });
 
     setComponents((prev) => ({
       ...prev,
@@ -1111,13 +1132,16 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
     }
     const removedName = components[cat].subStyles[indexToRemove].name;
     const updatedSubStyles = components[cat].subStyles.filter((_, idx) => idx !== indexToRemove);
+    // Another section still named the same (e.g. two unrenamed SUBSTYLE sections) keeps its data.
+    const shared = updatedSubStyles.some((sub) => sub.name === removedName);
 
-    const updatedGrid = components[cat].productionGrid.map((row) => {
+    const updatedGrid = shared ? components[cat].productionGrid : components[cat].productionGrid.map((row) => {
       const nextSizes = { ...row.sizes };
       delete nextSizes[removedName];
       return {
         ...row,
         sizes: nextSizes,
+        subStyles: Array.isArray(row.subStyles) ? row.subStyles.filter((n) => n !== removedName) : row.subStyles,
       };
     });
 
@@ -1469,6 +1493,12 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
       }
 
       const sheetName = cat === 'OTHER' || isCustomCategory(cat) ? components[cat].styleName.trim() : cat;
+      const nameProblem = subStyleNameProblem(components[cat].subStyles);
+      if (nameProblem) {
+        setError(`${nameProblem} in the ${sheetName} Average section.`);
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
       const unitlessSection = components[cat].subStyles.find((sub) =>
         !sub.unit && (sub.rows || []).some((row) => String(row.mtr).trim() !== '')
       );
@@ -2261,6 +2291,8 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
                       <div className="flex flex-wrap items-start gap-3">
                         {comp.subStyles.map((sub, sIdx) => {
                           const subRows = getSubStyleRows(sub);
+                          const cleanName = sub.name.trim().toUpperCase();
+                          const nameInvalid = !cleanName || comp.subStyles.some((other, oIdx) => oIdx !== sIdx && other.name.trim().toUpperCase() === cleanName);
                           return (
                             <div key={sIdx} className="flex-1 min-w-[200px] sm:max-w-[280px] flex flex-col">
                               <div className="flex items-center gap-1 mb-1">
@@ -2269,8 +2301,17 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
                                   value={sub.name}
                                   onChange={(e) => handleSubStyleNameChange(cat, sIdx, e.target.value)}
                                   onFocus={(e) => e.target.select()}
-                                  placeholder=""
-                                  className="font-black text-xs tracking-wider w-full min-w-0 uppercase bg-transparent border-none px-0.5 focus:outline-none focus:bg-brand-50"
+                                  ref={(el) => {
+                                    if (el && focusSubStyle?.cat === cat && focusSubStyle.index === sIdx) {
+                                      el.focus();
+                                      setFocusSubStyle(null);
+                                    }
+                                  }}
+                                  placeholder="SUBSTYLE NAME"
+                                  aria-label="Substyle name"
+                                  aria-invalid={nameInvalid || undefined}
+                                  title={nameInvalid ? (cleanName ? 'Another substyle has this name' : 'Enter a name') : 'Click to rename'}
+                                  className={`font-black text-xs tracking-wider w-full min-w-0 uppercase bg-transparent border-none px-0.5 focus:outline-none focus:bg-brand-50 ${nameInvalid ? 'ring-1 ring-danger-400 text-danger-700 rounded-sm' : ''}`}
                                 />
                                 {comp.subStyles.length > 1 && (
                                   <button
