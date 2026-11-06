@@ -260,20 +260,6 @@ export default function OutwardStockPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <Link
-              href="/fabric-store/my-work/challan-to-dyeing"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-xs transition"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Issue to Dyeing</span>
-            </Link>
-            <Link
-              href="/fabric-store/my-work/challan-to-embroidery"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-xs transition"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Issue to Embroidery</span>
-            </Link>
             <button
               onClick={() => {
                 setFormError('');
