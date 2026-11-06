@@ -90,11 +90,7 @@ function InspectionContent({ flow }: { flow: WorkflowView }) {
 
   return (
     <div className="min-h-screen bg-canvas pb-16">
-      <PageHeader title={flow.inspectionTitle || 'QC Inspection'} loading={loading} onRefresh={load}>
-        <Link href={transferPath(flow, 'PASS')} className={BTN_PRIMARY}>
-          Issue Challan to {flow.next}
-        </Link>
-      </PageHeader>
+      <PageHeader title={flow.inspectionTitle || 'QC Inspection'} loading={loading} onRefresh={load} />
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}

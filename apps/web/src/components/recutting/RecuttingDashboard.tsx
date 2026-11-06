@@ -6,8 +6,6 @@ import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 import { ArrowRight } from 'lucide-react';
 import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 import {
-  BTN_PRIMARY,
-  BTN_SECONDARY,
   DeadlineText,
   EmptyRow,
   FabricStatusBadge,
@@ -77,14 +75,7 @@ export function RecuttingDashboard() {
 
   return (
     <div className="min-h-screen bg-canvas pb-16">
-      <PageHeader title="Recutting" loading={loading} onRefresh={load}>
-        <Link href={`${W}/allocation`} className={BTN_SECONDARY}>
-          Fabric Allocation
-        </Link>
-        <Link href={`${W}/issue-challan`} className={BTN_PRIMARY}>
-          Generate Stitching Challan
-        </Link>
-      </PageHeader>
+      <PageHeader title="Recutting" loading={loading} onRefresh={load} />
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}

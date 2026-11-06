@@ -10,7 +10,6 @@ import {
   Clock,
   AlertCircle,
   ArrowRight,
-  Briefcase,
   ShieldAlert,
   RotateCcw,
   PauseCircle,
@@ -146,13 +145,6 @@ export default function QC1FloorBoard() {
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <Link
-            href="/qc1/my-work"
-            className="flex items-center gap-1.5 px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
-          >
-            <Briefcase className="w-3.5 h-3.5" />
-            <span>My Work</span>
-          </Link>
         </div>
       </header>
 

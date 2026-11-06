@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { userChallanRemarks } from '@/lib/challan-remarks.mjs';
-import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { BTN_PRIMARY, ChallanBarcode, DocumentsButton, EmptyRow, FIELD, FabricStatusBadge, Notice, PageHeader, Panel, THEAD, fetchJson, fmtDate, fmtQty, sheetRef } from '@/components/workflow/WorkflowUi';
+import { ChallanBarcode, DocumentsButton, EmptyRow, FIELD, FabricStatusBadge, Notice, PageHeader, Panel, THEAD, fetchJson, fmtDate, fmtQty, sheetRef } from '@/components/workflow/WorkflowUi';
 import { CategoryBadge } from '@/components/recutting/RecuttingUi';
 import { CATEGORY_LABEL, GARMENT_CATEGORIES } from '@/lib/recutting.mjs';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
@@ -40,11 +39,7 @@ export function RecuttingIssuedChallans() {
 
   return (
     <div className="min-h-screen bg-canvas pb-16">
-      <PageHeader title="Issued Challans" loading={loading} onRefresh={load}>
-        <Link href="/recutting/my-work/issue-challan" className={BTN_PRIMARY}>
-          Generate Stitching Challan
-        </Link>
-      </PageHeader>
+      <PageHeader title="Issued Challans" loading={loading} onRefresh={load} />
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}

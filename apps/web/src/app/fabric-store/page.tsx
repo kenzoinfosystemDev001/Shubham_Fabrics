@@ -101,9 +101,9 @@ export default function FabricStoreDashboard() {
   return (
     <div className="min-h-screen bg-canvas">
       {/* HEADER */}
-      <header className="bg-white/90 backdrop-blur border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <header className="bg-white/90 backdrop-blur border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 flex items-center justify-between gap-3">
         <h1 className="text-xl font-bold text-neutral-900">Fabric Store</h1>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center">
           <button
             onClick={loadData}
             disabled={loading}
@@ -113,20 +113,6 @@ export default function FabricStoreDashboard() {
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <Link
-            href="/fabric-store/my-work/challan-to-dyeing"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
-          >
-            <Send className="w-4 h-4" />
-            <span>Store &rarr; Dyeing</span>
-          </Link>
-          <Link
-            href="/fabric-store/my-work/challan-to-embroidery"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-brand-50 text-brand-800 border border-brand-300 text-xs font-semibold rounded-lg transition"
-          >
-            <Send className="w-4 h-4" />
-            <span>Store &rarr; Embroidery</span>
-          </Link>
         </div>
       </header>
 
