@@ -361,28 +361,6 @@ export default function AdminConsolePage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900 flex flex-col">
-      {/* TOP HEADER */}
-      <header className="bg-white/95 backdrop-blur border-b border-neutral-200/80 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-white p-1 ring-1 ring-neutral-200 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
-              <img src="/shubham-logo.jpg" alt="Shubham Fabrics" className="w-full h-full object-contain" />
-            </div>
-            <p className="min-w-0 text-sm font-semibold text-neutral-900 truncate">Shubham Fabrics India Pvt. Ltd.</p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition shrink-0"
-              title="Sign Out"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Sign Out</span>
-            </button>
-          </div>
-        </div>
-      </header>
 
       {/* NOTIFICATION TOAST */}
       {actionMessage && (
@@ -402,19 +380,33 @@ export default function AdminConsolePage() {
         </div>
       )}
 
-      {/* PAGE HEADING & TABS */}
-      <div className="bg-white border-b border-neutral-200/80">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-5">
-          <h1 className="text-xl sm:text-2xl font-semibold text-neutral-900 tracking-tight text-center">
-            Enterprise Administration &amp; Master Console
+      {/* PAGE HEADING: logo, company name and console title, centered */}
+      <div className="relative bg-white border-b border-neutral-200/80 shadow-xs">
+        <button
+          onClick={handleSignOut}
+          className="absolute top-4 right-4 md:right-8 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition"
+          title="Sign Out"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span className="hidden md:inline">Sign Out</span>
+        </button>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 flex flex-col items-center text-center">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-white p-2 ring-1 ring-neutral-200 shadow-md flex items-center justify-center overflow-hidden">
+            <img src="/shubham-logo.jpg" alt="Shubham Fabrics" className="w-full h-full object-contain" />
+          </div>
+          <h1 className="mt-5 text-2xl sm:text-3xl font-semibold text-neutral-900 tracking-tight">
+            Shubham Fabrics India Pvt. Ltd.
           </h1>
+          <p className="mt-1.5 text-base sm:text-lg text-brand-600">
+            Enterprise Administration &amp; Master Console
+          </p>
         </div>
       </div>
 
       {/* CONTENT AREA: sections listed one below another on the left (a single scrolling row on small screens) */}
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-6 lg:py-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Departments on top, the sections below (scrolling on their own when tall), Wipe All Data pinned at the bottom. */}
-        <nav aria-label="Administration sections" className="lg:w-60 shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] flex flex-col gap-3 lg:gap-0 lg:bg-white lg:rounded-2xl lg:ring-1 lg:ring-neutral-200 lg:shadow-xs lg:p-3">
+        <nav aria-label="Administration sections" className="lg:w-60 shrink-0 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)] flex flex-col gap-3 lg:gap-0 lg:bg-white lg:rounded-2xl lg:ring-1 lg:ring-neutral-200 lg:shadow-xs lg:p-3">
           <div className="flex flex-col gap-3 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
             <AdminDepartmentMenu />
             <div className="-mx-4 px-4 md:mx-0 md:px-0 overflow-x-auto lg:overflow-visible">
