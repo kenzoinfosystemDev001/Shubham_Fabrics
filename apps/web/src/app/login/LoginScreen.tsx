@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { PasswordInput } from '@/components/common/PasswordInput';
 import { checkRouteAccess, getUserStationHome } from '@/lib/rbac';
-import { MES_DEPARTMENTS, isStationUsername } from '@/lib/departments';
+import { MES_DEPARTMENTS, departmentDesignation } from '@/lib/departments';
 import {
   Shield,
   Cpu,
@@ -13,6 +13,7 @@ import {
   Lock,
   ArrowRight,
   User,
+  X,
   Droplet,
   CheckCircle2,
   Scissors,
@@ -28,8 +29,10 @@ type IconType = React.ComponentType<{ className?: string }>;
 interface StationOption {
   id: string;
   name: string;
+  /** The account's real sign-in username, sent on login (never shown). */
   username: string;
-  aliases?: string[];
+  /** What the Station ID field shows once the tile is picked, e.g. "Inventory Incharge". */
+  designation: string;
   icon: IconType;
 }
 
@@ -53,12 +56,12 @@ const DEPARTMENT_ICONS: Record<string, IconType> = {
 };
 
 const STATIONS: StationOption[] = [
-  { id: 'admin', name: 'Admin', username: 'admin', icon: Shield },
+  { id: 'admin', name: 'Admin', username: 'admin', designation: departmentDesignation('ADMIN') || 'System Administrator', icon: Shield },
   ...MES_DEPARTMENTS.map((d) => ({
     id: d.code,
     name: d.shortName,
     username: d.stationId,
-    aliases: d.stationAliases,
+    designation: d.designation,
     icon: DEPARTMENT_ICONS[d.code] || CheckCircle2,
   })),
 ];
@@ -103,13 +106,26 @@ function LoginBackground({ src }: { src: string | null }) {
 
 export function LoginScreen({ backgroundSrc }: { backgroundSrc: string | null }) {
   const router = useRouter();
-  const [username, setUsername] = useState('');
+  // A picked station tile fills the Station ID with its designation (read-only) and signs in with the
+  // station's real username; with no tile picked, any other account's username can be typed.
+  const [station, setStation] = useState<StationOption | null>(null);
+  const [typedUsername, setTypedUsername] = useState('');
   const [pin, setPin] = useState('');
+  const pinRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const selectStation = (stationUsername: string) => {
-    setUsername(stationUsername);
+  const selectStation = (picked: StationOption) => {
+    setStation(picked);
+    setPin('');
+    setError(null);
+    // Straight to the PIN: the username is already filled in.
+    requestAnimationFrame(() => pinRef.current?.querySelector('input')?.focus());
+  };
+
+  const clearStation = () => {
+    setStation(null);
+    setTypedUsername('');
     setPin('');
     setError(null);
   };
@@ -136,7 +152,7 @@ export function LoginScreen({ backgroundSrc }: { backgroundSrc: string | null })
     try {
       await endingSession.current;
       const res = await api.login({
-        usernameOrEmail: username.trim(),
+        usernameOrEmail: (station ? station.username : typedUsername).trim(),
         password: pin.trim(),
       });
 
@@ -158,10 +174,6 @@ export function LoginScreen({ backgroundSrc }: { backgroundSrc: string | null })
       setLoading(false);
     }
   };
-
-  const activeStation = STATIONS.find((s) =>
-    isStationUsername({ stationId: s.username, stationAliases: s.aliases }, username),
-  );
 
   return (
     <div className="relative min-h-[100dvh] w-full flex items-center justify-center px-4 py-4 sm:px-8 sm:py-6 bg-canvas overflow-x-hidden select-none font-sans">
@@ -185,14 +197,14 @@ export function LoginScreen({ backgroundSrc }: { backgroundSrc: string | null })
 
         {/* STATION SELECTOR (glass tiles directly on the background, no panel behind them) */}
         <div role="group" aria-label="Select your station" className="w-full grid grid-cols-2 min-[420px]:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-2.5">
-          {STATIONS.map((station) => {
-            const Icon = station.icon;
-            const isSelected = activeStation?.id === station.id;
+          {STATIONS.map((tile) => {
+            const Icon = tile.icon;
+            const isSelected = station?.id === tile.id;
             return (
               <button
-                key={station.id}
+                key={tile.id}
                 type="button"
-                onClick={() => selectStation(station.username)}
+                onClick={() => selectStation(tile)}
                 aria-pressed={isSelected}
                 className={`relative min-h-[58px] px-2 py-2 rounded-xl border backdrop-blur-md text-center transition-colors duration-200 flex flex-col items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 ${
                   isSelected
@@ -204,7 +216,7 @@ export function LoginScreen({ backgroundSrc }: { backgroundSrc: string | null })
                   <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-accent-400 ring-1 ring-neutral-900/20" aria-hidden="true" />
                 )}
                 <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-brand-700' : 'text-neutral-600'}`} />
-                <span className="text-[11px] sm:text-xs font-semibold leading-tight break-words">{station.name}</span>
+                <span className="text-[11px] sm:text-xs font-semibold leading-tight break-words">{tile.name}</span>
               </button>
             );
           })}
@@ -234,16 +246,32 @@ export function LoginScreen({ backgroundSrc }: { backgroundSrc: string | null })
                   spellCheck={false}
                   data-lpignore="true"
                   data-1p-ignore
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={station ? station.designation : typedUsername}
+                  readOnly={!!station}
+                  aria-readonly={!!station}
+                  onChange={(e) => {
+                    if (!station) setTypedUsername(e.target.value);
+                  }}
                   placeholder="Station ID"
-                  className="w-full pl-10 pr-4 py-3 bg-white/85 backdrop-blur-md border border-white/80 shadow-sm shadow-neutral-900/5 rounded-xl text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500/40 transition"
+                  title={station ? 'Filled in from the selected station' : undefined}
+                  className={`w-full pl-10 ${station ? 'pr-10 font-semibold text-brand-800 cursor-default' : 'pr-4 text-neutral-900'} py-3 bg-white/85 backdrop-blur-md border border-white/80 shadow-sm shadow-neutral-900/5 rounded-xl text-sm placeholder-neutral-400 focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500/40 transition`}
                 />
+                {station && (
+                  <button
+                    type="button"
+                    onClick={clearStation}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
+                    title="Sign in with a different account"
+                    aria-label="Sign in with a different account"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <User className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
               </div>
             </div>
 
-            <div>
+            <div ref={pinRef}>
               <PasswordInput
                 required
                 name="mes-station-pin"
