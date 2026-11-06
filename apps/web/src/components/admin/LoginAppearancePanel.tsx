@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Eye, EyeOff, RefreshCw, RotateCcw, Upload, X } from 'lucide-react';
+import { RefreshCw, Upload, X } from 'lucide-react';
 import {
   DEFAULT_APP_BACKGROUND,
   DEFAULT_LOGIN_BACKGROUND,
@@ -13,7 +13,6 @@ import {
 } from '@/lib/branding';
 import {
   ALLOWED_DEPARTMENT_IMAGE_TYPES,
-  MAX_ALT_TEXT_LENGTH,
   MAX_DEPARTMENT_IMAGE_BYTES,
   sniffDepartmentImageType,
 } from '@/lib/department-images';
@@ -130,7 +129,7 @@ function SidebarPreview({ src, dimmed }: { src: string; dimmed?: boolean }) {
 interface BrandingImagePanelProps {
   api: string;
   title: string;
-  description: string;
+  description?: string;
   noun: string;
   defaultSrc: string;
   srcForVersion: (version: string) => string;
@@ -264,15 +263,6 @@ function BrandingImagePanel({
   const patch = (body: Record<string, unknown>, success: (data: any) => string) =>
     request({ method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, success);
 
-  const restoreDefault = async () => {
-    if (!image) return;
-    if (!window.confirm(`Remove the uploaded ${noun} and restore the default image?`)) return;
-    if (await request({ method: 'DELETE' }, () => `Default ${noun} restored.`)) {
-      setAltText('');
-      clearDraft();
-    }
-  };
-
   const currentSrc = image ? srcForVersion(brandingVersionToken(image.id, image.version)) : defaultSrc;
   const off = !!withEnableSwitch && !enabled;
   const badge = off
@@ -288,7 +278,7 @@ function BrandingImagePanel({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">{title}</h2>
-          <p className="text-xs text-neutral-500">{description}</p>
+          {description && <p className="text-xs text-neutral-500">{description}</p>}
         </div>
         <button
           onClick={load}
@@ -367,17 +357,6 @@ function BrandingImagePanel({
                 }}
                 className="block w-full text-[11px] text-neutral-700 file:mr-2 file:px-2.5 file:py-1.5 file:rounded-lg file:border file:border-neutral-200 file:bg-white file:text-[11px] file:font-semibold file:text-neutral-900 hover:file:bg-neutral-100"
               />
-              <label className="block">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Description (alt text)</span>
-                <input
-                  type="text"
-                  value={altText}
-                  maxLength={MAX_ALT_TEXT_LENGTH}
-                  onChange={(e) => setAltText(e.target.value)}
-                  placeholder="Textile background"
-                  className="mt-1 w-full px-2.5 py-1.5 rounded-lg border border-neutral-200 text-xs text-neutral-900 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-                />
-              </label>
               {fileError && <p className="text-[11px] font-semibold text-danger-700">{fileError}</p>}
               <div className="flex items-center gap-2">
                 <button
@@ -401,30 +380,6 @@ function BrandingImagePanel({
               </div>
             </div>
 
-            {image && (
-              <div className="flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-3">
-                <button
-                  onClick={() =>
-                    patch({ isActive: !image.isActive }, (d) =>
-                      d.image?.isActive ? `Uploaded ${noun} activated.` : `Uploaded ${noun} deactivated (default shown).`,
-                    )
-                  }
-                  disabled={busy}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-700 rounded-lg text-[11px] font-semibold transition disabled:opacity-50"
-                >
-                  {image.isActive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  <span>{image.isActive ? 'Use Default Instead' : 'Use Uploaded Image'}</span>
-                </button>
-                <button
-                  onClick={restoreDefault}
-                  disabled={busy}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white hover:bg-danger-50 hover:text-danger-800 border border-neutral-200 text-neutral-700 rounded-lg text-[11px] font-semibold transition disabled:opacity-50"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Restore Default</span>
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -456,9 +411,6 @@ export function SidebarImagePanel({ onNotify }: { onNotify: Notify }) {
     <BrandingImagePanel
       api="/api/admin/branding/sidebar-image"
       title="Sidebar Background Image"
-      description={`One textile image behind the sidebar of every department; it fills the sidebar from the bottom. JPG, PNG or WebP up to ${
-        MAX_DEPARTMENT_IMAGE_BYTES / (1024 * 1024)
-      } MB; a tall portrait photo around 800 × 1600 works best.`}
       noun="sidebar image"
       defaultSrc={DEFAULT_SIDEBAR_IMAGE}
       srcForVersion={sidebarImageSrc}

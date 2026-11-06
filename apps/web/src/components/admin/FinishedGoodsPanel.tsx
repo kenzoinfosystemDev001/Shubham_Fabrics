@@ -347,10 +347,6 @@ export function FinishedGoodsPanel({ onOpenSheets }: { onOpenSheets?: (count: nu
             <PackageCheck className="w-5 h-5 text-brand-600" />
             Finished Goods Inventory
           </h2>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            Final Check → Inventory → Packing · garments in PCS, live from Inventory transactions
-            {overview && <> · Updated {fmtDate(overview.generatedAt, true)}</>}
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link href="/inventory" className="inline-flex items-center gap-1.5 h-8 px-3 bg-white hover:bg-neutral-50 text-neutral-800 rounded-lg text-xs font-semibold ring-1 ring-neutral-300">
