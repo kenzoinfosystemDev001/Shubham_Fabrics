@@ -27,18 +27,18 @@ const quoteIdent = (name: string) => `"${name.replace(/"/g, '""')}"`;
 export async function deleteUserPermanently(userId: string): Promise<{ movedRecords: number }> {
   return prisma.$transaction(
     async (tx) => {
-      const placeholder = await tx.user.upsert({
-        where: { username: DELETED_USER_USERNAME },
-        update: {},
-        create: {
-          username: DELETED_USER_USERNAME,
-          email: 'deleted-user@subhamfabrics.invalid',
-          fullName: 'Deleted User',
-          passwordHash: NO_PASSWORD,
-          isActive: false,
-        },
-        select: { id: true },
-      });
+      const placeholder =
+        (await tx.user.findFirst({ where: { username: DELETED_USER_USERNAME }, select: { id: true }, orderBy: { createdAt: 'asc' } })) ||
+        (await tx.user.create({
+          data: {
+            username: DELETED_USER_USERNAME,
+            email: 'deleted-user@subhamfabrics.invalid',
+            fullName: 'Deleted User',
+            passwordHash: NO_PASSWORD,
+            isActive: false,
+          },
+          select: { id: true },
+        }));
       if (placeholder.id === userId) throw new Error('The Deleted User account cannot be removed.');
 
       await tx.userRole.deleteMany({ where: { userId } });

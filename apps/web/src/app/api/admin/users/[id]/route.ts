@@ -3,6 +3,7 @@ import { prisma } from '@shubham/database';
 import bcrypt from 'bcryptjs';
 import { requireUser } from '@/lib/auth/require-user';
 import { validatePin } from '@/lib/auth/pin';
+import { findPinConflict, isUsernameUniqueError, USERNAME_MIGRATION_MESSAGE } from '@/lib/auth/account-resolution';
 import { DELETED_USER_USERNAME, deleteUserPermanently } from '@/lib/auth/delete-user';
 
 export const dynamic = 'force-dynamic';
@@ -68,7 +69,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    const existing = await prisma.user.findUnique({ where: { id }, select: { id: true, username: true } });
+    const existing = await prisma.user.findUnique({ where: { id }, select: { id: true, username: true, departmentCode: true } });
     if (!existing) {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 });
     }
@@ -99,12 +100,42 @@ export async function PATCH(
       dataToUpdate.fullName = fullName;
     }
     if (departmentCode) dataToUpdate.departmentCode = departmentCode;
+
+    // Username can be changed (and may be shared with other incharges); "admin" stays the administrator's.
+    if (body.username !== undefined) {
+      const username = String(body.username).trim().toLowerCase();
+      if (!username) {
+        return NextResponse.json({ error: 'Username cannot be empty.' }, { status: 400 });
+      }
+      if (username !== existing.username) {
+        if (existing.username === 'admin') {
+          return NextResponse.json({ error: 'The "admin" account username cannot be changed.' }, { status: 400 });
+        }
+        if (username === DELETED_USER_USERNAME || username === 'admin') {
+          return NextResponse.json({ error: `The username "${username}" is reserved.` }, { status: 400 });
+        }
+        dataToUpdate.username = username;
+      }
+    }
     if (body.isActive !== undefined) dataToUpdate.isActive = Boolean(body.isActive);
 
     if (body.pin) {
       const pinError = validatePin(body.pin);
       if (pinError) {
         return NextResponse.json({ error: pinError }, { status: 400 });
+      }
+      // Another account reachable by the same login must not already use this PIN, or sign-in could not
+      // tell them apart. Only this account's own record is changed.
+      const conflict = await findPinConflict(body.pin.trim(), {
+        username: dataToUpdate.username ?? existing.username,
+        departmentCode: dataToUpdate.departmentCode ?? existing.departmentCode,
+        excludeUserId: id,
+      });
+      if (conflict) {
+        return NextResponse.json(
+          { error: `"${conflict.fullName}" (${conflict.username}) already uses this PIN on the same login. Choose a different PIN.` },
+          { status: 400 }
+        );
       }
       dataToUpdate.passwordHash = await bcrypt.hash(body.pin.trim(), 10);
     }
@@ -121,6 +152,9 @@ export async function PATCH(
       user: updated,
     });
   } catch (error: any) {
+    if (isUsernameUniqueError(error)) {
+      return NextResponse.json({ error: USERNAME_MIGRATION_MESSAGE }, { status: 409 });
+    }
     console.error('Error updating user:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to update user' },

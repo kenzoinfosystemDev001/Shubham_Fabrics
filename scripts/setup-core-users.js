@@ -3,6 +3,15 @@ const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
+// Usernames are not unique (several incharges may share one), so "upsert" means: update the oldest account
+// with that username, or create it when there is none.
+async function upsertUser({ where, update, create }) {
+  const existing = await prisma.user.findFirst({ where, orderBy: { createdAt: 'asc' } });
+  return existing
+    ? prisma.user.update({ where: { id: existing.id }, data: update })
+    : prisma.user.create({ data: create });
+}
+
 async function setup() {
   console.log('--- Setting up core MES users (Admin, Programming, Fabric Store) ---');
   // PIN for users this script creates. Existing users keep their current PIN.
@@ -30,7 +39,7 @@ async function setup() {
   });
 
   // 2. Admin User
-  const adminUser = await prisma.user.upsert({
+  const adminUser = await upsertUser({
     where: { username: 'admin' },
     update: { departmentCode: 'ADMIN', fullName: 'System Administrator' },
     create: {
@@ -44,7 +53,7 @@ async function setup() {
   console.log('✓ Admin user ready: admin');
 
   // 3. Programming User
-  const progUser = await prisma.user.upsert({
+  const progUser = await upsertUser({
     where: { username: 'program' },
     update: { departmentCode: 'PROGRAMMING', fullName: 'Programming Incharge' },
     create: {
@@ -58,7 +67,7 @@ async function setup() {
   console.log('✓ Programming user ready: program');
 
   // 4. Fabric Store User
-  const storeUser = await prisma.user.upsert({
+  const storeUser = await upsertUser({
     where: { username: 'store' },
     update: { departmentCode: 'STORE', fullName: 'Fabric Store Incharge' },
     create: {
@@ -89,7 +98,7 @@ async function setup() {
 
   // washingqc is the Washing QC account; "qc3" and "qcwashing" are older sign-in names for it (lib/departments.ts).
   const existingQc3 =
-    (await prisma.user.findUnique({ where: { username: 'washingqc' } })) || (await prisma.user.findUnique({ where: { username: 'qc3' } }));
+    (await prisma.user.findFirst({ where: { username: 'washingqc' } })) || (await prisma.user.findFirst({ where: { username: 'qc3' } }));
   const qc3User = existingQc3
     ? await prisma.user.update({
         where: { id: existingQc3.id },
@@ -120,7 +129,7 @@ async function setup() {
   });
 
 
-  const recuttingUser = await prisma.user.upsert({
+  const recuttingUser = await upsertUser({
     where: { username: 'recutting' },
     update: { departmentCode: 'RECUTTING', fullName: 'Recutting Incharge' },
     create: {
@@ -135,7 +144,7 @@ async function setup() {
 
   // 7. Stitching Department & User
 
-  const stitchingUser = await prisma.user.upsert({
+  const stitchingUser = await upsertUser({
     where: { username: 'stitching' },
     update: { departmentCode: 'STITCHING', fullName: 'Stitching Incharge' },
     create: {
@@ -150,7 +159,7 @@ async function setup() {
 
   // 8. Finishing Department & User
 
-  const finishingUser = await prisma.user.upsert({
+  const finishingUser = await upsertUser({
     where: { username: 'finishing' },
     update: { departmentCode: 'FINISHING', fullName: 'Finishing Incharge' },
     create: {
@@ -190,7 +199,7 @@ async function setup() {
 
   // 10. Steam Press Department & User
 
-  const steamPressUser = await prisma.user.upsert({
+  const steamPressUser = await upsertUser({
     where: { username: 'steampress' },
     update: { departmentCode: 'STEAM_PRESS', fullName: 'Steam Press Incharge' },
     create: {
@@ -207,7 +216,7 @@ async function setup() {
 
   // finalqc is the Final QC account; "finalcheck" is its older sign-in name.
   const existingFinalCheck =
-    (await prisma.user.findUnique({ where: { username: 'finalqc' } })) || (await prisma.user.findUnique({ where: { username: 'finalcheck' } }));
+    (await prisma.user.findFirst({ where: { username: 'finalqc' } })) || (await prisma.user.findFirst({ where: { username: 'finalcheck' } }));
   const finalCheckUser = existingFinalCheck
     ? await prisma.user.update({
         where: { id: existingFinalCheck.id },
@@ -234,7 +243,7 @@ async function setup() {
 
 
   const existingInventoryUser =
-    (await prisma.user.findUnique({ where: { username: 'inventory' } })) || (await prisma.user.findUnique({ where: { username: 'packing' } }));
+    (await prisma.user.findFirst({ where: { username: 'inventory' } })) || (await prisma.user.findFirst({ where: { username: 'packing' } }));
   const inventoryUser = existingInventoryUser
     ? await prisma.user.update({
         where: { id: existingInventoryUser.id },

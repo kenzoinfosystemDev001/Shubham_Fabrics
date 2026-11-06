@@ -17,7 +17,8 @@ datasource db {
 
 model User {
   id             String     @id @default(uuid())
-  username       String     @unique
+  // Not unique: several incharges may share a department login; the PIN tells them apart (see auth/login).
+  username       String
   email          String     @unique
   fullName       String
   passwordHash   String
