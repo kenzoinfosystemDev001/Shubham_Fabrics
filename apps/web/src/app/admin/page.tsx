@@ -37,6 +37,7 @@ import { QualityMonitorPanel, type MonitorKind } from '@/components/admin/Qualit
 import { FabricStorePanel } from '@/components/admin/FabricStorePanel';
 import { FinishedGoodsPanel } from '@/components/admin/FinishedGoodsPanel';
 import { departmentName } from '@/lib/workflow-views';
+import { departmentDesignation } from '@/lib/departments';
 import { printProductionSheet } from '@/lib/download-production-sheet';
 import { PasswordInput } from '@/components/common/PasswordInput';
 
@@ -497,7 +498,7 @@ export default function AdminConsolePage() {
               const q = userSearch.trim().toLowerCase();
               const shownUsers = q
                 ? users.filter((u) =>
-                    [u.username, u.fullName, u.departmentCode ? departmentName(u.departmentCode) : '']
+                    [u.username, u.fullName, u.departmentCode ? departmentName(u.departmentCode) : '', departmentDesignation(u.departmentCode)]
                       .some((text) => String(text || '').toLowerCase().includes(q))
                   )
                 : users;
@@ -568,7 +569,7 @@ export default function AdminConsolePage() {
                               </span>
                               <div className="min-w-0">
                                 <p className="font-medium text-neutral-900 truncate">{u.fullName}</p>
-                                <p className="text-xs font-mono text-neutral-500 truncate">{u.username}</p>
+                                <p className="text-xs text-neutral-500 truncate">{departmentDesignation(u.departmentCode) ?? '—'}</p>
                               </div>
                             </div>
                           </td>
@@ -1008,7 +1009,11 @@ export default function AdminConsolePage() {
               <KeyRound className="w-5 h-5 text-brand-600" />
               Edit User
             </h3>
-            <p className="text-xs text-neutral-500 mb-4 font-mono">{editingUser.username}</p>
+            <p className="text-xs text-neutral-500 mb-4">
+              {departmentDesignation(editingUser.departmentCode) ?? 'No designation'}
+              <span className="text-neutral-400"> · Login </span>
+              <span className="font-mono">{editingUser.username}</span>
+            </p>
 
             <form onSubmit={handleUpdateUser} className="space-y-3.5">
               <div>

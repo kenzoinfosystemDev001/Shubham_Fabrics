@@ -62,15 +62,15 @@ export function AdminDepartmentMenu() {
         type="button"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className="w-full flex items-center gap-2.5 h-9 px-3 rounded-lg text-[13px] font-semibold text-neutral-800 hover:bg-neutral-50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
+        className="w-full flex items-center gap-2.5 h-10 px-3 rounded-lg text-[13px] font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1"
         title="Open any department's workspace"
       >
-        <Building2 className="w-4 h-4 shrink-0 text-brand-600" />
+        <Building2 className="w-4 h-4 shrink-0 text-white" />
         <span>Departments</span>
-        <span className="ml-auto text-[11px] leading-[18px] min-w-[22px] px-1.5 rounded-md tabular-nums text-center font-semibold bg-brand-50 text-brand-700 ring-1 ring-inset ring-brand-100">
+        <span className="ml-auto text-[11px] leading-[18px] min-w-[22px] px-1.5 rounded-md tabular-nums text-center font-semibold bg-white text-brand-700">
           {departments.length}
         </span>
-        <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-3.5 h-3.5 text-white/80 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
