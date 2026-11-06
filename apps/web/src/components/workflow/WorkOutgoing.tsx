@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { userChallanRemarks } from '@/lib/challan-remarks.mjs';
-import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { CategoryBadge } from '@/components/recutting/RecuttingUi';
 import {
-  BTN_PRIMARY,
   ChallanBarcode,
   DocumentsButton,
   EmptyRow,
@@ -22,7 +20,7 @@ import {
   fmtQty,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
-import { transferPath, type WorkflowView } from '@/lib/workflow-views';
+import { type WorkflowView } from '@/lib/workflow-views';
 import { FinishedGarmentList, GarmentThumb, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { groupGarments, imageFor } from '@/lib/finished-garments.mjs';
 
@@ -60,11 +58,7 @@ export function WorkOutgoing({ flow }: { flow: WorkflowView }) {
 
   return (
     <div className="min-h-screen bg-canvas pb-16">
-      <PageHeader title="Outgoing Challans" loading={loading} onRefresh={load}>
-        <Link href={transferPath(flow, 'PASS')} className={BTN_PRIMARY}>
-          Issue Challan to {flow.next}
-        </Link>
-      </PageHeader>
+      <PageHeader title="Outgoing Challans" loading={loading} onRefresh={load} />
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}

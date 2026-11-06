@@ -6,8 +6,6 @@ import { DeleteRecordButton } from '@/components/common/DeleteRecordDialog';
 import { ArrowRight } from 'lucide-react';
 import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 import {
-  BTN_PRIMARY,
-  BTN_SECONDARY,
   DeadlineText,
   EmptyRow,
   FabricStatusBadge,
@@ -128,14 +126,7 @@ export function WorkDashboard({ flow }: { flow: WorkflowView }) {
 
   return (
     <div className="min-h-screen bg-canvas pb-16">
-      <PageHeader title={flow.label} loading={loading} onRefresh={load}>
-        <Link href={`${work}/incoming`} className={BTN_SECONDARY}>
-          Incoming Challans
-        </Link>
-        <Link href={`${work}/issue-challan`} className={BTN_PRIMARY}>
-          Issue Challan to {flow.next}
-        </Link>
-      </PageHeader>
+      <PageHeader title={flow.label} loading={loading} onRefresh={load} />
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}

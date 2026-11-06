@@ -9,7 +9,6 @@ import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 import {
   BTN_PRIMARY,
   BTN_QUIET,
-  BTN_SECONDARY,
   DeadlineText,
   DocumentsButton,
   EmptyRow,
@@ -103,10 +102,7 @@ export function InventoryDashboard() {
 
   return (
     <div className="min-h-screen bg-canvas pb-16">
-      <PageHeader title="Inventory" loading={loading} onRefresh={load}>
-        <Link href="/inventory/received" className={BTN_SECONDARY}>Receive Finished Garments</Link>
-        <Link href="/inventory/packing" className={BTN_PRIMARY}>Packing Management</Link>
-      </PageHeader>
+      <PageHeader title="Inventory" loading={loading} onRefresh={load} />
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
         <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-9 gap-3">

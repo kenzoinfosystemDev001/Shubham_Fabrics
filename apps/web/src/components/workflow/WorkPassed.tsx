@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Search } from 'lucide-react';
 import {
-  BTN_PRIMARY,
   DeadlineText,
   EmptyRow,
   FIELD,
@@ -58,11 +57,7 @@ export function WorkPassed({ flow }: { flow: WorkflowView }) {
 
   return (
     <div className="min-h-screen bg-canvas pb-16">
-      <PageHeader title="Passed Items" loading={loading} onRefresh={load}>
-        <Link href={transferPath(flow, 'PASS')} className={BTN_PRIMARY}>
-          Issue Challan to {flow.next}
-        </Link>
-      </PageHeader>
+      <PageHeader title="Passed Items" loading={loading} onRefresh={load} />
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}

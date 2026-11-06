@@ -107,11 +107,7 @@ function AllocationContent() {
 
   return (
     <div className="min-h-screen bg-canvas pb-16">
-      <PageHeader title="Fabric Allocation & Recutting" loading={loading} onRefresh={load}>
-        <Link href="/recutting/my-work/issue-challan" className={BTN_PRIMARY}>
-          Generate Stitching Challan
-        </Link>
-      </PageHeader>
+      <PageHeader title="Fabric Allocation & Recutting" loading={loading} onRefresh={load} />
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
