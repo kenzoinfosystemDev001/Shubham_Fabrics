@@ -446,10 +446,6 @@ ${data ? `<h2>Department-wise analysis</h2><table><thead><tr><th>Department</th>
             <meta.icon className="w-5 h-5 text-brand-600" />
             {meta.title} Monitoring
           </h2>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            Factory-wide, live from QC decisions, defect records and HOLD records · MTR and PCS are never added together
-            {data && <> · Updated {dateTime(data.generatedAt)}</>}
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <select value={reportBy} onChange={(e) => setReportBy(e.target.value as GroupBy)} className="h-8 px-2 border border-neutral-300 rounded-lg text-xs bg-white" aria-label="Report grouping for PDF and print">
