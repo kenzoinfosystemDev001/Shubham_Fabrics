@@ -5,8 +5,6 @@ import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
-  FilePlus, 
-  Send, 
   Clock, 
   CheckCircle2, 
   AlertCircle, 
@@ -159,9 +157,9 @@ export default function ProgrammingDashboardPage() {
   return (
     <div className="min-h-screen bg-neutral-50 pl-0 md:pl-64">
       {/* HEADER */}
-      <header className="bg-white/90 backdrop-blur border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <header className="bg-white/90 backdrop-blur border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 flex items-center justify-between gap-3">
         <h1 className="text-xl font-bold text-neutral-900">Programming</h1>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center">
           <button
             onClick={loadData}
             disabled={loading}
@@ -171,20 +169,6 @@ export default function ProgrammingDashboardPage() {
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <Link
-            href="/my-work/issue-challan"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-brand-50 text-brand-800 border border-brand-300 text-xs font-semibold rounded-lg transition"
-          >
-            <Send className="w-4 h-4" />
-            <span>Issue Challan</span>
-          </Link>
-          <Link
-            href="/my-work/create-production-sheet"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
-          >
-            <FilePlus className="w-4 h-4" />
-            <span>Create Production Sheet</span>
-          </Link>
         </div>
       </header>
 
