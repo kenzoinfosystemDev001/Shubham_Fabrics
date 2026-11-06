@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@shubham/database';
-import bcrypt from 'bcryptjs';
 import { buildSessionUser } from '@/lib/auth/session-user';
 import { setSessionCookies } from '@/lib/auth/require-user';
 import { AuthConfigError, signSessionToken } from '@/lib/auth/session-token';
-import { MES_DEPARTMENTS, isStationUsername } from '@/lib/departments';
+import { resolveLogin } from '@/lib/auth/account-resolution';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,48 +21,25 @@ export async function POST(request: Request) {
       );
     }
 
-    const include = { userRoles: { include: { role: true } } } as const;
-    let user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { username: { equals: usernameOrEmail, mode: 'insensitive' } },
-          { email: { equals: usernameOrEmail, mode: 'insensitive' } },
-        ],
-      },
-      include,
-    });
-    // A station's other sign-in names (e.g. "inventory" and the earlier "packing") reach the same account,
-    // and so does its displayed designation (e.g. "Inventory Incharge"). The account's username is unchanged.
-    if (!user && usernameOrEmail === 'system administrator') {
-      user = await prisma.user.findFirst({ where: { username: { equals: 'admin', mode: 'insensitive' } }, include });
-    }
-    const station = user
-      ? null
-      : MES_DEPARTMENTS.find(
-          (d) => isStationUsername(d, usernameOrEmail) || d.designation.toLowerCase() === usernameOrEmail,
-        );
-    if (station) {
-      const names = [station.stationId, ...(station.stationAliases || [])].filter((n) => n !== usernameOrEmail);
-      user = await prisma.user.findFirst({
-        where: { OR: names.map((n) => ({ username: { equals: n, mode: 'insensitive' as const } })) },
-        include,
-      });
-    }
-
-    const isPasswordValid = user?.passwordHash
-      ? await bcrypt.compare(password, user.passwordHash).catch(() => false)
-      : false;
-
-    if (!user || !isPasswordValid) {
+    // The login name (username, station ID, older alias or designation such as "Inventory Incharge") is
+    // resolved to every account it can mean; the PIN then picks exactly one. See account-resolution.ts.
+    const result = await resolveLogin(usernameOrEmail, password);
+    if (result.kind === 'invalid') {
       return NextResponse.json({ message: INVALID_CREDENTIALS }, { status: 401 });
     }
-
-    if (!user.isActive) {
+    if (result.kind === 'inactive') {
       return NextResponse.json(
         { message: 'This user account has been deactivated. Please contact an Administrator.' },
         { status: 403 }
       );
     }
+    if (result.kind === 'ambiguous') {
+      return NextResponse.json(
+        { message: 'Two accounts share this username and PIN. Ask the Administrator to give each a different PIN.' },
+        { status: 409 }
+      );
+    }
+    const user = result.user;
 
     const sessionUser = buildSessionUser(user);
     const token = await signSessionToken({

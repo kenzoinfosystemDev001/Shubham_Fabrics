@@ -212,7 +212,8 @@ export default function AdminConsolePage() {
     if (!editingUser) return;
     try {
       setSubmittingModal(true);
-      const { id, username, pin, ...changes } = editingUser;
+      const { id, pin, ...changes } = editingUser;
+      const username = changes.username.trim();
       const res = await fetch(`/api/admin/users/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -1018,8 +1019,6 @@ export default function AdminConsolePage() {
             </h3>
             <p className="text-xs text-neutral-500 mb-4">
               {departmentDesignation(editingUser.departmentCode) ?? 'No designation'}
-              <span className="text-neutral-400"> · Login </span>
-              <span className="font-mono">{editingUser.username}</span>
             </p>
 
             <form onSubmit={handleUpdateUser} className="space-y-3.5">
@@ -1032,6 +1031,23 @@ export default function AdminConsolePage() {
                   onChange={(e) => setEditingUser({ ...editingUser, fullName: e.target.value })}
                   className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1">Username *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingUser.username}
+                  readOnly={editingUser.username === 'admin'}
+                  onChange={(e) => setEditingUser({ ...editingUser, username: e.target.value })}
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none read-only:bg-neutral-50 read-only:text-neutral-500"
+                />
+                <p className="mt-1 text-[11px] text-neutral-500">
+                  Used to sign in. Several incharges may share one username; each needs a different PIN.
+                </p>
               </div>
 
               <div>
