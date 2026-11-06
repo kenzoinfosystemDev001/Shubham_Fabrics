@@ -387,14 +387,12 @@ function BrandingImagePanel({
   );
 }
 
-const SIZE_NOTE = `JPG, PNG or WebP up to ${MAX_DEPARTMENT_IMAGE_BYTES / (1024 * 1024)} MB; a landscape photo around 1920 × 1080 works best.`;
 
 export function AppBackgroundPanel({ onNotify }: { onNotify: Notify }) {
   return (
     <BrandingImagePanel
       api="/api/admin/branding/app-background"
       title="Department Background"
-      description={`One background behind the content of every department page. ${SIZE_NOTE}`}
       noun="department background"
       defaultSrc={DEFAULT_APP_BACKGROUND}
       srcForVersion={appBackgroundSrc}
@@ -425,7 +423,6 @@ export function LoginAppearancePanel({ onNotify }: { onNotify: Notify }) {
     <BrandingImagePanel
       api="/api/admin/branding/login-background"
       title="Login Page Background"
-      description={`Full-page background behind the sign-in screen. ${SIZE_NOTE}`}
       noun="login background"
       defaultSrc={DEFAULT_LOGIN_BACKGROUND}
       srcForVersion={loginBackgroundSrc}
