@@ -33,8 +33,16 @@ export async function POST(request: Request) {
       },
       include,
     });
-    // A station's other sign-in names (e.g. "inventory" and the earlier "packing") reach the same account.
-    const station = user ? null : MES_DEPARTMENTS.find((d) => isStationUsername(d, usernameOrEmail));
+    // A station's other sign-in names (e.g. "inventory" and the earlier "packing") reach the same account,
+    // and so does its displayed designation (e.g. "Inventory Incharge"). The account's username is unchanged.
+    if (!user && usernameOrEmail === 'system administrator') {
+      user = await prisma.user.findFirst({ where: { username: { equals: 'admin', mode: 'insensitive' } }, include });
+    }
+    const station = user
+      ? null
+      : MES_DEPARTMENTS.find(
+          (d) => isStationUsername(d, usernameOrEmail) || d.designation.toLowerCase() === usernameOrEmail,
+        );
     if (station) {
       const names = [station.stationId, ...(station.stationAliases || [])].filter((n) => n !== usernameOrEmail);
       user = await prisma.user.findFirst({

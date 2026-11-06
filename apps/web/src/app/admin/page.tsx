@@ -381,28 +381,35 @@ export default function AdminConsolePage() {
         </div>
       )}
 
-      {/* PAGE HEADING: logo, company name and console title, centered */}
-      <div className="relative bg-white border-b border-neutral-200/80 shadow-xs">
-        <button
-          onClick={handleSignOut}
-          className="absolute top-4 right-4 md:right-8 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition"
-          title="Sign Out"
-        >
-          <LogOut className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">Sign Out</span>
-        </button>
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 flex flex-col items-center text-center">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-white p-2 ring-1 ring-neutral-200 shadow-md flex items-center justify-center overflow-hidden">
-            <img src="/shubham-logo.jpg" alt="Shubham Fabrics" className="w-full h-full object-contain" />
+      {/* PAGE HEADING: compact bar; logo, company name and console title centered, Sign Out on the right */}
+      <header className="bg-white border-b border-neutral-200/80 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-2.5 grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_1fr] items-center gap-3">
+          <div className="hidden sm:block" aria-hidden="true" />
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white p-1 ring-1 ring-neutral-200 shadow-xs flex items-center justify-center overflow-hidden shrink-0">
+              <img src="/shubham-logo.jpg" alt="Shubham Fabrics" className="w-full h-full object-contain" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-lg font-semibold text-neutral-900 tracking-tight leading-tight truncate">
+                Shubham Fabrics India Pvt. Ltd.
+              </h1>
+              <p className="text-[11px] sm:text-xs text-brand-600 leading-tight truncate">
+                Enterprise Administration &amp; Master Console
+              </p>
+            </div>
           </div>
-          <h1 className="mt-5 text-2xl sm:text-3xl font-semibold text-neutral-900 tracking-tight">
-            Shubham Fabrics India Pvt. Ltd.
-          </h1>
-          <p className="mt-1.5 text-base sm:text-lg text-brand-600">
-            Enterprise Administration &amp; Master Console
-          </p>
+          <div className="flex justify-end">
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition shrink-0"
+              title="Sign Out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Sign Out</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* CONTENT AREA: sections listed one below another on the left (a single scrolling row on small screens) */}
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-6 lg:py-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
