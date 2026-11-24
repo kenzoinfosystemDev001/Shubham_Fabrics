@@ -7,7 +7,7 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/api/**/*': [
       './src/generated/client/**/*',
-      '../../packages/database/src/generated/client/**/*',
+      '../packages/database/src/generated/client/**/*',
       './node_modules/@shubham/database/**/*',
     ],
   },

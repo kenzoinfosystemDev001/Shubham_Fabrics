@@ -67,10 +67,9 @@ Every Challan preserves:
 
 ```
 Subham_Fabrics/
-├── apps/
-│   ├── api/                 # NestJS REST & WebSocket Gateway (Port 3001)
-│   ├── web/                 # Next.js Operational Web Portal (Port 3000)
-│   └── worker/              # Background Reconciliation Worker
+├── backend/                 # NestJS REST & WebSocket Gateway (Port 3001)
+├── frontend/                # Next.js Operational Web Portal (Port 3000)
+├── worker/                  # Background Reconciliation Worker
 ├── packages/
 │   ├── database/            # Prisma Schema (SQLite dev / PostgreSQL prod)
 │   ├── types/               # Pure TypeScript domain contracts
