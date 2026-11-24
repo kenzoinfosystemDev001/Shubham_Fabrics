@@ -7,7 +7,7 @@ services:
     plan: free
     rootDir: .
     buildCommand: "npm install && npm run build:render"
-    startCommand: node apps/api/dist/main.js
+    startCommand: node backend/dist/main.js
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV

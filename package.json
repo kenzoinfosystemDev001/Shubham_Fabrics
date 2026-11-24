@@ -4,14 +4,16 @@
   "private": true,
   "description": "Production-grade Garment Manufacturing Execution System (MES)",
   "workspaces": [
-    "apps/*",
+    "backend",
+    "frontend",
+    "worker",
     "packages/*"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
-    "build:ordered": "npm run build --workspace=packages/types && npm run build --workspace=packages/config && npm run build --workspace=packages/validation && npm run build --workspace=packages/database && npm run build --workspace=apps/api",
+    "build:ordered": "npm run build --workspace=packages/types && npm run build --workspace=packages/config && npm run build --workspace=packages/validation && npm run build --workspace=packages/database && npm run build --workspace=backend",
     "build:render": "npx prisma generate --schema=packages/database/prisma/schema.prisma && npm run build:ordered",
-    "start:api": "node apps/api/dist/main.js",
+    "start:api": "node backend/dist/main.js",
     "dev:api": "npm run dev --workspace=@shubham/api",
     "dev:web": "npm run dev --workspace=@shubham/web",
     "dev:worker": "npm run dev --workspace=@shubham/worker",
