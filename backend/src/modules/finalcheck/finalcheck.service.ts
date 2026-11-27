@@ -18,15 +18,6 @@ export class FinalCheckService {
     };
   }
 
-  private async getFinalCheckUser() {
-    return this.prisma.user.findFirst({
-      where: {
-        OR: [{ username: 'finalqc' }, { username: 'finalcheck' }, { departmentCode: DepartmentCode.FINAL_CHECK }],
-      },
-      select: { id: true, username: true, departmentCode: true },
-    });
-  }
-
   async getDashboardSummary() {
     const [awaitingReceiptCount, inQueueCount, readyForHandoverCount] = await Promise.all([
       this.prisma.challan.count({
@@ -143,7 +134,7 @@ export class FinalCheckService {
     });
   }
 
-  async receiveChallan(id: string, body: { receivedQuantity?: number }) {
+  async receiveChallan(id: string, body: { receivedQuantity?: number }, actor: { id: string }) {
     const challan = await this.prisma.challan.findUnique({
       where: { id },
       include: { items: true },
@@ -180,7 +171,7 @@ export class FinalCheckService {
         fromStatus: challan.status,
         toStatus: 'RECEIVED',
         action: 'RECEIVED_BY_FINAL_QC',
-        actorId: (await this.getFinalCheckUser())?.id || 'system',
+        actorId: actor.id,
         notes: `Final QC received ${requestedQty} units against challan ${challan.challanNumber}.`,
       },
     });
@@ -193,7 +184,7 @@ export class FinalCheckService {
     });
   }
 
-  async inspectJob(id: string, payload: Record<string, any>) {
+  async inspectJob(id: string, payload: Record<string, any>, actor: { id: string }) {
     const challan = await this.prisma.challan.findUnique({ where: { id } });
     if (!challan) {
       throw new NotFoundException(`Job '${id}' not found`);
@@ -229,7 +220,7 @@ export class FinalCheckService {
         fromStatus: challan.status,
         toStatus: nextStatus,
         action: 'FINAL_QC_INSPECTION',
-        actorId: (await this.getFinalCheckUser())?.id || 'system',
+        actorId: actor.id,
         notes: `Final QC inspection reconciled: accepted=${acceptedQuantity}, rework=${reworkQuantity}, rejected=${rejectedQuantity}, pending=${pendingQuantity}.`,
       },
     });
@@ -245,7 +236,7 @@ export class FinalCheckService {
     });
   }
 
-  async holdJob(id: string, body: { reason?: string }) {
+  async holdJob(id: string, body: { reason?: string }, actor: { id: string }) {
     const challan = await this.prisma.challan.findUnique({ where: { id } });
     if (!challan) {
       throw new NotFoundException(`Job '${id}' not found`);
@@ -266,7 +257,7 @@ export class FinalCheckService {
         fromStatus: challan.status,
         toStatus: 'ON_HOLD',
         action: 'FINAL_QC_HOLD',
-        actorId: (await this.getFinalCheckUser())?.id || 'system',
+        actorId: actor.id,
         reason: body?.reason || 'Supervisor hold',
       },
     });
@@ -278,7 +269,7 @@ export class FinalCheckService {
     });
   }
 
-  async issueChallan(payload: any) {
+  async issueChallan(payload: any, actor: { id: string }) {
     if (!payload || typeof payload !== 'object') {
       throw new BadRequestException('Request body is required');
     }
@@ -300,7 +291,6 @@ export class FinalCheckService {
       throw new NotFoundException(`Parent challan '${payload.parentChallanId}' not found`);
     }
 
-    const user = await this.getFinalCheckUser();
     const totalQty = payload.items.reduce((sum: number, item: any) => sum + Number(item.quantity || 0), 0);
     const challanNumber = `CH-FQC-${String(Date.now()).slice(-6)}`;
 
@@ -315,8 +305,8 @@ export class FinalCheckService {
         status: 'ISSUED',
         priority: payload.priority || 'NORMAL',
         issuedDate: new Date(),
-        createdById: user?.id || 'system',
-        issuedById: user?.id || 'system',
+        createdById: actor.id,
+        issuedById: actor.id,
         fabricIn: totalQty,
         fabricOut: totalQty,
         remarks: payload.remarks || `Final QC issued goods to ${payload.toDepartment || 'PACKING'}`,

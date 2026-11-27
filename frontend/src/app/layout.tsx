@@ -7,6 +7,7 @@ import { Navigation } from '@/components/Navigation';
 import { AppBackground } from '@/components/AppBackground';
 import { ThemeProvider } from '@/components/ThemeContext';
 import { DepartmentGuard } from '@/components/DepartmentGuard';
+import { AssistantLauncher } from '@/components/assistant/AssistantLauncher';
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -60,6 +61,7 @@ export default function RootLayout({
               {children}
             </main>
           </DepartmentGuard>
+          <AssistantLauncher />
         </ThemeProvider>
       </body>
     </html>
